@@ -18,6 +18,7 @@ work_dir="work"
 out_dir="out"
 sfs_mode="sfs"
 sfs_comp="xz"
+sfs_opts=""
 gpg_key=
 
 # Show an INFO message
@@ -95,6 +96,8 @@ _usage ()
     echo "                     Default: ${sfs_mode}"
     echo "    -c <comp_type>   Set SquashFS compression type (gzip, lzma, lzo, xz, zstd)"
     echo "                     Default: '${sfs_comp}'"
+    echo "    -t <sfs_opts>    Set additional SquashFS options"
+    echo "                     Default: ''"
     echo "    -v               Enable verbose output"
     echo "    -h               This message"
     echo " commands:"
@@ -223,9 +226,9 @@ _mkairootfs_img () {
     mkdir -p "${work_dir}/iso/${install_dir}/${arch}"
     _msg_info "Creating SquashFS image, this may take some time..."
     if [[ "${quiet}" = "y" ]]; then
-        mksquashfs "${work_dir}/airootfs.img" "${work_dir}/iso/${install_dir}/${arch}/airootfs.sfs" -noappend -comp "${sfs_comp}" -no-progress &> /dev/null
+        mksquashfs "${work_dir}/airootfs.img" "${work_dir}/iso/${install_dir}/${arch}/airootfs.sfs" -noappend -comp "${sfs_comp}" ${sfs_opts} -no-progress &> /dev/null
     else
-        mksquashfs "${work_dir}/airootfs.img" "${work_dir}/iso/${install_dir}/${arch}/airootfs.sfs" -noappend -comp "${sfs_comp}" -no-progress
+        mksquashfs "${work_dir}/airootfs.img" "${work_dir}/iso/${install_dir}/${arch}/airootfs.sfs" -noappend -comp "${sfs_comp}" ${sfs_opts} -no-progress
     fi
     _msg_info "Done!"
     rm ${work_dir}/airootfs.img
@@ -240,9 +243,9 @@ _mkairootfs_sfs () {
     mkdir -p "${work_dir}/iso/${install_dir}/${arch}"
     _msg_info "Creating SquashFS image, this may take some time..."
     if [[ "${quiet}" = "y" ]]; then
-        mksquashfs "${work_dir}/airootfs" "${work_dir}/iso/${install_dir}/${arch}/airootfs.sfs" -noappend -comp "${sfs_comp}" -no-progress &> /dev/null
+        mksquashfs "${work_dir}/airootfs" "${work_dir}/iso/${install_dir}/${arch}/airootfs.sfs" -noappend -comp "${sfs_comp}" ${sfs_opts} -no-progress &> /dev/null
     else
-        mksquashfs "${work_dir}/airootfs" "${work_dir}/iso/${install_dir}/${arch}/airootfs.sfs" -noappend -comp "${sfs_comp}" -no-progress
+        mksquashfs "${work_dir}/airootfs" "${work_dir}/iso/${install_dir}/${arch}/airootfs.sfs" -noappend -comp "${sfs_comp}" ${sfs_opts} -no-progress
     fi
     _msg_info "Done!"
 }
@@ -369,7 +372,7 @@ fi
 
 umask 0022
 
-while getopts 'p:r:C:L:P:A:D:w:o:s:c:g:vh' arg; do
+while getopts 'p:r:C:L:P:A:D:w:o:s:c:t:g:vh' arg; do
     case "${arg}" in
         p) pkg_list="${pkg_list} ${OPTARG}" ;;
         r) run_cmd="${OPTARG}" ;;
@@ -382,6 +385,7 @@ while getopts 'p:r:C:L:P:A:D:w:o:s:c:g:vh' arg; do
         o) out_dir="${OPTARG}" ;;
         s) sfs_mode="${OPTARG}" ;;
         c) sfs_comp="${OPTARG}" ;;
+        t) sfs_opts="${OPTARG}" ;;
         g) gpg_key="${OPTARG}" ;;
         v) quiet="n" ;;
         h|?) _usage 0 ;;
