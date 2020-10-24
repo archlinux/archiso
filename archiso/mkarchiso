@@ -200,13 +200,30 @@ _mkairootfs_squashfs() {
     install -d -m 0755 -- "${isofs_dir}/${install_dir}/${arch}"
     _msg_info "Creating SquashFS image, this may take some time..."
     _run_mksquashfs "${airootfs_dir}"
+}
+
+# Makes an EROFS file system from a source directory.
+_mkairootfs_erofs() {
+    local fsuuid
+    [[ -e "${airootfs_dir}" ]] || _msg_error "The path '${airootfs_dir}' does not exist" 1
+
+    install -d -m 0755 -- "${isofs_dir}/${install_dir}/${arch}"
+    local image_path="${isofs_dir}/${install_dir}/${arch}/airootfs.erofs"
+    # Generate reproducible file system UUID from SOURCE_DATE_EPOCH
+    fsuuid="$(uuidgen --sha1 --namespace 93a870ff-8565-4cf3-a67b-f47299271a96 --name "${SOURCE_DATE_EPOCH}")"
+    _msg_info "Creating EROFS image, this may take some time..."
+    mkfs.erofs -U "${fsuuid}" "${airootfs_image_tool_options[@]}" -- "${image_path}" "${airootfs_dir}"
     _msg_info "Done!"
 }
 
 _mkchecksum() {
     _msg_info "Creating checksum file for self-test..."
     cd -- "${isofs_dir}/${install_dir}/${arch}"
-    sha512sum airootfs.sfs > airootfs.sha512
+    if [[ -e "${isofs_dir}/${install_dir}/${arch}/airootfs.sfs" ]]; then
+        sha512sum airootfs.sfs > airootfs.sha512
+    elif [[ -e "${isofs_dir}/${install_dir}/${arch}/airootfs.erofs" ]]; then
+        sha512sum airootfs.erofs > airootfs.sha512
+    fi
     cd -- "${OLDPWD}"
     _msg_info "Done!"
 }
@@ -214,7 +231,11 @@ _mkchecksum() {
 _mksignature() {
     _msg_info "Signing SquashFS image..."
     cd -- "${isofs_dir}/${install_dir}/${arch}"
-    gpg --detach-sign --default-key "${gpg_key}" airootfs.sfs
+    if [[ -e "${isofs_dir}/${install_dir}/${arch}/airootfs.sfs" ]]; then
+        gpg --detach-sign --default-key "${gpg_key}" airootfs.sfs
+    elif [[ -e "${isofs_dir}/${install_dir}/${arch}/airootfs.erofs" ]]; then
+        gpg --detach-sign --default-key "${gpg_key}" airootfs.erofs
+    fi
     cd -- "${OLDPWD}"
     _msg_info "Done!"
 }
@@ -632,6 +653,13 @@ _validate_requirements_airootfs_image_type_ext4+squashfs() {
         _msg_error "Validating '${airootfs_image_type}': mkfs.ext4 and/or tune2fs is not available on this host. Install 'e2fsprogs'!" 0
     fi
     _validate_requirements_airootfs_image_type_squashfs
+}
+
+_validate_requirements_airootfs_image_type_erofs() {
+    if ! command -v mkfs.erofs; then
+        (( validation_error=validation_error+1 ))
+        _msg_error "Validating '${airootfs_image_type}': mkfs.erofs is not available on this host. Install 'erofs-utils'!" 0
+    fi
 }
 
 # SYSLINUX El Torito

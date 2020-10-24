@@ -81,12 +81,36 @@ _mnt_sfs() {
     _mnt_dev "${sfs_dev}" "${mnt}" "-r" "defaults"
 }
 
+# args: /path/to/image_file, mountpoint
+_mnt_erofs() {
+    local img="${1}"
+    local mnt="${2}"
+    local img_fullname="${img##*/}"
+    local erofs_dev
+
+    # shellcheck disable=SC2154
+    # defined via initcpio's parse_cmdline()
+    if [ "${copytoram}" = "y" ]; then
+        msg -n ":: Copying EROFS image to RAM..."
+        if ! cp -- "${img}" "/run/archiso/copytoram/${img_fullname}" ; then
+            echo "ERROR: while copy '${img}' to '/run/archiso/copytoram/${img_fullname}'"
+            launch_interactive_shell
+        fi
+        img="/run/archiso/copytoram/${img_fullname}"
+        msg "done."
+    fi
+    erofs_dev="$(losetup --find --show --read-only -- "${img}")"
+    echo "${erofs_dev}" >> /run/archiso/used_block_devices
+    _mnt_dev "${erofs_dev}" "${mnt}" "-r" "defaults" "erofs"
+}
+
 # args: device, mountpoint, flags, opts
 _mnt_dev() {
     local dev="${1}"
     local mnt="${2}"
     local flg="${3}"
     local opts="${4}"
+    local fstype="${5:-auto}"
 
     mkdir -p "${mnt}"
 
@@ -99,7 +123,7 @@ _mnt_dev() {
         launch_interactive_shell
     done
 
-    if mount -o "${opts}" "${flg}" "${dev}" "${mnt}"; then
+    if mount -t "${fstype}" -o "${opts}" "${flg}" "${dev}" "${mnt}"; then
         msg ":: Device '${dev}' mounted successfully."
     else
         echo "ERROR; Failed to mount '${dev}'"
@@ -120,8 +144,9 @@ _verify_checksum() {
 
 _verify_signature() {
     local _status
+    local sigfile="${1}"
     cd "/run/archiso/bootmnt/${archisobasedir}/${arch}" || exit 1
-    gpg --homedir /gpg --status-fd 1 --verify airootfs.sfs.sig 2>/dev/null | grep -qE '^\[GNUPG:\] GOODSIG'
+    gpg --homedir /gpg --status-fd 1 --verify "${sigfile}" 2>/dev/null | grep -qE '^\[GNUPG:\] GOODSIG'
     _status=$?
     cd -- "${OLDPWD}" || exit 1
     return ${_status}
@@ -160,6 +185,7 @@ run_hook() {
 # args: /path/to/newroot
 archiso_mount_handler() {
     local newroot="${1}"
+    local sigfile
 
     if ! mountpoint -q "/run/archiso/bootmnt"; then
         _mnt_dev "${archisodevice}" "/run/archiso/bootmnt" "-r" "defaults"
@@ -190,15 +216,20 @@ archiso_mount_handler() {
     # defined via initcpio's parse_cmdline()
     if [ "${verify}" = "y" ]; then
         if [ -f "/run/archiso/bootmnt/${archisobasedir}/${arch}/airootfs.sfs.sig" ]; then
+            sigfile="airootfs.sfs.sig"
+        elif [ -f "/run/archiso/bootmnt/${archisobasedir}/${arch}/airootfs.erofs.sig" ]; then
+            sigfile="airootfs.erofs.sig"
+        fi
+        if [ -n "${sigfile}" ]; then
             msg -n ":: Signature verification requested, please wait..."
-            if _verify_signature; then
+            if _verify_signature "${sigfile}"; then
                 msg "done. Signature is OK, continue booting."
             else
                 echo "ERROR: one or more files are corrupted"
                 launch_interactive_shell
             fi
         else
-            echo "ERROR: verify=y option specified but ${archisobasedir}/${arch}/airootfs.sfs.sig not found"
+            echo "ERROR: verify=y option specified but GPG signature not found in ${archisobasedir}/${arch}/"
             launch_interactive_shell
         fi
     fi
@@ -221,7 +252,11 @@ archiso_mount_handler() {
     mkdir -p "/run/archiso/cowspace/${cow_directory}"
     chmod 0700 "/run/archiso/cowspace/${cow_directory}"
 
-    _mnt_sfs "/run/archiso/bootmnt/${archisobasedir}/${arch}/airootfs.sfs" "/run/archiso/airootfs"
+    if [ -f "/run/archiso/bootmnt/${archisobasedir}/${arch}/airootfs.sfs" ]; then
+        _mnt_sfs "/run/archiso/bootmnt/${archisobasedir}/${arch}/airootfs.sfs" "/run/archiso/airootfs"
+    elif [ -f "/run/archiso/bootmnt/${archisobasedir}/${arch}/airootfs.erofs" ]; then
+        _mnt_erofs "/run/archiso/bootmnt/${archisobasedir}/${arch}/airootfs.erofs" "/run/archiso/airootfs"
+    fi
     if [ -f "/run/archiso/airootfs/airootfs.img" ]; then
         _mnt_dmsnapshot "/run/archiso/airootfs/airootfs.img" "${newroot}" "/"
     else
