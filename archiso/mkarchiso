@@ -242,17 +242,14 @@ _make_pacman_conf() {
     fi
 
     _msg_info "Copying custom pacman.conf to work directory..."
-    # take the profile pacman.conf and strip all settings that would break in chroot when using pacman -r
-    # see `man 8 pacman` for further info
-    pacman-conf --config "${pacman_conf}" | \
-        sed '/CacheDir/d;/DBPath/d;/HookDir/d;/LogFile/d;/RootDir/d' > "${work_dir}/pacman.conf"
-
     _msg_info "Using pacman CacheDir: ${_cache_dirs}"
+    # take the profile pacman.conf and strip all settings that would break in chroot when using pacman -r
     # append CacheDir and HookDir to [options] section
     # HookDir is *always* set to the airootfs' override directory
-    sed "/\[options\]/a CacheDir = ${_cache_dirs}
-        /\[options\]/a HookDir = ${airootfs_dir}/etc/pacman.d/hooks/" \
-        -i "${work_dir}/pacman.conf"
+    # see `man 8 pacman` for further info
+    pacman-conf --config "${pacman_conf}" | \
+        sed "/CacheDir/d;/DBPath/d;/HookDir/d;/LogFile/d;/RootDir/d;/\[options\]/a CacheDir = ${_cache_dirs}
+        /\[options\]/a HookDir = ${airootfs_dir}/etc/pacman.d/hooks/" > "${work_dir}/pacman.conf"
 }
 
 # Prepare working directory and copy custom airootfs files (airootfs)
