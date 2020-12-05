@@ -9,34 +9,28 @@ umask 0022
 export LANG="C"
 export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-"$(date +%s)"}"
 
-# mkarchiso defaults
+# Set application name from the script's file name
 app_name="${0##*/}"
-pkg_list=()
-quiet="y"
-work_dir="work"
-out_dir="out"
-img_name="${app_name}.iso"
-gpg_key=""
-override_gpg_key=""
 
-# profile defaults
-profile=""
-iso_name="${app_name}"
-iso_label="${app_name^^}"
-override_iso_label=""
-iso_publisher="${app_name}"
-override_iso_publisher=""
-iso_application="${app_name} iso"
-override_iso_application=""
+# Define global variables. All of them will be overwritten later
+pkg_list=()
+quiet=""
+work_dir=""
+out_dir=""
+img_name=""
+gpg_key=""
+iso_name=""
+iso_label=""
+iso_publisher=""
+iso_application=""
 iso_version=""
-install_dir="${app_name}"
-override_install_dir=""
-arch="$(uname -m)"
-pacman_conf="/etc/pacman.conf"
-override_pacman_conf=""
+install_dir=""
+arch=""
+pacman_conf=""
+packages=""
 bootmodes=()
-airootfs_image_type="squashfs"
-airootfs_image_tool_options=('-comp' 'xz')
+airootfs_image_type=""
+airootfs_image_tool_options=()
 declare -A file_permissions=()
 
 
@@ -103,7 +97,8 @@ usage: ${app_name} [options] <profile_dir>
      -h               This message
      -o <out_dir>     Set the output directory
                       Default: '${out_dir}'
-     -p PACKAGE(S)    Package(s) to install, can be used multiple times
+     -p PACKAGE(S)    Package(s) to install.
+                      Multiple packages are provided as quoted, space delimited list.
      -v               Enable verbose output
      -w <work_dir>    Set the working directory
                       Default: '${work_dir}'
@@ -160,6 +155,11 @@ _cleanup_airootfs() {
 }
 
 _run_mksquashfs() {
+    # Set default mksquashfs options
+    if (( ${#airootfs_image_tool_options[@]} < 1 )); then
+        airootfs_image_tool_options=('-comp' 'xz')
+    fi
+
     local image_path="${isofs_dir}/${install_dir}/${arch}/airootfs.sfs"
     if [[ "${quiet}" == "y" ]]; then
         mksquashfs "$@" "${image_path}" -noappend "${airootfs_image_tool_options[@]}" -no-progress > /dev/null
@@ -266,7 +266,7 @@ _make_custom_airootfs() {
         for filename in "${!file_permissions[@]}"; do
             IFS=':' read -ra permissions <<< "${file_permissions["${filename}"]}"
             # Prevent file path traversal outside of $airootfs_dir
-            if [[ "$(realpath -q -- "${airootfs_dir}${filename}")" != "$(realpath -q -- "${airootfs_dir}")"* ]]; then
+            if [[ "$(realpath -q -- "${airootfs_dir}${filename}")" != "${airootfs_dir}"* ]]; then
                 _msg_error "Failed to set permissions on '${airootfs_dir}${filename}'. Outside of valid path." 1
             # Warn if the file does not exist
             elif [[ ! -e "${airootfs_dir}${filename}" ]]; then
@@ -749,10 +749,6 @@ _build_iso() {
 
 # Read profile's values from profiledef.sh
 _read_profile() {
-    local validation_error=0
-    local bootmode
-
-    _msg_info "Reading profile..."
     if [[ -z "${profile}" ]]; then
         _msg_error "No profile specified!" 1
     fi
@@ -767,71 +763,123 @@ _read_profile() {
         # shellcheck source=configs/releng/profiledef.sh
         . "${profile}/profiledef.sh"
 
-        # Resolve paths
-        packages="$(realpath -- "${profile}/packages.${arch}")"
+        # Resolve paths of files that are expected to reside in the profile's directory
+        [[ -n "$packages" ]] || packages="${profile}/packages.${arch}"
+        packages="$(realpath -- "${packages}")"
         pacman_conf="$(realpath -- "${pacman_conf}")"
 
         cd -- "${OLDPWD}"
+    fi
+}
 
-        # Validate profile
-        # Check if the package list file exists and read packages from it
-        if [[ -e "${packages}" ]]; then
-            mapfile -t pkg_list < <(sed '/^[[:blank:]]*#.*/d;s/#.*//;/^[[:blank:]]*$/d' "${packages}")
-            if (( ${#pkg_list} < 1 )); then
-                (( validation_error=validation_error+1 ))
-                _msg_error "No package specified in '${packages}'." 0
+# Validate set options
+_validate_options() {
+    local validation_error=0 bootmode
+    local pkg_list_from_file=()
+    _msg_info "Validating options..."
+    # Check if the package list file exists and read packages from it
+    if [[ -e "${packages}" ]]; then
+        mapfile -t pkg_list_from_file < <(sed '/^[[:blank:]]*#.*/d;s/#.*//;/^[[:blank:]]*$/d' "${packages}")
+        pkg_list+=("${pkg_list_from_file[@]}")
+        if (( ${#pkg_list_from_file} < 1 )); then
+            (( validation_error=validation_error+1 ))
+            _msg_error "No package specified in '${packages}'." 0
+        fi
+    else
+        (( validation_error=validation_error+1 ))
+        _msg_error "File '${packages}' does not exist." 0
+
+    fi
+
+    # Check if pacman configuration file exists
+    if [[ ! -e "${pacman_conf}" ]]; then
+        (( validation_error=validation_error+1 ))
+        _msg_error "File '${pacman_conf}' does not exist." 0
+    fi
+    # Check if the specified bootmodes are supported
+    for bootmode in "${bootmodes[@]}"; do
+        if typeset -f "_make_bootmode_${bootmode}" &> /dev/null; then
+            if typeset -f "_validate_requirements_bootmode_${bootmode}" &> /dev/null; then
+                "_validate_requirements_bootmode_${bootmode}"
+            else
+                _msg_warning "Function '_validate_requirements_bootmode_${bootmode}' does not exist. Validating the requirements of '${bootmode}' boot mode will not be possible."
             fi
         else
             (( validation_error=validation_error+1 ))
-            _msg_error "File '${packages}' does not exist." 0
+            _msg_error "${bootmode} is not a valid boot mode!" 0
         fi
-        # Check if pacman configuration file exists
-        if [[ ! -e "${pacman_conf}" ]]; then
-            (( validation_error=validation_error+1 ))
-            _msg_error "File '${pacman_conf}' does not exist." 0
-        fi
-        # Check if the specified bootmodes are supported
-        for bootmode in "${bootmodes[@]}"; do
-            if typeset -f "_make_bootmode_${bootmode}" &> /dev/null; then
-                if typeset -f "_validate_requirements_bootmode_${bootmode}" &> /dev/null; then
-                    "_validate_requirements_bootmode_${bootmode}"
-                else
-                    _msg_warning "Function '_validate_requirements_bootmode_${bootmode}' does not exist. Validating the requirements of '${bootmode}' boot mode will not be possible."
-                fi
-            else
-                (( validation_error=validation_error+1 ))
-                _msg_error "${bootmode} is not a valid boot mode!" 0
-            fi
-        done
-        # Check if the specified airootfs_image_type is supported
-        if typeset -f "_mkairootfs_${airootfs_image_type}" &> /dev/null; then
-            if typeset -f "_validate_requirements_airootfs_image_type_${airootfs_image_type}" &> /dev/null; then
-                "_validate_requirements_airootfs_image_type_${airootfs_image_type}"
-            else
-                _msg_warning "Function '_validate_requirements_airootfs_image_type_${airootfs_image_type}' does not exist. Validating the requirements of '${airootfs_image_type}' airootfs image type will not be possible."
-            fi
+    done
+    # Check if the specified airootfs_image_type is supported
+    if typeset -f "_mkairootfs_${airootfs_image_type}" &> /dev/null; then
+        if typeset -f "_validate_requirements_airootfs_image_type_${airootfs_image_type}" &> /dev/null; then
+            "_validate_requirements_airootfs_image_type_${airootfs_image_type}"
         else
-            (( validation_error=validation_error+1 ))
-            _msg_error "Unsupported image type: '${airootfs_image_type}'" 0
+            _msg_warning "Function '_validate_requirements_airootfs_image_type_${airootfs_image_type}' does not exist. Validating the requirements of '${airootfs_image_type}' airootfs image type will not be possible."
         fi
-        if (( validation_error )); then
-            _msg_error "${validation_error} errors were encountered while validating the profile. Aborting." 1
-        fi
+    else
+        (( validation_error=validation_error+1 ))
+        _msg_error "Unsupported image type: '${airootfs_image_type}'" 0
+    fi
+    if (( validation_error )); then
+        _msg_error "${validation_error} errors were encountered while validating the profile. Aborting." 1
     fi
     _msg_info "Done!"
 }
 
-# set overrides from mkarchiso option parameters, if present
+# Set defaults and, if present, overrides from mkarchiso command line option parameters
 _set_overrides() {
-    _msg_info "Setting overrides..."
-    [[ -n "$override_iso_label" ]] && iso_label="$override_iso_label"
-    [[ -n "$override_iso_publisher" ]] && iso_publisher="$override_iso_publisher"
-    [[ -n "$override_iso_application" ]] && iso_application="$override_iso_application"
-    [[ -n "$override_install_dir" ]] && install_dir="$override_install_dir"
-    [[ -n "$override_pacman_conf" ]] && pacman_conf="$override_pacman_conf"
-    [[ -n "$override_gpg_key" ]] && gpg_key="$override_gpg_key"
-    # NOTE: the call to _msg_info() conveniently guards this function from evaluating to false
-    _msg_info "Done!"
+    # Set variables that have command line overrides
+    if [[ -v override_work_dir ]]; then
+        work_dir="$override_work_dir"
+    elif [[ -z "$work_dir" ]]; then
+        work_dir='./work'
+    fi
+    work_dir="$(realpath -- "$work_dir")"
+    if [[ -v override_out_dir ]]; then
+        out_dir="$override_out_dir"
+    elif [[ -z "$out_dir" ]]; then
+        out_dir='./out'
+    fi
+    out_dir="$(realpath -- "$out_dir")"
+    if [[ -v override_pacman_conf ]]; then
+        pacman_conf="$override_pacman_conf"
+    elif [[ -z "$pacman_conf" ]]; then
+        pacman_conf="/etc/pacman.conf"
+    fi
+    pacman_conf="$(realpath -- "$pacman_conf")"
+    [[ ! -v override_pkg_list ]] || pkg_list+=("${override_pkg_list[@]}")
+    if [[ -v override_iso_label ]]; then
+        iso_label="$override_iso_label"
+    elif [[ -z "$iso_label" ]]; then
+        iso_label="${app_name^^}"
+    fi
+    if [[ -v override_iso_publisher ]]; then
+        iso_publisher="$override_iso_publisher"
+    elif [[ -z "$iso_publisher" ]]; then
+        iso_publisher="${app_name}"
+    fi
+    if [[ -v override_iso_application ]]; then
+        iso_application="$override_iso_application"
+    elif [[ -z "$iso_application" ]]; then
+        iso_application="${app_name} iso"
+    fi
+    if [[ -v override_install_dir ]]; then
+        install_dir="$override_install_dir"
+    elif [[ -z "$install_dir" ]]; then
+        install_dir="${app_name}"
+    fi
+    [[ ! -v override_gpg_key ]] || gpg_key="$override_gpg_key"
+    if [[ -v override_quiet ]]; then
+        quiet="$override_quiet"
+    elif [[ -z "$quiet" ]]; then
+        quiet="y"
+    fi
+
+    # Set variables that do not have overrides
+    [[ -n "$arch" ]] || arch="$(uname -m)"
+    [[ -n "$airootfs_image_type" ]] || airootfs_image_type="squashfs"
+    [[ -n "$iso_name" ]] || iso_name="${app_name}"
+    [[ -n "$img_name" ]] || img_name="${iso_name}-${iso_version}-${arch}.iso"
 }
 
 _export_gpg_publickey() {
@@ -859,8 +907,6 @@ _build_profile() {
     # Set up essential directory paths
     airootfs_dir="${work_dir}/${arch}/airootfs"
     isofs_dir="${work_dir}/iso"
-    # Set ISO file name
-    img_name="${iso_name}-${iso_version}-${arch}.iso"
     # Create working directory
     [[ -d "${work_dir}" ]] || install -d -- "${work_dir}"
     # Write build date to file or if the file exists, read it from there
@@ -870,9 +916,9 @@ _build_profile() {
         printf '%s\n' "$SOURCE_DATE_EPOCH" > "${work_dir}/build_date"
     fi
 
-    [[ "${quiet}" == "n" ]] && _show_config
+    [[ "${quiet}" == "y" ]] || _show_config
     _run_once _make_pacman_conf
-    [[ -n "${gpg_key}" ]] && _run_once _export_gpg_publickey
+    [[ -z "${gpg_key}" ]] || _run_once _export_gpg_publickey
     _run_once _make_custom_airootfs
     _run_once _make_packages
     _run_once _make_version
@@ -886,19 +932,16 @@ _build_profile() {
 
 while getopts 'p:C:L:P:A:D:w:o:g:vh?' arg; do
     case "${arg}" in
-        p)
-            read -r -a opt_pkg_list <<< "${OPTARG}"
-            pkg_list+=("${opt_pkg_list[@]}")
-            ;;
-        C) override_pacman_conf="$(realpath -- "${OPTARG}")" ;;
+        p) read -r -a override_pkg_list <<< "${OPTARG}" ;;
+        C) override_pacman_conf="${OPTARG}" ;;
         L) override_iso_label="${OPTARG}" ;;
         P) override_iso_publisher="${OPTARG}" ;;
         A) override_iso_application="${OPTARG}" ;;
         D) override_install_dir="${OPTARG}" ;;
-        w) work_dir="$(realpath -- "${OPTARG}")" ;;
-        o) out_dir="$(realpath -- "${OPTARG}")" ;;
+        w) override_work_dir="${OPTARG}" ;;
+        o) override_out_dir="${OPTARG}" ;;
         g) override_gpg_key="${OPTARG}" ;;
-        v) quiet="n" ;;
+        v) override_quiet="n" ;;
         h|?) _usage 0 ;;
         *)
             _msg_error "Invalid argument '${arg}'" 0
@@ -923,6 +966,7 @@ profile="$(realpath -- "${1}")"
 
 _read_profile
 _set_overrides
+_validate_options
 _build_profile
 
 # vim:ts=4:sw=4:et:
