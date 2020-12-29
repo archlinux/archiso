@@ -28,6 +28,7 @@ Options:
     -i [image]      image to boot into
     -s              use Secure Boot (only relevant when using UEFI)
     -u              set boot type to 'UEFI'
+    -v              use VNC display (instead of default SDL)
 
 Example:
     Run an image using UEFI:
@@ -87,12 +88,12 @@ run_image() {
     qemu-system-x86_64 \
         -boot order=d,menu=on,reboot-timeout=5000 \
         -m "size=3072,slots=0,maxmem=$((3072*1024*1024))" \
-        -k en \
+        -k en-us \
         -name archiso,process=archiso_0 \
         -device virtio-scsi-pci,id=scsi0 \
         -device "scsi-${mediatype%rom},bus=scsi0.0,drive=${mediatype}0" \
         -drive "id=${mediatype}0,if=none,format=raw,media=${mediatype/hd/disk},readonly=on,file=${image}" \
-        -display sdl \
+        -display "${display}" \
         -vga virtio \
         -audiodev pa,id=snd0 \
         -device ich9-intel-hda \
@@ -123,12 +124,13 @@ accessibility=''
 boot_type='bios'
 mediatype='cdrom'
 secure_boot='off'
+display='sdl'
 qemu_options=()
 working_dir="$(mktemp -dt run_archiso.XXXXXXXXXX)"
 trap cleanup_working_dir EXIT
 
 if (( ${#@} > 0 )); then
-    while getopts 'abdhi:su' flag; do
+    while getopts 'abdhi:suv' flag; do
         case "$flag" in
             a)
                 accessibility='on'
@@ -151,6 +153,10 @@ if (( ${#@} > 0 )); then
                 ;;
             s)
                 secure_boot='on'
+                ;;
+            v)
+                display='none'
+                qemu_options+=(-vnc 'vnc=0.0.0.0:0,vnc=[::]:0')
                 ;;
             *)
                 printf '%s\n' "Error: Wrong option. Try 'run_archiso -h'."
