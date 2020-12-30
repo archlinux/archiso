@@ -29,6 +29,7 @@ Options:
     -s              use Secure Boot (only relevant when using UEFI)
     -u              set boot type to 'UEFI'
     -v              use VNC display (instead of default SDL)
+    -c [image]      attach an additional optical disc image (e.g. for cloud-init)
 
 Example:
     Run an image using UEFI:
@@ -85,6 +86,13 @@ run_image() {
         )
     fi
 
+    if [[ -n "${oddimage}" ]]; then
+        qemu_options+=(
+            '-device' 'scsi-cd,bus=scsi0.0,drive=cdrom1'
+            '-drive' "id=cdrom1,if=none,format=raw,media=cdrom,readonly=on,file=${oddimage}"
+        )
+    fi
+
     qemu-system-x86_64 \
         -boot order=d,menu=on,reboot-timeout=5000 \
         -m "size=3072,slots=0,maxmem=$((3072*1024*1024))" \
@@ -120,6 +128,7 @@ set_image() {
 }
 
 image=''
+oddimage=''
 accessibility=''
 boot_type='bios'
 mediatype='cdrom'
@@ -130,13 +139,16 @@ working_dir="$(mktemp -dt run_archiso.XXXXXXXXXX)"
 trap cleanup_working_dir EXIT
 
 if (( ${#@} > 0 )); then
-    while getopts 'abdhi:suv' flag; do
+    while getopts 'abc:dhi:suv' flag; do
         case "$flag" in
             a)
                 accessibility='on'
                 ;;
             b)
                 boot_type='bios'
+                ;;
+            c)
+                oddimage="$OPTARG"
                 ;;
             d)
                 mediatype='hd'
