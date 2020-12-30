@@ -1,4 +1,7 @@
 *~
 archiso-*.tar.gz*
-configs/*/work
-configs/*/out
+work/
+out/
+*.iso
+user-data
+meta-data
