@@ -351,7 +351,7 @@ _make_bootmodes() {
 # Prepare kernel/initramfs ${install_dir}/boot/
 _make_boot_on_iso9660() {
     local ucode_image
-    _msg_info "Preparing kernel and intramfs for the ISO 9660 file system..."
+    _msg_info "Preparing kernel and initramfs for the ISO 9660 file system..."
     install -d -m 0755 -- "${isofs_dir}/${install_dir}/boot/${arch}"
     install -m 0644 -- "${airootfs_dir}/boot/initramfs-"*".img" "${isofs_dir}/${install_dir}/boot/${arch}/"
     install -m 0644 -- "${airootfs_dir}/boot/vmlinuz-"* "${isofs_dir}/${install_dir}/boot/${arch}/"
@@ -450,7 +450,7 @@ _make_efi_dir_on_iso9660() {
 # Prepare kernel/initramfs on efiboot.img
 _make_boot_on_fat() {
     local ucode_image all_ucode_images=()
-    _msg_info "Preparing kernel and intramfs for the FAT file system..."
+    _msg_info "Preparing kernel and initramfs for the FAT file system..."
     mmd -i "${work_dir}/efiboot.img" \
         "::/${install_dir}" "::/${install_dir}/boot" "::/${install_dir}/boot/${arch}"
     mcopy -i "${work_dir}/efiboot.img" "${airootfs_dir}/boot/vmlinuz-"* \
