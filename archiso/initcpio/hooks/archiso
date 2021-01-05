@@ -72,7 +72,7 @@ _mnt_sfs() {
 
         # in case we have pv use it to display copy progress feedback otherwise
         # fallback to using plain cp
-        if [ -x /usr/bin/pv ]; then
+        if command -v pv > /dev/null 2>&1; then
             echo ""
             (pv "${img}" > "/run/archiso/copytoram/${img_fullname}")
             local rc=$?
