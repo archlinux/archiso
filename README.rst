@@ -118,6 +118,19 @@ Optionally install archiso's mkinitcpio hooks:
 
     make install-initcpio
 
+Optional Features
+=================
+
+The iso image contains a grub environment block holding the iso version. This allows to boot the iso image from grub
+with a version specific cow directory to mitigate overlay clashes.
+
+  .. code:: grub
+      loopback loop archlinux.iso
+      load_env -f (loop)/arch/grubenv
+      linux (loop)/arch/boot/x86_64/vmlinuz-linux ... \
+          cow_directory=archlinux/${VERSION} ...
+      initrd (loop)/arch/boot/x86_64/initramfs-linux-lts.img
+
 Contribute
 ==========
 

@@ -834,11 +834,19 @@ _set_overrides() {
     _msg_info "Done!"
 }
 
-
 _export_gpg_publickey() {
     gpg --batch --output "${work_dir}/pubkey.gpg" --export "${gpg_key}"
 }
 
+_make_version() {
+    install -d -m 0755 -- "${isofs_dir}/${install_dir}"
+    _msg_info "Creating files with iso version..."
+    printf '%s\n' "${iso_version}" > "${airootfs_dir}/version"
+    printf '%s\n' "${iso_version}" > "${isofs_dir}/${install_dir}/version"
+    printf '%.1024s' "$(printf '# GRUB Environment Block\nVERSION=%s\n%s' "${iso_version}" \
+        "$(printf '%0.1s' "#"{1..1024})")" > "${isofs_dir}/${install_dir}/grubenv"
+    _msg_info "Done!"
+}
 
 _make_pkglist() {
     install -d -m 0755 -- "${isofs_dir}/${install_dir}"
@@ -867,6 +875,7 @@ _build_profile() {
     [[ -n "${gpg_key}" ]] && _run_once _export_gpg_publickey
     _run_once _make_custom_airootfs
     _run_once _make_packages
+    _run_once _make_version
     _run_once _make_customize_airootfs
     _run_once _make_pkglist
     _make_bootmodes
