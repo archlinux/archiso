@@ -73,6 +73,7 @@ run_latehook () {
                 ip link set "${netdev}" down
             done
         elif [ "${copy_resolvconf}" != "n" ] && [ -f /etc/resolv.conf ]; then
+            rm -f /new_root/etc/resolv.conf
             cp /etc/resolv.conf /new_root/etc/resolv.conf
         fi
     fi
