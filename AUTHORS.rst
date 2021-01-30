@@ -24,6 +24,7 @@ Archiso Authors
 * Loui Chang <louipc.ist@gmail.com>
 * Lukas Fleischer <archlinux@cryptocrack.de>
 * Martin Damian Fernandez <martin.damian.fernandez@gmail.com>
+* Michael Vorburger <mike@vorburger.ch>
 * Pierre Schmitz <pierre@archlinux.de>
 * Sean Enck <enckse@voidedtech.com>
 * Simo Leone <simo@archlinux.org>
