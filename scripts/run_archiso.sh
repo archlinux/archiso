@@ -115,18 +115,6 @@ run_image() {
         -no-reboot
 }
 
-set_image() {
-    if [[ -z "$image" ]]; then
-        printf 'ERROR: %s\n' "Image name can not be empty."
-        exit 1
-    fi
-    if [[ ! -f "$image" ]]; then
-        printf 'ERROR: %s\n' "Image (${image}) does not exist."
-        exit 1
-    fi
-    image="$1"
-}
-
 image=''
 oddimage=''
 accessibility=''
