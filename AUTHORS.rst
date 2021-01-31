@@ -29,7 +29,7 @@ Archiso Authors
 * Sean Enck <enckse@voidedtech.com>
 * Simo Leone <simo@archlinux.org>
 * Steffen Bönigk <boenki@gmx.de>
-* Sven-Hendrik Haase <sh@lutzhaase.com>
+* Sven-Hendrik Haase <svenstaro@gmail.com>
 * Thomas Bächler <thomas@archlinux.org>
 * Yu Li-Yu <afg984@gmail.com>
 * nl6720 <nl6720@gmail.com>
