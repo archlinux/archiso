@@ -21,6 +21,7 @@ check: lint
 lint:
 	shellcheck -s bash archiso/mkarchiso \
 	                   $(wildcard scripts/*.sh) \
+	                   $(wildcard .gitlab/ci/*.sh) \
 	                   $(INSTALL_FILES) \
 	                   $(wildcard configs/*/build.sh) \
 	                   $(wildcard configs/*/profiledef.sh) \
