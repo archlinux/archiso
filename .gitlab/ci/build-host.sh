@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # build-host.sh runs build-inside-vm.sh in a qemu VM running the latest Arch installer iso
 #
 # nounset: "Treat unset variables and parameters [...] as an error when performing parameter expansion."
@@ -17,21 +17,30 @@ function init() {
 
 # Do some cleanup when the script exits
 function cleanup() {
-  rm -rf "${TMPDIR}"
+  rm -rf -- "${TMPDIR}"
   jobs -p | xargs --no-run-if-empty kill
 }
 trap cleanup EXIT
 
 # Use local Arch iso or download the latest iso and extract the relevant files
 function prepare_boot() {
-  if LOCAL_ISO="$(ls "${ORIG_PWD}/"archlinux-*-x86_64.iso 2>/dev/null)"; then
-    echo "Using local iso: ${LOCAL_ISO}"
-    ISO="${LOCAL_ISO}"
+  local iso
+  local isos=()
+
+  # retrieve any local images and sort them
+  for iso in "${ORIG_PWD}/"archlinux-*-x86_64.iso; do
+    if [[ -f "$iso" ]]; then
+      isos+=("${iso}")
+    fi
+  done
+  if (( ${#isos[@]} >= 1 )); then
+    ISO="$(printf '%s\n' "${isos[@]}" | sort -r | head -n1)"
+    printf "Using local iso: %s\n" "$ISO"
   fi
 
-  if [ -z "${LOCAL_ISO}" ]; then
+  if (( ${#isos[@]} < 1 )); then
     LATEST_ISO="$(curl -fs "${MIRROR}/iso/latest/" | grep -Eo 'archlinux-[0-9]{4}\.[0-9]{2}\.[0-9]{2}-x86_64.iso' | head -n 1)"
-    if [ -z "${LATEST_ISO}" ]; then
+    if [[ -z "${LATEST_ISO}" ]]; then
       echo "Error: Couldn't find latest iso'"
       exit 1
     fi
@@ -55,11 +64,10 @@ function start_qemu() {
     -machine accel=kvm:tcg \
     -smp "$(nproc)" \
     -m 4096 \
-    -net nic \
-    -net user \
+    -device virtio-net-pci,romfile=,netdev=net0 -netdev user,id=net0 \
     -kernel vmlinuz-linux \
     -initrd initramfs-linux.img \
-    -append "archisobasedir=arch archisolabel=${ISO_VOLUME_ID} ip=dhcp net.ifnames=0 console=ttyS0 mirror=${MIRROR}" \
+    -append "archisobasedir=arch archisolabel=${ISO_VOLUME_ID} cow_spacesize=4G ip=dhcp net.ifnames=0 console=ttyS0 mirror=${MIRROR}" \
     -drive file=scratch-disk.img,format=raw,if=virtio \
     -drive file="${ISO}",format=raw,if=virtio,media=cdrom,read-only \
     -virtfs "local,path=${ORIG_PWD},mount_tag=host,security_model=none" \
@@ -81,9 +89,9 @@ function expect() {
     # read should never exit with a non-zero exit code,
     # but it can happen if the fd is EOF or it times out
     IFS= read -r -u 10 -n 1 -t "${timeout}" c
-    if [ "${1:${i}:1}" = "${c}" ]; then
+    if [[ "${1:${i}:1}" = "${c}" ]]; then
       i="$((i + 1))"
-      if [ "${length}" -eq "${i}" ]; then
+      if [[ "${length}" -eq "${i}" ]]; then
         break
       fi
     else
@@ -118,7 +126,7 @@ function main() {
   expect "# "
   send "mkfs.ext4 /dev/vda && mkdir /mnt/scratch-disk/ && mount /dev/vda /mnt/scratch-disk && cd /mnt/scratch-disk\n"
   expect "# "
-  send "cp -a /mnt/project/{.gitlab,archiso,configs,scripts} .\n"
+  send "cp -a -- /mnt/project/{.gitlab,archiso,configs,scripts} .\n"
   expect "# "
   send "mkdir pkg && mount --bind pkg /var/cache/pacman/pkg\n"
   expect "# "
@@ -132,18 +140,18 @@ function main() {
   expect "# "
 
   # Install required packages
-  send "pacman -Sy --noconfirm qemu-headless jq dosfstools e2fsprogs libisoburn mtools squashfs-tools\n"
-  expect "# "
+  send "pacman -Syu --ignore linux --noconfirm --needed qemu-headless jq dosfstools e2fsprogs libisoburn mtools squashfs-tools\n"
+  expect "# " 120
 
   ## Start build and copy output to local disk
   send "bash -x ./.gitlab/ci/build-inside-vm.sh ${PROFILE}\n "
   expect "# " 1000 # mksquashfs can take a long time
-  send "cp -r --preserve=mode,timestamps output /mnt/project/tmp/$(basename "${TMPDIR}")/\n"
+  send "cp -r --preserve=mode,timestamps -- output /mnt/project/tmp/$(basename "${TMPDIR}")/\n"
   expect "# " 60
   mv output/* "${OUTPUT}/"
 
   # Shutdown the VM
-  send "shutdown now\n"
+  send "systemctl poweroff -i\n"
   wait
 }
 main
