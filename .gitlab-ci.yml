@@ -23,7 +23,7 @@ shellcheck:
   script:
     - ./.gitlab/ci/build-host.sh
   after_script:
-    - echo "image_size_megabytes{image=\"${PROFILE}\"} $(du --block-size=MiB -- output/${PROFILE}/*iso)" > metrics.txt
+    - echo "image_size_mebibytes{image=\"${PROFILE}\"} $(du -m output/${PROFILE}/*iso)" > metrics.txt
   parallel:
     matrix:
       - PROFILE: [baseline, releng]
