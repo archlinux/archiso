@@ -26,12 +26,22 @@ create_checksums() {
   fi
 }
 
+create_zsync_delta() {
+  # create a zsync control file for a file
+  # $1: a file
+  zsyncmake -C -u "${1##*/}" -o "${1}".zsync "${1}"
+  if [ -n "${SUDO_UID:-}" ]; then
+    chown "${SUDO_UID}:${SUDO_GID}" "${1}".zsync
+  fi
+}
+
 run_mkarchiso() {
   # run mkarchiso
   # $1: template name
   mkdir -p "${output}/${1}" "${tmpdir}/${1}"
   ./archiso/mkarchiso -o "${output}/${1}" -w "${tmpdir}/${1}" -v "configs/${1}"
   create_checksums "${output}/${1}/"*.iso
+  create_zsync_delta "${output}/${1}/"*.iso
 }
 
 trap cleanup EXIT
