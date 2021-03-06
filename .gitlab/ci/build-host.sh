@@ -145,7 +145,7 @@ function main() {
 
   ## Start build and copy output to local disk
   send "bash -x ./.gitlab/ci/build-inside-vm.sh ${PROFILE}\n "
-  expect "# " 1000 # mksquashfs can take a long time
+  expect "# " 2400 # mksquashfs can take a very long time
   send "cp -r --preserve=mode,timestamps -- output /mnt/project/tmp/$(basename "${TMPDIR}")/\n"
   expect "# " 60
   mv output/* "${OUTPUT}/"
