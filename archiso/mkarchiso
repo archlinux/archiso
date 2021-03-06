@@ -681,15 +681,10 @@ _add_xorrisofs_options_bios.syslinux.mbr() {
         '-isohybrid-mbr' "${isofs_dir}/syslinux/isohdpfx.bin"
         # When GPT is used, create an additional partition in the MBR (besides 0xEE) for sectors 0–1 (MBR
         # bootstrap code area) and mark it as bootable
-        # This violates the UEFI specification, but may allow booting on some systems
+        # May allow booting on some systems
         # https://wiki.archlinux.org/index.php/Partitioning#Tricking_old_BIOS_into_booting_from_GPT
         '--mbr-force-bootable'
-        # Set the ISO 9660 partition's type to "Linux filesystem data"
-        # When only MBR is present, the partition type ID will be 0x83 "Linux" as xorriso translates all
-        # GPT partition type GUIDs except for the ESP GUID to MBR type ID 0x83
-        '-iso_mbr_part_type' '0FC63DAF-8483-4772-8E79-3D69D8477DE4'
-        # Move the first partition away from the start of the ISO to match the expectations of partition
-        # editors
+        # Move the first partition away from the start of the ISO to match the expectations of partition editors
         # May allow booting on some systems
         # https://dev.lovelyhq.com/libburnia/libisoburn/src/branch/master/doc/partition_offset.wiki
         '-partition_offset' '16'
@@ -702,12 +697,26 @@ _add_xorrisofs_options_uefi-x64.systemd-boot.esp() {
     # partition will not be mountable
     # shellcheck disable=SC2076
     [[ " ${xorrisofs_options[*]} " =~ ' -partition_offset ' ]] || xorrisofs_options+=('-partition_offset' '16')
-    xorrisofs_options+=(
-        # Attach efiboot.img as a second partition and set its partition type to "EFI system partition"
-        '-append_partition' '2' 'C12A7328-F81F-11D2-BA4B-00A0C93EC93B' "${work_dir}/efiboot.img"
-        # Ensure GPT is used as some systems do not support UEFI booting without it
-        '-appended_part_as_gpt'
-    )
+    # Attach efiboot.img as a second partition and set its partition type to "EFI system partition"
+    xorrisofs_options+=('-append_partition' '2' 'C12A7328-F81F-11D2-BA4B-00A0C93EC93B' "${work_dir}/efiboot.img")
+    # Ensure GPT is used as some systems do not support UEFI booting without it
+    # shellcheck disable=SC2076
+    if [[ " ${bootmodes[*]} " =~ ' bios.syslinux.mbr ' ]]; then
+        # A valid GPT prevents BIOS booting on some systems, instead use an invalid GPT (without a protective MBR).
+        # The attached partition will have the EFI system partition type code in MBR, but in the invalid GPT it will
+        # have a Microsoft basic partition type code.
+        if [[ ! " ${bootmodes[*]} " =~ ' uefi-x64.systemd-boot.eltorito ' ]]; then
+            # If '-isohybrid-gpt-basdat' is specified before '-e', then the appended EFI system partition will have the
+            # EFI system partition type ID/GUID in both MBR and GPT. If '-isohybrid-gpt-basdat' is specified after '-e',
+            # the appended EFI system partition will have the Microsoft basic data type GUID in GPT.
+            if [[ ! " ${xorrisofs_options[*]} " =~ ' -isohybrid-gpt-basdat ' ]]; then
+                xorrisofs_options+=('-isohybrid-gpt-basdat')
+            fi
+        fi
+    else
+        # Use valid GPT if BIOS booting support will not be required
+        xorrisofs_options+=('-appended_part_as_gpt')
+    fi
 }
 
 # systemd-boot via El Torito
@@ -723,6 +732,15 @@ _add_xorrisofs_options_uefi-x64.systemd-boot.eltorito() {
             # Boot image is not emulating floppy or hard disk; required for all known boot loaders
             '-no-emul-boot'
         )
+        # A valid GPT prevents BIOS booting on some systems, use an invalid GPT instead.
+        if [[ " ${bootmodes[*]} " =~ ' bios.syslinux.mbr ' ]]; then
+            # If '-isohybrid-gpt-basdat' is specified before '-e', then the appended EFI system partition will have the
+            # EFI system partition type ID/GUID in both MBR and GPT. If '-isohybrid-gpt-basdat' is specified after '-e',
+            # the appended EFI system partition will have the Microsoft basic data type GUID in GPT.
+            if [[ ! " ${xorrisofs_options[*]} " =~ ' -isohybrid-gpt-basdat ' ]]; then
+                xorrisofs_options+=('-isohybrid-gpt-basdat')
+            fi
+        fi
     else
         # The ISO will not contain a GPT partition table, so to be able to reference efiboot.img, place it as a
         # file inside the ISO 9660 file system
