@@ -40,15 +40,15 @@ build:
   tags:
     - fast-single-thread
   except:
-    - master
-    - schedules
-    - tags
+    - master@archlinux/archiso
+    - schedules@archlinux/archiso
+    - tags@archlinux/archiso
 
 build:secure:
   extends: .build
   tags:
     - secure
   only:
-    - master
-    - schedules
-    - tags
+    - master@archlinux/archiso
+    - schedules@archlinux/archiso
+    - tags@archlinux/archiso
