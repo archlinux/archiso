@@ -140,7 +140,7 @@ function main() {
   expect "# "
 
   # Install required packages
-  send "pacman -Syu --ignore linux --noconfirm --needed qemu-headless jq dosfstools e2fsprogs libisoburn mtools squashfs-tools zsync\n"
+  send "pacman -Fy && pacman -Syu --ignore \$(pacman -Fq --machinereadable /usr/lib/modules/ | awk 'BEGIN { FS = \"\\\0\";ORS=\",\" }; { print \$2 } ' | sort -ut , | head -c -2) --noconfirm --needed qemu-headless jq dosfstools e2fsprogs libisoburn mtools squashfs-tools zsync\n"
   expect "# " 120
 
   ## Start build and copy output to local disk
