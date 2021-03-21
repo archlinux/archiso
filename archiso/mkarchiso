@@ -155,11 +155,6 @@ _cleanup_airootfs() {
 }
 
 _run_mksquashfs() {
-    # Set default mksquashfs options
-    if (( ${#airootfs_image_tool_options[@]} < 1 )); then
-        airootfs_image_tool_options=('-comp' 'xz')
-    fi
-
     local image_path="${isofs_dir}/${install_dir}/${arch}/airootfs.sfs"
     if [[ "${quiet}" == "y" ]]; then
         mksquashfs "$@" "${image_path}" -noappend "${airootfs_image_tool_options[@]}" -no-progress > /dev/null
