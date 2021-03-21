@@ -55,7 +55,7 @@ The image file is constructed from some of the variables in **profiledef.sh**: `
   `('-comp' 'xz')` for squashfs).
 * `file_permissions`: An associative array that lists files and/or directories who need specific ownership or
   permissions. The array's keys contain the path and the value is a colon separated list of owner UID, owner GID and
-  access mode. E.g. `file_permissions=(["/etc/shadow"]="0:0:400")`.
+  access mode. E.g. `file_permissions=(["/etc/shadow"]="0:0:400")`. When directories are listed with a trailing backslash ("/") **all** files and directories contained within the listed directory will have the same owner UID, owner GID, and access mode applied recursively.
 
 packages.arch
 =============
