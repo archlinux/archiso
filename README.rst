@@ -33,7 +33,7 @@ Profiles
 Archiso comes with two profiles: **baseline** and **releng**. While both can serve as starting points for creating
 custom live media, **releng** is used to create the monthly installation medium.
 They can be found below `configs/baseline/ <configs/baseline/>`_  and `configs/releng/ <configs/releng/>`_
-(respectively). Both profiles are defined by files to be placed into overlays (e.g. *airootfs* -> *the image's /*).
+(respectively). Both profiles are defined by files to be placed into overlays (e.g. airootfs ‎→‎ the image's ``/``).
 
 Read `README.profile.rst <README.profile.rst>`_ to learn more about how to create profiles.
 
@@ -47,32 +47,32 @@ As filesystems are created and various mount actions have to be done when creati
 the scripts.
 
 When archiso is installed system-wide and the modification of a profile is desired, it is necessary to copy it to a
-writeable location, as */usr/share/archiso* is tracked by the package manager and only writeable by root (changes will
+writeable location, as ``/usr/share/archiso`` is tracked by the package manager and only writeable by root (changes will
 be lost on update).
 
 The examples below will assume an unmodified profile in a system location (unless noted otherwise).
 
 It is advised to consult the help output of **mkarchiso**:
 
-  .. code:: bash
+.. code:: sh
 
-    mkarchiso -h
+   mkarchiso -h
 
 Create images with packaged archiso
 -----------------------------------
 
-  .. code:: bash
+.. code:: sh
 
-    mkarchiso -w path/to/work_dir -o path/to/out_dir path/to/profile
+   mkarchiso -w path/to/work_dir -o path/to/out_dir path/to/profile
 
 Create images with local clone
 ------------------------------
 
 Clone this repository and run:
 
-  .. code:: bash
+.. code:: sh
 
-    ./archiso/mkarchiso -w path/to/work_dir -o path/to/out_dir path/to/profile
+   ./archiso/mkarchiso -w path/to/work_dir -o path/to/out_dir path/to/profile
 
 Testing
 =======
@@ -80,61 +80,60 @@ Testing
 The convenience script **run_archiso** is provided to boot into the medium using qemu.
 It is advised to consult its help output:
 
-  .. code:: bash
+.. code:: sh
 
-    run_archiso -h
+   run_archiso -h
 
 Run the following to boot the iso using BIOS:
 
-  .. code:: bash
+.. code:: sh
 
-    run_archiso -i path/to/an/arch.iso
+   run_archiso -i path/to/an/arch.iso
 
 Run the following to boot the iso using UEFI:
 
-  .. code:: bash
+.. code:: sh
 
-    run_archiso -u -i path/to/an/arch.iso
+   run_archiso -u -i path/to/an/arch.iso
 
 The script can of course also be executed from this repository:
 
 
-  .. code:: bash
+.. code:: sh
 
-    ./scripts/run_archiso.sh -i path/to/an/arch.iso
+   ./scripts/run_archiso.sh -i path/to/an/arch.iso
 
 Installation
 ============
 
-To install archiso system-wide use the included **Makefile**:
+To install archiso system-wide use the included ``Makefile``:
 
-  .. code:: bash
+.. code:: sh
 
-    make install
+   make install
 
 Optionally install archiso's mkinitcpio hooks:
 
-  .. code:: bash
+.. code:: sh
 
-    make install-initcpio
+   make install-initcpio
 
-Optional Features
-=================
+Optional features
 
-The iso image contains a grub environment block holding the iso name and version. This allows to
-boot the iso image from grub with a version specific cow directory to mitigate overlay clashes.
+The iso image contains a GRUB environment block holding the iso name and version. This allows to
+boot the iso image from GRUB with a version specific cow directory to mitigate overlay clashes.
 
-  .. code:: grub
-      loopback loop archlinux.iso
-      load_env -f (loop)/arch/grubenv
-      linux (loop)/arch/boot/x86_64/vmlinuz-linux ... \
-          cow_directory=${NAME}/${VERSION} ...
-      initrd (loop)/arch/boot/x86_64/initramfs-linux-lts.img
+.. code:: sh
+     loopback loop archlinux.iso
+     load_env -f (loop)/arch/grubenv
+     linux (loop)/arch/boot/x86_64/vmlinuz-linux ... \
+         cow_directory=${NAME}/${VERSION} ...
+     initrd (loop)/arch/boot/x86_64/initramfs-linux-lts.img
 
 Contribute
 ==========
 
-Development of archiso takes place on Arch Linux' Gitlab: https://gitlab.archlinux.org/archlinux/archiso
+Development of archiso takes place on Arch Linux' Gitlab: https://gitlab.archlinux.org/archlinux/archiso.
 
 Please read our distribution-wide `Code of Conduct <https://wiki.archlinux.org/index.php/Code_of_conduct>`_ before
 contributing, to understand what actions will and will not be tolerated.
@@ -153,20 +152,20 @@ Releases
 
 `Releases of archiso <https://gitlab.archlinux.org/archlinux/archiso/-/tags>`_ are created by its current maintainer
 `David Runge <https://gitlab.archlinux.org/dvzrv>`_. Tags are signed using the PGP key with the ID
-`C7E7849466FE2358343588377258734B41C31549`.
+``C7E7849466FE2358343588377258734B41C31549``.
 
 To verify a tag, first import the relevant PGP key:
 
-  .. code:: bash
+.. code:: sh
 
-    gpg --auto-key-locate wkd --search-keys dvzrv@archlinux.org
+  gpg --auto-key-locate wkd --search-keys dvzrv@archlinux.org
 
 
 Afterwards a tag can be verified from a clone of this repository:
 
-  .. code:: bash
+.. code:: sh
 
-    git verify-tag <tag>
+  git verify-tag <tag>
 
 License
 =======
