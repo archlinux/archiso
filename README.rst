@@ -148,6 +148,26 @@ Discussion around archiso takes place on the `arch-releng mailing list
 
 All past and present authors of archiso are listed in `AUTHORS <AUTHORS.rst>`_.
 
+Releases
+========
+
+`Releases of archiso <https://gitlab.archlinux.org/archlinux/archiso/-/tags>`_ are created by its current maintainer
+`David Runge <https://gitlab.archlinux.org/dvzrv>`_. Tags are signed using the PGP key with the ID
+`C7E7849466FE2358343588377258734B41C31549`.
+
+To verify a tag, first import the relevant PGP key:
+
+  .. code:: bash
+
+    gpg --auto-key-locate wkd --search-keys dvzrv@archlinux.org
+
+
+Afterwards a tag can be verified from a clone of this repository:
+
+  .. code:: bash
+
+    git verify-tag <tag>
+
 License
 =======
 
