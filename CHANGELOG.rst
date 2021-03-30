@@ -2,6 +2,30 @@
 Changelog
 #########
 
+[52] - 2021-04-01
+=================
+
+Added
+-----
+
+- Add usbmuxd support
+- Add EROFS support (as an experimental alternative to squashfs)
+- Add creation of zsync control file for delta downloads
+- Add sof-firmware for additional soundcard support
+- Add support for recursively setting file permissions on folders using profiledef.sh
+- Add support for mobile broadband devices with the help of modemmanager
+- Add information on PGP signatures of tags
+- Add archinstall support
+
+Changed
+-------
+
+- Remove haveged
+- Fix various things in relation to gitlab CI
+- Change systemd-networkd files to more generically setup networkds for devices
+- Fix the behavior of the `script=` kernel commandline parameter to follow redirects
+- Change the amount of mirrors checked by reflector to 20 to speed up availability of the mirrorlist
+
 [51] - 2021-02-01
 =================
 
