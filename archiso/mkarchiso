@@ -933,13 +933,29 @@ _export_gpg_publickey() {
 }
 
 _make_version() {
+    local osrelease
     install -d -m 0755 -- "${isofs_dir}/${install_dir}"
     _msg_info "Creating files with iso version..."
+    # Write version file to airootfs
+    rm -f -- "${airootfs_dir}/version"
     printf '%s\n' "${iso_version}" > "${airootfs_dir}/version"
+    # Write version file to ISO 9660
     printf '%s\n' "${iso_version}" > "${isofs_dir}/${install_dir}/version"
+    # Write grubenv with version information to ISO 9660
     printf '%.1024s' "$(printf '# GRUB Environment Block\nNAME=%s\nVERSION=%s\n%s' \
         "${iso_name}" "${iso_version}" "$(printf '%0.1s' "#"{1..1024})")" \
         > "${isofs_dir}/${install_dir}/grubenv"
+    # Append IMAGE_ID & IMAGE_VERSION to os-release
+    osrelease="$(realpath -- "${airootfs_dir}/etc/os-release")"
+    if [[ ! -e "${airootfs_dir}/etc/os-release" && -e "${airootfs_dir}/usr/lib/os-release" ]]; then
+        osrelease="$(realpath -- "${airootfs_dir}/usr/lib/os-release")"
+    fi
+    if [[ "${osrelease}" != "${airootfs_dir}"* ]]; then
+        _msg_warning "os-release file '${osrelease}' is outside of valid path."
+    else
+        [[ ! -e "${osrelease}" ]] || sed -i '/^IMAGE_ID=/d;/^IMAGE_VERSION=/d' "${osrelease}"
+        printf 'IMAGE_ID=%s\nIMAGE_VERSION=%s\n' "${iso_name}" "${iso_version}" >> "${osrelease}"
+    fi
     _msg_info "Done!"
 }
 
