@@ -36,6 +36,27 @@ create_zsync_delta() {
   fi
 }
 
+create_metrics() {
+  # create metrics
+  {
+    printf 'image_size_mebibytes{image="%s"} %s\n' "${1}" "$(du -m "${output}/${1}/"*.iso | cut -f1)"
+    printf 'package_count{image="%s"} %s\n' "${1}" "$(sort -u "${tmpdir}/${1}/iso/"*/pkglist.*.txt | wc -l)"
+    if [[ -e "${tmpdir}/${1}/efiboot.img" ]]; then
+      printf 'eltorito_efi_image_size_mebibytes{image="%s"} %s\n' \
+        "${1}" "$(du -m "${tmpdir}/${1}/efiboot.img" | cut -f1)"
+    fi
+    # shellcheck disable=SC2046
+    # shellcheck disable=SC2183
+    printf 'initramfs_size_mebibytes{image="%s",initramfs="%s"} %s\n' \
+      $(du -m "${tmpdir}/${1}/iso/"*/boot/**/initramfs*.img | awk -v profile="${1}" '
+        function basename(file) {
+          sub(".*/", "", file)
+          return file
+        }
+        { print profile, basename($2), $1 }')
+  } > "${output}/${1}/job-metrics"
+}
+
 run_mkarchiso() {
   # run mkarchiso
   # $1: template name
@@ -43,6 +64,7 @@ run_mkarchiso() {
   ./archiso/mkarchiso -o "${output}/${1}" -w "${tmpdir}/${1}" -v "configs/${1}"
   create_checksums "${output}/${1}/"*.iso
   create_zsync_delta "${output}/${1}/"*.iso
+  create_metrics "${1}"
 }
 
 trap cleanup EXIT
