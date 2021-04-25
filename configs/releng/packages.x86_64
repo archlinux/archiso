@@ -43,6 +43,7 @@ iwd
 jfsutils
 kitty-terminfo
 lftp
+libusb-compat
 linux
 linux-atm
 linux-firmware
@@ -74,6 +75,7 @@ openvpn
 partclone
 parted
 partimage
+pcsclite
 ppp
 pptpclient
 reflector
