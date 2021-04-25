@@ -13,7 +13,7 @@ run_hook () {
     if [ -n "${ip}" ]; then
         if [ -n "${BOOTIF}" ]; then
             bootif_mac="${BOOTIF#01-}"
-            # shellcheck disable=SC2169
+            # shellcheck disable=SC2169,SC3060
             # ash supports bash-like string replacment
             bootif_mac="${bootif_mac//-/:}"
             for i in /sys/class/net/*/address; do
