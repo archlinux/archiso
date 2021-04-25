@@ -6,7 +6,8 @@
 
 readonly orig_pwd="${PWD}"
 readonly output="${orig_pwd}/output"
-readonly tmpdir="$(mktemp --dry-run --directory --tmpdir="${orig_pwd}/tmp")"
+tmpdir=""
+tmpdir="$(mktemp --dry-run --directory --tmpdir="${orig_pwd}/tmp")"
 
 cleanup() {
   # clean up temporary directories
@@ -21,7 +22,7 @@ create_checksums() {
   sha256sum "${1}" >"${1}.sha256"
   sha512sum "${1}" >"${1}.sha512"
   b2sum "${1}" >"${1}.b2"
-  if [ -n "${SUDO_UID:-}" ]; then
+  if [[ -n "${SUDO_UID:-}" ]] && [[ -n "${SUDO_GID:-}" ]]; then
     chown "${SUDO_UID}:${SUDO_GID}" "${1}"{,.b2,.sha{256,512}}
   fi
 }
@@ -30,7 +31,7 @@ create_zsync_delta() {
   # create a zsync control file for a file
   # $1: a file
   zsyncmake -C -u "${1##*/}" -o "${1}".zsync "${1}"
-  if [ -n "${SUDO_UID:-}" ]; then
+  if [[ -n "${SUDO_UID:-}" ]] && [[ -n "${SUDO_GID:-}" ]]; then
     chown "${SUDO_UID}:${SUDO_GID}" "${1}".zsync
   fi
 }

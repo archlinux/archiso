@@ -6,18 +6,20 @@
 set -o nounset -o errexit
 readonly MIRROR="https://mirror.pkgbuild.com"
 
+tmpdir=""
+
 function init() {
   readonly ORIG_PWD="${PWD}"
   readonly OUTPUT="${PWD}/output"
-  readonly TMPDIR="$(mktemp --dry-run --directory --tmpdir="${PWD}/tmp")"
-  mkdir -p "${OUTPUT}" "${TMPDIR}"
+  tmpdir="$(mktemp --dry-run --directory --tmpdir="${PWD}/tmp")"
+  mkdir -p "${OUTPUT}" "${tmpdir}"
 
-  cd "${TMPDIR}"
+  cd "${tmpdir}"
 }
 
 # Do some cleanup when the script exits
 function cleanup() {
-  rm -rf -- "${TMPDIR}"
+  rm -rf -- "${tmpdir}"
   jobs -p | xargs --no-run-if-empty kill
 }
 trap cleanup EXIT
@@ -146,7 +148,7 @@ function main() {
   ## Start build and copy output to local disk
   send "bash -x ./.gitlab/ci/build-inside-vm.sh ${PROFILE}\n "
   expect "# " 2400 # mksquashfs can take a very long time
-  send "cp -r --preserve=mode,timestamps -- output /mnt/project/tmp/$(basename "${TMPDIR}")/\n"
+  send "cp -r --preserve=mode,timestamps -- output /mnt/project/tmp/$(basename "${tmpdir}")/\n"
   expect "# " 60
   mv output/* "${OUTPUT}/"
 
