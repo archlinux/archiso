@@ -413,10 +413,10 @@ _make_bootmode_bios.syslinux.mbr() {
     if [[ -e "${isofs_dir}/syslinux/hdt.c32" ]]; then
         install -d -m 0755 -- "${isofs_dir}/syslinux/hdt"
         if [[ -e "${airootfs_dir}/usr/share/hwdata/pci.ids" ]]; then
-            gzip -c -9 "${airootfs_dir}/usr/share/hwdata/pci.ids" > \
+            gzip -cn9 "${airootfs_dir}/usr/share/hwdata/pci.ids" > \
                 "${isofs_dir}/syslinux/hdt/pciids.gz"
         fi
-        find "${airootfs_dir}/usr/lib/modules" -name 'modules.alias' -print -exec gzip -c -9 '{}' ';' -quit > \
+        find "${airootfs_dir}/usr/lib/modules" -name 'modules.alias' -print -exec gzip -cn9 '{}' ';' -quit > \
             "${isofs_dir}/syslinux/hdt/modalias.gz"
     fi
 
