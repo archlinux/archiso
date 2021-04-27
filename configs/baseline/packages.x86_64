@@ -6,4 +6,6 @@ linux
 mkinitcpio
 mkinitcpio-archiso
 openssh
+qemu-guest-agent
 syslinux
+virtualbox-guest-utils-nox
