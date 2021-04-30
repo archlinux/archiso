@@ -43,6 +43,7 @@ iwd
 jfsutils
 kitty-terminfo
 lftp
+libfido2
 libusb-compat
 linux
 linux-atm
@@ -96,6 +97,7 @@ terminus-font
 termite-terminfo
 testdisk
 tmux
+tpm2-tss
 udftools
 usb_modeswitch
 usbmuxd
