@@ -2,6 +2,26 @@
 Changelog
 #########
 
+[53] - 2021-05-01
+=================
+
+Added
+-----
+
+- Add ISO name to grubenv
+- Add further metrics to CI, so that number of packages and further image sizes can be tracked
+- Add IMAGE_ID and IMAGE_VERSION to /etc/os-release
+
+Changed
+-------
+
+- Revert to an invalid GPT for greater hardware compatibility
+- Fix CI scripts and initcpio script to comply with stricter shellcheck
+- Fix an issue where writing to /etc/machine-id might override a file outside of the build directory
+- Change gzip flags, so that compressed files are created reproducibly
+- Increase default serial baud rate to 115200
+- Remove deprecated documentation and format existing documentation
+
 [52] - 2021-04-01
 =================
 
