@@ -8,6 +8,8 @@ readonly orig_pwd="${PWD}"
 readonly output="${orig_pwd}/output"
 tmpdir=""
 tmpdir="$(mktemp --dry-run --directory --tmpdir="${orig_pwd}/tmp")"
+gnupg_homedir=""
+pgp_key_id=""
 
 cleanup() {
   # clean up temporary directories
@@ -57,11 +59,56 @@ create_metrics() {
   } > "${output}/${1}/job-metrics"
 }
 
+create_temp_pgp_key() {
+  # create an ephemeral PGP key for signing the rootfs image
+  gnupg_homedir="$tmpdir/.gnupg"
+  mkdir -p "${gnupg_homedir}"
+  chmod 700 "${gnupg_homedir}"
+
+  cat << __EOF__ > "${gnupg_homedir}"/gpg.conf
+quiet
+batch
+no-tty
+no-permission-warning
+export-options no-export-attributes,export-clean
+list-options no-show-keyring
+armor
+no-emit-version
+__EOF__
+
+  gpg --homedir "${gnupg_homedir}" --gen-key <<EOF
+%echo Generating ephemeral Arch Linux release engineering key pair...
+Key-Type: default
+Key-Length: 3072
+Key-Usage: sign
+Name-Real: Arch Linux Release Engineering
+Name-Comment: Ephemeral Signing Key
+Name-Email: arch-releng@lists.archlinux.org
+Expire-Date: 0
+%no-protection
+%commit
+%echo Done
+EOF
+
+  pgp_key_id="$(
+    gpg --homedir "${gnupg_homedir}" \
+        --list-secret-keys \
+        --with-colons \
+        | awk -F':' '{if($1 ~ /sec/){ print $5 }}'
+  )"
+}
+
 run_mkarchiso() {
   # run mkarchiso
   # $1: template name
+
+  create_temp_pgp_key
   mkdir -p "${output}/${1}" "${tmpdir}/${1}"
-  ./archiso/mkarchiso -o "${output}/${1}" -w "${tmpdir}/${1}" -v "configs/${1}"
+  GNUPGHOME="${gnupg_homedir}" ./archiso/mkarchiso \
+      -g "${pgp_key_id}" \
+      -o "${output}/${1}" \
+      -w "${tmpdir}/${1}" \
+      -v "configs/${1}"
   create_checksums "${output}/${1}/"*.iso
   create_zsync_delta "${output}/${1}/"*.iso
   create_metrics "${1}"
