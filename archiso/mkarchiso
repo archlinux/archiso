@@ -227,10 +227,11 @@ _mkchecksum() {
 _mksignature() {
     _msg_info "Signing SquashFS image..."
     cd -- "${isofs_dir}/${install_dir}/${arch}"
+    # always use the .sig file extension, as that is what mkinitcpio-archiso's hooks expect
     if [[ -e "${isofs_dir}/${install_dir}/${arch}/airootfs.sfs" ]]; then
-        gpg --detach-sign --default-key "${gpg_key}" airootfs.sfs
+        gpg --output airootfs.sfs.sig --detach-sign --default-key "${gpg_key}" airootfs.sfs
     elif [[ -e "${isofs_dir}/${install_dir}/${arch}/airootfs.erofs" ]]; then
-        gpg --detach-sign --default-key "${gpg_key}" airootfs.erofs
+        gpg --output airootfs.erofs.sig --detach-sign --default-key "${gpg_key}" airootfs.erofs
     fi
     cd -- "${OLDPWD}"
     _msg_info "Done!"
