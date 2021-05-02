@@ -10,6 +10,7 @@ An archiso profile consists of several configuration files and a directory for f
    ├── airootfs/
    ├── efiboot/
    ├── syslinux/
+   ├── bootstrap_packages.arch
    ├── packages.arch
    ├── pacman.conf
    └── profiledef.sh
@@ -33,6 +34,11 @@ The image file is constructed from some of the variables in ``profiledef.sh``: `
 * ``iso_version``: A string that states the version of the resulting image (defaults to ``""``)
 * ``install_dir``: A string (maximum eight characters long, which **must** consist of ``[a-z0-9]``) that states the
   directory on the resulting image into which all files will be installed (defaults to ``mkarchiso``)
+* ``buildmodes``: An optional list of strings, that state the build modes that the profile uses. Only the following are
+  understood:
+
+  - ``bootstrap``: Build a compressed file containing a minimal system to bootstrap from
+  - ``iso``: Build a bootable ISO image (implicit default, if no ``buildmodes`` are set)
 * ``bootmodes``: A list of strings, that state the supported boot modes of the resulting image. Only the following are
   understood:
 
@@ -40,7 +46,7 @@ The image file is constructed from some of the variables in ``profiledef.sh``: `
   - ``bios.syslinux.eltorito``: Syslinux for x86 BIOS booting from an optical disc
   - ``uefi-x64.systemd-boot.esp``: systemd-boot for x86_64 UEFI booting from a disk
   - ``uefi-x64.systemd-boot.eltorito``: systemd-boot for x86_64 UEFI booting from an optical disc
-  Note that BIOS El Torito boot mode must always be listed before UEFI El Torito boot mode.
+    Note that BIOS El Torito boot mode must always be listed before UEFI El Torito boot mode.
 * ``arch``: The architecture (e.g. ``x86_64``) to build the image for. This is also used to resolve the name of the packages
   file (e.g. ``packages.x86_64``)
 * ``pacman_conf``: The ``pacman.conf`` to use to install packages to the work directory when creating the image (defaults to
@@ -56,18 +62,30 @@ The image file is constructed from some of the variables in ``profiledef.sh``: `
   permissions. The array's keys contain the path and the value is a colon separated list of owner UID, owner GID and
   access mode. E.g. ``file_permissions=(["/etc/shadow"]="0:0:400")``. When directories are listed with a trailing backslash (``/``) **all** files and directories contained within the listed directory will have the same owner UID, owner GID, and access mode applied recursively.
 
+bootstrap_packages.arch
+=======================
+
+All packages to be installed into the environment of a bootstrap image have to be listed in an architecture specific
+file (e.g. ``bootstrap_packages.x86_64``), which resides top-level in the profile.
+
+Packages have to be listed one per line. Lines starting with a ``#`` and blank lines are ignored.
+
+This file is required when generating bootstrap images using the ``bootstrap`` build mode.
+
 packages.arch
 =============
 
-All packages to be installed into the environment of the image have to be listed in an architecture specific file (e.g.
-``packages.x86_64``), which resides top-level in the profile.
+All packages to be installed into the environment of an ISO image have to be listed in an architecture specific file
+(e.g. ``packages.x86_64``), which resides top-level in the profile.
 
-Packages have to be listed one per line. Lines starting with a `#` and blank lines are ignored.
+Packages have to be listed one per line. Lines starting with a ``#`` and blank lines are ignored.
 
   .. note::
 
     The **mkinitcpio** and **mkinitcpio-archiso** packages are mandatory (see `#30
     <https://gitlab.archlinux.org/archlinux/archiso/-/issues/30>`_).
+
+This file is required when generating ISO images using the ``iso`` build mode.
 
 pacman.conf
 ===========
