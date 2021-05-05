@@ -71,7 +71,7 @@ function start_qemu() {
     -initrd initramfs-linux.img \
     -append "archisobasedir=arch archisolabel=${ISO_VOLUME_ID} cow_spacesize=4G ip=dhcp net.ifnames=0 console=ttyS0 mirror=${MIRROR}" \
     -drive file=scratch-disk.img,format=raw,if=virtio \
-    -drive file="${ISO}",format=raw,if=virtio,media=cdrom,read-only \
+    -drive file="${ISO}",format=raw,if=virtio,media=cdrom,read-only=on \
     -virtfs "local,path=${ORIG_PWD},mount_tag=host,security_model=none" \
     -monitor none \
     -serial pipe:guest \
