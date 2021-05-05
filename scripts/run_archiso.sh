@@ -73,7 +73,7 @@ run_image() {
             local ovmf_code='/usr/share/edk2-ovmf/x64/OVMF_CODE.fd'
         fi
         qemu_options+=(
-            '-drive' "if=pflash,format=raw,unit=0,file=${ovmf_code},readonly"
+            '-drive' "if=pflash,format=raw,unit=0,file=${ovmf_code},read-only=on"
             '-drive' "if=pflash,format=raw,unit=1,file=${working_dir}/OVMF_VARS.fd"
             '-global' "driver=cfi.pflash01,property=secure,value=${secure_boot}"
         )
@@ -89,7 +89,7 @@ run_image() {
     if [[ -n "${oddimage}" ]]; then
         qemu_options+=(
             '-device' 'scsi-cd,bus=scsi0.0,drive=cdrom1'
-            '-drive' "id=cdrom1,if=none,format=raw,media=cdrom,readonly=on,file=${oddimage}"
+            '-drive' "id=cdrom1,if=none,format=raw,media=cdrom,read-only=on,file=${oddimage}"
         )
     fi
 
@@ -100,7 +100,7 @@ run_image() {
         -name archiso,process=archiso_0 \
         -device virtio-scsi-pci,id=scsi0 \
         -device "scsi-${mediatype%rom},bus=scsi0.0,drive=${mediatype}0" \
-        -drive "id=${mediatype}0,if=none,format=raw,media=${mediatype/hd/disk},readonly=on,file=${image}" \
+        -drive "id=${mediatype}0,if=none,format=raw,media=${mediatype/hd/disk},read-only=on,file=${image}" \
         -display "${display}" \
         -vga virtio \
         -audiodev pa,id=snd0 \
