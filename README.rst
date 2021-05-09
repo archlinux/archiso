@@ -3,8 +3,8 @@ archiso
 =======
 
 The archiso project features scripts and configuration templates to build installation media (*.iso* images and
-*.tar.gz* bootstrap images) for BIOS and UEFI based systems on the x86_64 architecture.
-Currently creating the images is only supported on Arch Linux.
+*.tar.gz* bootstrap images) as well as netboot artifacts for BIOS and UEFI based systems on the x86_64 architecture.
+Currently creating the images is only supported on Arch Linux but may work on other operating systems as well.
 
 Requirements
 ============
@@ -21,6 +21,7 @@ The following packages need to be installed to be able to create an image with t
 * libarchive
 * libisoburn
 * mtools
+* openssl
 * pacman
 * sed
 * squashfs-tools
