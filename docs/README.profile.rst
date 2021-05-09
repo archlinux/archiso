@@ -39,6 +39,7 @@ The image file is constructed from some of the variables in ``profiledef.sh``: `
 
   - ``bootstrap``: Build a compressed file containing a minimal system to bootstrap from
   - ``iso``: Build a bootable ISO image (implicit default, if no ``buildmodes`` are set)
+  - ``netboot``: Build artifacts required for netboot using iPXE
 * ``bootmodes``: A list of strings, that state the supported boot modes of the resulting image. Only the following are
   understood:
 
@@ -85,7 +86,7 @@ Packages have to be listed one per line. Lines starting with a ``#`` and blank l
     The **mkinitcpio** and **mkinitcpio-archiso** packages are mandatory (see `#30
     <https://gitlab.archlinux.org/archlinux/archiso/-/issues/30>`_).
 
-This file is required when generating ISO images using the ``iso`` build mode.
+This file is required when generating ISO images using the ``iso`` or ``netboot`` build modes.
 
 pacman.conf
 ===========
