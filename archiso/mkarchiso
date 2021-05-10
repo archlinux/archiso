@@ -1135,7 +1135,7 @@ _make_pkglist() {
         "bootstrap")
             pacman -Q --sysroot "${pacstrap_dir}" > "${pacstrap_dir}/pkglist.${arch}.txt"
             ;;
-        "iso")
+        "iso"|"netboot")
             install -d -m 0755 -- "${isofs_dir}/${install_dir}"
             pacman -Q --sysroot "${pacstrap_dir}" > "${isofs_dir}/${install_dir}/pkglist.${arch}.txt"
             ;;
