@@ -24,9 +24,6 @@ shellcheck:
     - ./.gitlab/ci/build-host.sh
   after_script:
     - cp -- "output/${PROFILE}/job-metrics" metrics.txt
-  parallel:
-    matrix:
-      - PROFILE: [baseline, releng]
   artifacts:
     name: "output"
     paths:
@@ -35,20 +32,29 @@ shellcheck:
     reports:
       metrics: metrics.txt
 
-build:
+build_short:
+  extends: .build
+  parallel:
+    matrix:
+      # baseline does not support netboot with codesinging
+      # https://gitlab.archlinux.org/archlinux/archiso/-/issues/132
+      - PROFILE: baseline
+        BUILDMODE:
+          - bootstrap
+      - PROFILE: releng
+        BUILDMODE:
+          - bootstrap
+
+build_long:
   extends: .build
   tags:
     - fast-single-thread
-  except:
-    - master@archlinux/archiso
-    - schedules@archlinux/archiso
-    - tags@archlinux/archiso
-
-build:secure:
-  extends: .build
-  tags:
-    - secure
-  only:
-    - master@archlinux/archiso
-    - schedules@archlinux/archiso
-    - tags@archlinux/archiso
+  parallel:
+    matrix:
+      - PROFILE: baseline
+        BUILDMODE:
+          - iso
+      - PROFILE: releng
+        BUILDMODE:
+          - iso
+          - netboot
