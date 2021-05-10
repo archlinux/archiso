@@ -146,7 +146,7 @@ function main() {
   expect "# " 120
 
   ## Start build and copy output to local disk
-  send "bash -x ./.gitlab/ci/build-inside-vm.sh ${PROFILE}\n "
+  send "bash -x ./.gitlab/ci/build-inside-vm.sh ${PROFILE} ${BUILDMODE}\n "
   expect "# " 2400 # mksquashfs can take a very long time
   send "cp -r --preserve=mode,timestamps -- output /mnt/project/tmp/$(basename "${tmpdir}")/\n"
   expect "# " 60
