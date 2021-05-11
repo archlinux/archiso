@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 alsa-utils
 amd-ucode
-archinstall
 arch-install-scripts
+archinstall
 b43-fwcutter
 base
 bind-tools
@@ -13,6 +13,7 @@ btrfs-progs
 clonezilla
 cloud-init
 crda
+cryptsetup
 darkhttpd
 ddrescue
 dhclient
@@ -21,6 +22,7 @@ diffutils
 dmraid
 dnsmasq
 dosfstools
+e2fsprogs
 edk2-shell
 efibootmgr
 espeakup
@@ -39,9 +41,11 @@ intel-ucode
 ipw2100-fw
 ipw2200-fw
 irssi
+iw
 iwd
 jfsutils
 kitty-terminfo
+less
 lftp
 libfido2
 libusb-compat
@@ -85,6 +89,7 @@ reiserfsprogs
 rp-pppoe
 rsync
 rxvt-unicode-terminfo
+screen
 sdparm
 sg3_utils
 smartmontools
