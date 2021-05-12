@@ -1,0 +1,8 @@
+# mkinitcpio preset file for the 'linux-aarch64' package
+
+PRESETS=('archiso')
+
+ALL_kver="5.11.4-1-ARCH"
+ALL_config="/etc/mkinitcpio.conf"
+
+archiso_image="/boot/initramfs-linux.img"

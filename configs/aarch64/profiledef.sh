@@ -2,7 +2,7 @@
 # shellcheck disable=SC2034
 
 iso_name="Arch Linux Arm"
-iso_label="Arch Linux Arm"
+iso_label="Arch"
 iso_publisher="IComplainInComments"
 iso_application="Generic ARM64 UEFI install/Rescue image"
 bootmodes=('uefi-aarch64.systemd-boot.esp' 'uefi-aarch64.systemd-boot.eltorito')
