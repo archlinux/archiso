@@ -2,6 +2,35 @@
 Changelog
 #########
 
+[54] - 2021-05-13
+=================
+
+Added
+-----
+
+- Add the concept of buildmodes to mkarchiso, which allows for building more than the default .iso artifact
+  (sequentially)
+- Add support to mkarchiso and both baseline and releng profiles for building a bootstrap image (a compressed
+  bootstrapped Arch Linux environment), by using the new buildmode `bootstrap`
+- Add support to mkarchiso and both baseline and releng profiles for building artifacts required for netboot with iPXE
+  (optionally allowing codesigning on the artifacts), by using the new buildmode `netboot`
+- Add qemu-guest-agent and virtualbox-guest-utils-nox to the releng profile and enable their services by default to
+  allow interaction between hypervisor and virtual machine if the installation medium is booted in a virtualized
+  environment
+
+Changed
+-------
+
+- Always use the .sig file extension when signing the rootfs image, as that is how mkinitcpio-archiso expects it
+- Fix for CI and run_archiso scripts to be compatible with QEMU >= 6.0
+- Increase robustness of CI by granting more time to reach the first prompt
+- Change CI to build all available buildmodes of the baseline and releng profiles (baseline's netboot is currently
+  excluded due to a bug)
+- Install all implicitly installed packages explicitly for the releng profile
+- Install keyrings more generically when using pacman-init.service
+- Consolidate CI scripts so that they may be shared between the archiso, arch-boxes and releng project in the future and
+  expose their configuration with the help of environment variables
+
 [53] - 2021-05-01
 =================
 

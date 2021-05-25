@@ -6,6 +6,9 @@
 #
 # Dependencies:
 # * all archiso dependencies
+# * coreutils
+# * gnupg
+# * openssl
 # * zsync
 #
 # $1: profile
@@ -16,54 +19,69 @@ shopt -s extglob
 
 readonly orig_pwd="${PWD}"
 readonly output="${orig_pwd}/output"
+readonly tmpdir_base="${orig_pwd}/tmp"
 readonly profile="${1}"
 readonly buildmode="${2}"
 readonly install_dir="arch"
 
 tmpdir=""
-tmpdir="$(mktemp --dry-run --directory --tmpdir="${orig_pwd}/tmp")"
+tmpdir="$(mktemp --dry-run --directory --tmpdir="${tmpdir_base}")"
 gnupg_homedir=""
 codesigning_dir=""
 codesigning_cert=""
 codesigning_key=""
 pgp_key_id=""
 
+print_section_start() {
+  # gitlab collapsible sections start: https://docs.gitlab.com/ee/ci/jobs/#custom-collapsible-sections
+  local _section _title
+  _section="${1}"
+  _title="${2}"
+
+  printf "\e[0Ksection_start:%(%s)T:%s\r\e[0K%s\n" '-1' "${_section}" "${_title}"
+}
+
+print_section_end() {
+  # gitlab collapsible sections end: https://docs.gitlab.com/ee/ci/jobs/#custom-collapsible-sections
+  local _section
+  _section="${1}"
+
+  printf "\e[0Ksection_end:%(%s)T:%s\r\e[0K\n" '-1' "${_section}"
+}
+
 cleanup() {
   # clean up temporary directories
+  print_section_start "cleanup" "Cleaning up temporary directory"
 
-  # gitlab collapsable sections start
-  printf "\e[0Ksection_start:%(%s)T:cleanup\r\e[0KCleaning up temporary directory"
-
-  if [ -n "${tmpdir:-}" ]; then
-    rm -rf "${tmpdir}"
+  if [ -n "${tmpdir_base:-}" ]; then
+    rm -fr "${tmpdir_base}"
   fi
 
-  # gitlab collapsable sections end
-  printf "\e[0Ksection_end:%(%s)T:cleanup\r\e[0K"
+  print_section_end "cleanup"
 }
 
 create_checksums() {
   # create checksums for files
   # $@: files
-  local _file
+  local _file_path _file_name _current_pwd
+  _current_pwd="${PWD}"
 
-  # gitlab collapsable sections start
-  printf "\e[0Ksection_start:%(%s)T:checksums\r\e[0KCreating checksums"
+  print_section_start "checksums" "Creating checksums"
 
-  for _file in "$@"; do
-    md5sum "${_file}" >"${_file}.md5"
-    sha1sum "${_file}" >"${_file}.sha1"
-    sha256sum "${_file}" >"${_file}.sha256"
-    sha512sum "${_file}" >"${_file}.sha512"
-    b2sum "${_file}" >"${_file}.b2"
-
-    if [[ -n "${SUDO_UID:-}" ]] && [[ -n "${SUDO_GID:-}" ]]; then
-      chown "${SUDO_UID}:${SUDO_GID}" -- "${_file}"{,.b2,.sha{256,512}}
-    fi
+  for _file_path in "$@"; do
+    cd "$(dirname "${_file_path}")"
+    _file_name="$(basename "${_file_path}")"
+    b2sum "${_file_name}" > "${_file_name}.b2"
+    md5sum "${_file_name}" > "${_file_name}.md5"
+    sha1sum "${_file_name}" > "${_file_name}.sha1"
+    sha256sum "${_file_name}" > "${_file_name}.sha256"
+    sha512sum "${_file_name}" > "${_file_name}.sha512"
+    ls -lah "${_file_name}."{b2,md5,sha{1,256,512}}
+    cat "${_file_name}."{b2,md5,sha{1,256,512}}
   done
+  cd "${_current_pwd}"
 
-  # gitlab collapsable sections end
-  printf "\e[0Ksection_end:%(%s)T:checksums\r\e[0K"
+  print_section_end "checksums"
 }
 
 create_zsync_delta() {
@@ -71,29 +89,24 @@ create_zsync_delta() {
   # $@: files
   local _file
 
-  # gitlab collapsable sections start
-  printf "\e[0Ksection_start:%(%s)T:zsync_delta\r\e[0KCreating zsync delta"
+  print_section_start "zsync_delta" "Creating zsync delta"
+
   for _file in "$@"; do
     if [[ "${buildmode}" == "bootstrap" ]]; then
       # zsyncmake fails on 'too long between blocks' with default block size on bootstrap image
-      zsyncmake -b 512 -C -u "${_file##*/}" -o "${_file}".zsync "${_file}"
+      zsyncmake -v -b 512 -C -u "${_file##*/}" -o "${_file}".zsync "${_file}"
     else
-      zsyncmake -C -u "${_file##*/}" -o "${_file}".zsync "${_file}"
-    fi
-    if [[ -n "${SUDO_UID:-}" ]] && [[ -n "${SUDO_GID:-}" ]]; then
-      chown "${SUDO_UID}:${SUDO_GID}" -- "${_file}"{,.zsync}
+      zsyncmake -v -C -u "${_file##*/}" -o "${_file}".zsync "${_file}"
     fi
   done
 
-  # gitlab collapsable sections end
-  printf "\e[0Ksection_end:%(%s)T:zsync_delta\r\e[0K"
+  print_section_end "zsync_delta"
 }
 
 create_metrics() {
+  local _metrics="${output}/${profile}/metrics.txt"
   # create metrics
-
-  # gitlab collapsable sections start
-  printf "\e[0Ksection_start:%(%s)T:metrics\r\e[0KCreating metrics"
+  print_section_start "metrics" "Creating metrics"
 
   {
     # create metrics based on buildmode
@@ -139,17 +152,16 @@ create_metrics() {
           "$(sort -u -- "${tmpdir}/${profile}/"*/bootstrap/root.*/pkglist.*.txt | wc -l)"
         ;;
     esac
-  } > "${output}/${profile}/job-metrics"
+  } > "${_metrics}"
+  ls -lah "${_metrics}"
+  cat "${_metrics}"
 
-  # gitlab collapsable sections end
-  printf "\e[0Ksection_end:%(%s)T:metrics\r\e[0K"
+  print_section_end "metrics"
 }
 
 create_ephemeral_pgp_key() {
   # create an ephemeral PGP key for signing the rootfs image
-
-  # gitlab collapsable sections start
-  printf "\e[0Ksection_start:%(%s)T:ephemeral_pgp_key\r\e[0KCreating ephemeral PGP key"
+  print_section_start "ephemeral_pgp_key" "Creating ephemeral PGP key"
 
   gnupg_homedir="$tmpdir/.gnupg"
   mkdir -p "${gnupg_homedir}"
@@ -187,15 +199,12 @@ EOF
         | awk -F':' '{if($1 ~ /sec/){ print $5 }}'
   )"
 
-  # gitlab collapsable sections end
-  printf "\e[0Ksection_end:%(%s)T:ephemeral_pgp_key\r\e[0K"
+  print_section_end "ephemeral_pgp_key"
 }
 
 create_ephemeral_codesigning_key() {
   # create ephemeral certificates used for codesigning
-
-  # gitlab collapsable sections start
-  printf "\e[0Ksection_start:%(%s)T:ephemeral_codesigning_key\r\e[0KCreating ephemeral codesigning key"
+  print_section_start "ephemeral_codesigning_key" "Creating ephemeral codesigning key"
 
   codesigning_dir="${tmpdir}/.codesigning/"
   local codesigning_conf="${codesigning_dir}/openssl.cnf"
@@ -217,19 +226,15 @@ create_ephemeral_codesigning_key() {
       -subj "${codesigning_subj}" \
       -extensions codesigning
 
-  # gitlab collapsable sections end
-  printf "\e[0Ksection_end:%(%s)T:ephemeral_codesigning_key\r\e[0K"
+  print_section_end "ephemeral_codesigning_key"
 }
 
 run_mkarchiso() {
   # run mkarchiso
-
-  # gitlab collapsable sections start
-  printf "\e[0Ksection_start:%(%s)T:mkarchiso\r\e[0KRunning mkarchiso"
-
   create_ephemeral_pgp_key
   create_ephemeral_codesigning_key
 
+  print_section_start "mkarchiso" "Running mkarchiso"
   mkdir -p "${output}/${profile}" "${tmpdir}/${profile}"
   GNUPGHOME="${gnupg_homedir}" ./archiso/mkarchiso \
       -D "${install_dir}" \
@@ -240,8 +245,7 @@ run_mkarchiso() {
       -m "${buildmode}" \
       -v "configs/${profile}"
 
-  # gitlab collapsable sections end
-  printf "\e[0Ksection_end:%(%s)T:mkarchiso\r\e[0K"
+  print_section_end "mkarchiso"
 
   if [[ "${buildmode}" =~ "iso" ]]; then
     create_zsync_delta "${output}/${profile}/"*.iso
@@ -252,6 +256,13 @@ run_mkarchiso() {
     create_checksums "${output}/${profile}/"*.tar*(.gz|.xz|.zst)
   fi
   create_metrics
+
+  print_section_start "ownership" "Setting ownership on output"
+
+  if [[ -n "${SUDO_UID:-}" ]] && [[ -n "${SUDO_GID:-}" ]]; then
+    chown -Rv "${SUDO_UID}:${SUDO_GID}" -- "${output}"
+  fi
+  print_section_end "ownership"
 }
 
 trap cleanup EXIT
