@@ -151,7 +151,7 @@ base.
 
 Discussion around archiso takes place on the `arch-releng mailing list
 <https://lists.archlinux.org/listinfo/arch-releng>`_ and in `#archlinux-releng
-<ircs://chat.freenode.net/archlinux-releng>`_ on `freenode.net <https://freenode.net/>`_.
+<ircs://irc.libera.chat/archlinux-releng>`_ on `Libera Chat <https://libera.chat/>`_.
 
 All past and present authors of archiso are listed in `AUTHORS <AUTHORS.rst>`_.
 
