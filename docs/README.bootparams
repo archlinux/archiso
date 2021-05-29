@@ -24,7 +24,9 @@ INDEX
 * archisobasedir=   Set the base directory where all files reside.
                     Default: "arch"
 * copytoram=        If set to "y" or just "copytoram" without arguments,
-                    all SquashFS are copied to "RAM".
+                    all SquashFS are copied to "RAM". If you add the package
+                    "pv" to the packages.x86_64 it is used to display the copy
+                    progress.
                     Default: (unset)
 * checksum=         If set to "y" or just "checksum" without arguments,
                     performs a self-test of all files inside ${install_dir},

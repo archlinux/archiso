@@ -69,10 +69,23 @@ _mnt_sfs() {
     # defined via initcpio's parse_cmdline()
     if [ "${copytoram}" = "y" ]; then
         msg -n ":: Copying squashfs image to RAM..."
-        if ! cp -- "${img}" "/run/archiso/copytoram/${img_fullname}" ; then
+
+        # in case we have pv use it to display copy progress feedback otherwise
+        # fallback to using plain cp
+        if command -v pv > /dev/null 2>&1; then
+            echo ""
+            (pv "${img}" > "/run/archiso/copytoram/${img_fullname}")
+            local rc=$?
+        else
+            (cp -- "${img}" "/run/archiso/copytoram/${img_fullname}")
+            local rc=$?
+        fi
+
+        if [ $rc != 0 ]; then
             echo "ERROR: while copy '${img}' to '/run/archiso/copytoram/${img_fullname}'"
             launch_interactive_shell
         fi
+
         img="/run/archiso/copytoram/${img_fullname}"
         msg "done."
     fi
