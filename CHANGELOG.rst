@@ -2,6 +2,21 @@
 Changelog
 #########
 
+[55] - 2021-06-01
+=================
+
+Added
+-----
+
+- Add integration for pv when using the copytoram boot parameter so that progress on copying the image to RAM is shown
+- Add experimental support for EROFS by using it for the rootfs image in the baseline profile
+
+Changed
+-------
+
+- Change information on IRC channel, as Arch Linux moved to Libera Chat
+- Fix a regression, that would prevent network interfaces to be configured under certain circumstances
+
 [54] - 2021-05-13
 =================
 
