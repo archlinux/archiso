@@ -320,16 +320,18 @@ _make_custom_airootfs() {
 
 # Install desired packages to airootfs
 _make_packages() {
+    local envvars_in_chroot=()
     _msg_info "Installing packages to '${pacstrap_dir}/'..."
 
     if [[ -n "${gpg_key}" ]]; then
         exec {ARCHISO_GNUPG_FD}<>"${work_dir}/pubkey.gpg"
+        envvars_in_chroot+=("ARCHISO_GNUPG_FD=${ARCHISO_GNUPG_FD}")
     fi
 
     if [[ "${quiet}" = "y" ]]; then
-        env -i "ARCHISO_GNUPG_FD=${ARCHISO_GNUPG_FD}" pacstrap -C "${work_dir}/${buildmode}.pacman.conf" -c -G -M -- "${pacstrap_dir}" "${buildmode_pkg_list[@]}" &> /dev/null
+        env -i "${envvars_in_chroot[@]}" pacstrap -C "${work_dir}/${buildmode}.pacman.conf" -c -G -M -- "${pacstrap_dir}" "${buildmode_pkg_list[@]}" &> /dev/null
     else
-        env -i "ARCHISO_GNUPG_FD=${ARCHISO_GNUPG_FD}" pacstrap -C "${work_dir}/${buildmode}.pacman.conf" -c -G -M -- "${pacstrap_dir}" "${buildmode_pkg_list[@]}"
+        env -i "${envvars_in_chroot[@]}" pacstrap -C "${work_dir}/${buildmode}.pacman.conf" -c -G -M -- "${pacstrap_dir}" "${buildmode_pkg_list[@]}"
     fi
 
     if [[ -n "${gpg_key}" ]]; then
