@@ -6,11 +6,7 @@ build() {
     add_module "amdgpu"
     add_module "radeon"
     add_module "nouveau"
-    add_module "i915"
     add_module "mgag200"
-    add_module "via-agp"
-    add_module "sis-agp"
-    add_module "intel-agp"
 
     if [[ $(uname -m) == i686 ]]; then
         add_module "amd64-agp"
