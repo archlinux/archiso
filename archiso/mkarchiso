@@ -594,10 +594,10 @@ _make_bootmode_uefi-aarch64.systemd-boot.esp() {
 
     # the required image size in KiB (rounded up to the next full MiB with an additional MiB for reserved sectors)
     efiboot_imgsize="$(du -bc \
-        "${airootfs_dir}/usr/lib/systemd/boot/efi/systemd-bootaa64.efi" \
+        "${pacstrap_dir}/usr/lib/systemd/boot/efi/systemd-bootaa64.efi" \
         "${profile}/efiboot/" \
-        "${airootfs_dir}/boot/Image"* \
-        "${airootfs_dir}/boot/initramfs-"*".img" \
+        "${pacstrap_dir}/boot/Image"* \
+        "${pacstrap_dir}/boot/initramfs-"*".img" \
         2>/dev/null | awk 'function ceil(x){return int(x)+(x>int(x))}
             function byte_to_kib(x){return x/1024}
             function mib_to_kib(x){return x*1024}
@@ -612,7 +612,7 @@ _make_bootmode_uefi-aarch64.systemd-boot.esp() {
 
     mmd -i "${work_dir}/efiboot.img" ::/EFI ::/EFI/BOOT
     mcopy -i "${work_dir}/efiboot.img" \
-        "${airootfs_dir}/usr/lib/systemd/boot/efi/systemd-bootaa64.efi" ::/EFI/BOOT/BOOTAA64.EFI
+        "${pacstrap_dir}/usr/lib/systemd/boot/efi/systemd-bootaa64.efi" ::/EFI/BOOT/BOOTAA64.EFI
 
     mmd -i "${work_dir}/efiboot.img" ::/loader ::/loader/entries
     mcopy -i "${work_dir}/efiboot.img" "${profile}/efiboot/loader/loader.conf" ::/loader/
