@@ -439,7 +439,7 @@ _make_bootmode_bios.syslinux.mbr() {
 
     # Add other aditional/extra files to ${install_dir}/boot/
     if [[ -e "${pacstrap_dir}/boot/memtest86+/memtest.bin" ]]; then
-        # rename for PXE: https://wiki.archlinux.org/index.php/Syslinux#Using_memtest
+        # rename for PXE: https://wiki.archlinux.org/title/Syslinux#Using_memtest
         install -m 0644 -- "${pacstrap_dir}/boot/memtest86+/memtest.bin" "${isofs_dir}/${install_dir}/boot/memtest"
         install -d -m 0755 -- "${isofs_dir}/${install_dir}/boot/licenses/memtest86+/"
         install -m 0644 -- "${pacstrap_dir}/usr/share/licenses/common/GPL2/license.txt" \
@@ -767,7 +767,7 @@ _add_xorrisofs_options_bios.syslinux.mbr() {
         # When GPT is used, create an additional partition in the MBR (besides 0xEE) for sectors 0–1 (MBR
         # bootstrap code area) and mark it as bootable
         # May allow booting on some systems
-        # https://wiki.archlinux.org/index.php/Partitioning#Tricking_old_BIOS_into_booting_from_GPT
+        # https://wiki.archlinux.org/title/Partitioning#Tricking_old_BIOS_into_booting_from_GPT
         '--mbr-force-bootable'
         # Move the first partition away from the start of the ISO to match the expectations of partition editors
         # May allow booting on some systems
