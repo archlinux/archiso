@@ -597,6 +597,7 @@ _make_bootmode_uefi-aarch64.systemd-boot.esp() {
         "${pacstrap_dir}/usr/lib/systemd/boot/efi/systemd-bootaa64.efi" \
         "${profile}/efiboot/" \
         "${pacstrap_dir}/boot/Image"* \
+        "${pacstrap_dir}/boot/Image.gz"* \
         "${pacstrap_dir}/boot/initramfs-"*".img" \
         2>/dev/null | awk 'function ceil(x){return int(x)+(x>int(x))}
             function byte_to_kib(x){return x/1024}
