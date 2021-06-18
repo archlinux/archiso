@@ -143,7 +143,7 @@ Contribute
 
 Development of archiso takes place on Arch Linux' Gitlab: https://gitlab.archlinux.org/archlinux/archiso.
 
-Please read our distribution-wide `Code of Conduct <https://wiki.archlinux.org/index.php/Code_of_conduct>`_ before
+Please read our distribution-wide `Code of Conduct <https://wiki.archlinux.org/title/Code_of_conduct>`_ before
 contributing, to understand what actions will and will not be tolerated.
 
 Read our `contributing guide <CONTRIBUTING.rst>`_ to learn more about how to provide fixes or improvements for the code
