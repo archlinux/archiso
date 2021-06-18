@@ -141,3 +141,9 @@ INDEX
                     archiso_http_srv= in order to keep using the mirror
                     selected in the netboot menu.
                     Default: (unset)
+
+* script=           Takes a local file path or a URL to a script file which is
+                    executed from a temporary location after boot. If the
+                    parameter points at a remote file (supported protocols are
+                    http, https and ftp), it will be downloaded before execution.
+                    Default: (unset)
