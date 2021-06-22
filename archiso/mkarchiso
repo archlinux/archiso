@@ -320,7 +320,7 @@ _make_custom_airootfs() {
 
 # Install desired packages to airootfs
 _make_packages() {
-    local envvars_in_chroot=()
+    local envvars_in_chroot=("SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH}")
     _msg_info "Installing packages to '${pacstrap_dir}/'..."
 
     if [[ -n "${gpg_key}" ]]; then
@@ -373,7 +373,7 @@ _make_customize_airootfs() {
         _msg_info "Running customize_airootfs.sh in '${pacstrap_dir}' chroot..."
         _msg_warning "customize_airootfs.sh is deprecated! Support for it will be removed in a future archiso version."
         chmod -f -- +x "${pacstrap_dir}/root/customize_airootfs.sh"
-        eval -- env -i arch-chroot "${pacstrap_dir}" "/root/customize_airootfs.sh"
+        eval -- env -i "SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH}" arch-chroot "${pacstrap_dir}" "/root/customize_airootfs.sh"
         rm -- "${pacstrap_dir}/root/customize_airootfs.sh"
         _msg_info "Done! customize_airootfs.sh run successfully."
     fi
