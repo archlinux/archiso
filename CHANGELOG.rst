@@ -2,6 +2,25 @@
 Changelog
 #########
 
+[56] - 2021-07-01
+=================
+
+Added
+-----
+
+- Add pacman >= 6 compatible configuration
+- Add documentation for the `script` boot parameter
+
+Changed
+-------
+
+- Clear environment variables before working in chroot
+- Update Arch Wiki URLs
+- Pass SOURCE_DATE_EPOCH to chroot
+- Enable parallel downloads in profile pacman configurations
+- Generalize the approach of interacting with ucode images
+- Execute the netboot build mode for the baseline profile in CI
+
 [55] - 2021-06-01
 =================
 
