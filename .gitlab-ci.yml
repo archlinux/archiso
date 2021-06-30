@@ -6,7 +6,7 @@ default:
   image: "archlinux:latest"
 
 variables:
-  BUILD_SCRIPT: ./.gitlab/ci/build-inside-vm.sh
+  BUILD_SCRIPT: ./.gitlab/ci/build_archiso.sh
   QEMU_BUILD_TIMEOUT: 2400
   QEMU_VM_MEMORY: 3072
   ARCHISO_COW_SPACE_SIZE: 2g
