@@ -6,7 +6,7 @@ set -e -u
 
 # Control the environment
 umask 0022
-export LANG="C"
+export LC_ALL="C"
 export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-"$(date +%s)"}"
 
 # Set application name from the script's file name
