@@ -2,43 +2,30 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-default:
-  image: "archlinux:latest"
+# NOTE: most functionality (apart from building) is abstracted by this include
+include:
+  - project: 'archlinux/ci-scripts'
+    ref: master
+    file: '/prepare_archiso_vm.yml'
 
 variables:
-  BUILD_SCRIPT: ./.gitlab/ci/build-inside-vm.sh
+  BUILD_SCRIPT: ./.gitlab/ci/build_archiso.sh
+  PACKAGE_LIST: dosfstools e2fsprogs erofs-utils jq libisoburn mtools openssl qemu-headless squashfs-tools zsync
   QEMU_BUILD_TIMEOUT: 2400
+  QEMU_COPY_ARTIFACTS_TIMEOUT: 120
   QEMU_VM_MEMORY: 3072
   ARCHISO_COW_SPACE_SIZE: 2g
 
 stages:
-  - lint
+  - check
   - build
 
-shellcheck:
-  stage: lint
+check:
   before_script:
     - pacman --noconfirm -Syu --needed make shellcheck
   script:
     - make lint
-
-.build:
-  variables:
-    PACKAGE_LIST: dosfstools e2fsprogs erofs-utils jq libisoburn mtools openssl qemu-headless squashfs-tools zsync
-  stage: build
-  before_script:
-    - pacman -Syu --needed --noconfirm qemu-headless
-  script:
-    - ./.gitlab/ci/build-host.sh
-  after_script:
-    - PROFILE=($BUILD_SCRIPT_ARGS) && cp -- "output/${PROFILE[0]}/metrics.txt" .
-  artifacts:
-    name: "output"
-    paths:
-      - "output/*/*"
-    expire_in: 2d
-    reports:
-      metrics: metrics.txt
+  stage: check
 
 build_short:
   extends: .build
@@ -49,11 +36,11 @@ build_short:
 
 build_long:
   extends: .build
-  tags:
-    - fast-single-thread
   parallel:
     matrix:
       - BUILD_SCRIPT_ARGS: baseline iso
       - BUILD_SCRIPT_ARGS: baseline netboot
       - BUILD_SCRIPT_ARGS: releng iso
       - BUILD_SCRIPT_ARGS: releng netboot
+  tags:
+    - fast-single-thread
