@@ -2,6 +2,20 @@
 Changelog
 #########
 
+[56.1] - 2021-07-11
+===================
+
+Added
+-----
+
+Changed
+-------
+
+- Simplify gitlab CI setup by using ci-scripts (shared amongst several projects)
+- Fix an issue with the unsetting of environment variables before using pacstrap/arch-chroot
+- Remove termite-terminfo from the releng profile's list of packages (it is not in the official repositories anymore)
+- Set LC_ALL instead of LANG
+
 [56] - 2021-07-01
 =================
 
