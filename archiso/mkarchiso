@@ -172,6 +172,8 @@ _cleanup_pacstrap_dir() {
     _msg_info "Done!"
 }
 
+# Create a squashfs image and place it in the ISO 9660 file system.
+# $@: options to pass to mksquashfs
 _run_mksquashfs() {
     local image_path="${isofs_dir}/${install_dir}/${arch}/airootfs.sfs"
     if [[ "${quiet}" == "y" ]]; then
@@ -181,7 +183,8 @@ _run_mksquashfs() {
     fi
 }
 
-# Makes a ext4 filesystem inside a SquashFS from a source directory.
+# Create an ext4 image containing the root file system and pack it inside a squashfs image.
+# Save the squashfs image on the ISO 9660 file system.
 _mkairootfs_ext4+squashfs() {
     [[ -e "${pacstrap_dir}" ]] || _msg_error "The path '${pacstrap_dir}' does not exist" 1
 
@@ -206,7 +209,7 @@ _mkairootfs_ext4+squashfs() {
     rm -- "${pacstrap_dir}.img"
 }
 
-# Makes a SquashFS filesystem from a source directory.
+# Create a squashfs image containing the root file system and saves it on the ISO 9660 file system.
 _mkairootfs_squashfs() {
     [[ -e "${pacstrap_dir}" ]] || _msg_error "The path '${pacstrap_dir}' does not exist" 1
 
@@ -215,7 +218,7 @@ _mkairootfs_squashfs() {
     _run_mksquashfs "${pacstrap_dir}"
 }
 
-# Makes an EROFS file system from a source directory.
+# Create an EROFS image containing the root file system and saves it on the ISO 9660 file system.
 _mkairootfs_erofs() {
     local fsuuid
     [[ -e "${pacstrap_dir}" ]] || _msg_error "The path '${pacstrap_dir}' does not exist" 1
@@ -229,6 +232,7 @@ _mkairootfs_erofs() {
     _msg_info "Done!"
 }
 
+# Create checksum file for the rootfs image.
 _mkchecksum() {
     _msg_info "Creating checksum file for self-test..."
     cd -- "${isofs_dir}/${install_dir}/${arch}"
@@ -241,6 +245,7 @@ _mkchecksum() {
     _msg_info "Done!"
 }
 
+# GPG sign the root file system image.
 _mksignature() {
     _msg_info "Signing rootfs image..."
     cd -- "${isofs_dir}/${install_dir}/${arch}"
@@ -255,6 +260,7 @@ _mksignature() {
 }
 
 # Helper function to run functions only one time.
+# $1: function name
 _run_once() {
     if [[ ! -e "${work_dir}/${run_once_mode}.${1}" ]]; then
         "$1"
@@ -262,13 +268,13 @@ _run_once() {
     fi
 }
 
-# Set up custom pacman.conf with custom cache and pacman hook directories
+# Set up custom pacman.conf with custom cache and pacman hook directories.
 _make_pacman_conf() {
     local _cache_dirs _system_cache_dirs _profile_cache_dirs
     _system_cache_dirs="$(pacman-conf CacheDir| tr '\n' ' ')"
     _profile_cache_dirs="$(pacman-conf --config "${pacman_conf}" CacheDir| tr '\n' ' ')"
 
-    # only use the profile's CacheDir, if it is not the default and not the same as the system cache dir
+    # Only use the profile's CacheDir, if it is not the default and not the same as the system cache dir.
     if [[ "${_profile_cache_dirs}" != "/var/cache/pacman/pkg" ]] && \
         [[ "${_system_cache_dirs}" != "${_profile_cache_dirs}" ]]; then
         _cache_dirs="${_profile_cache_dirs}"
@@ -287,7 +293,7 @@ _make_pacman_conf() {
         /\[options\]/a HookDir = ${pacstrap_dir}/etc/pacman.d/hooks/" > "${work_dir}/${buildmode}.pacman.conf"
 }
 
-# Prepare working directory and copy custom airootfs files (airootfs)
+# Prepare working directory and copy custom root file system files.
 _make_custom_airootfs() {
     local passwd=()
     local filename permissions
@@ -320,7 +326,7 @@ _make_custom_airootfs() {
     fi
 }
 
-# Install desired packages to airootfs
+# Install desired packages to the root file system
 _make_packages() {
     _msg_info "Installing packages to '${pacstrap_dir}/'..."
 
@@ -344,7 +350,7 @@ _make_packages() {
     _msg_info "Done! Packages installed successfully."
 }
 
-# Customize installation (airootfs)
+# Customize installation.
 _make_customize_airootfs() {
     local passwd=()
 
@@ -390,7 +396,7 @@ _make_bootmodes() {
     done
 }
 
-# Prepare kernel/initramfs ${install_dir}/boot/
+# Copy kernel and initramfs to ISO 9660
 _make_boot_on_iso9660() {
     local ucode_image
     _msg_info "Preparing kernel and initramfs for the ISO 9660 file system..."
@@ -411,7 +417,7 @@ _make_boot_on_iso9660() {
     _msg_info "Done!"
 }
 
-# Prepare /syslinux for booting from MBR
+# Prepare syslinux for booting from MBR (isohybrid)
 _make_bootmode_bios.syslinux.mbr() {
     _msg_info "Setting up SYSLINUX for BIOS booting from a disk..."
     install -d -m 0755 -- "${isofs_dir}/syslinux"
@@ -451,7 +457,7 @@ _make_bootmode_bios.syslinux.mbr() {
     _msg_info "Done! SYSLINUX set up for BIOS booting from a disk successfully."
 }
 
-# Prepare /syslinux for El-Torito booting
+# Prepare syslinux for El-Torito booting
 _make_bootmode_bios.syslinux.eltorito() {
     _msg_info "Setting up SYSLINUX for BIOS booting from an optical disc..."
     install -d -m 0755 -- "${isofs_dir}/syslinux"
@@ -464,32 +470,7 @@ _make_bootmode_bios.syslinux.eltorito() {
     _msg_info "Done! SYSLINUX set up for BIOS booting from an optical disc successfully."
 }
 
-# Prepare /EFI on ISO-9660
-_make_efi_dir_on_iso9660() {
-    _msg_info "Preparing an /EFI directory for the ISO 9660 file system..."
-    install -d -m 0755 -- "${isofs_dir}/EFI/BOOT"
-    install -m 0644 -- "${pacstrap_dir}/usr/lib/systemd/boot/efi/systemd-bootx64.efi" \
-        "${isofs_dir}/EFI/BOOT/BOOTx64.EFI"
-
-    install -d -m 0755 -- "${isofs_dir}/loader/entries"
-    install -m 0644 -- "${profile}/efiboot/loader/loader.conf" "${isofs_dir}/loader/"
-
-    for _conf in "${profile}/efiboot/loader/entries/"*".conf"; do
-        sed "s|%ARCHISO_LABEL%|${iso_label}|g;
-             s|%INSTALL_DIR%|${install_dir}|g;
-             s|%ARCH%|${arch}|g" \
-            "${_conf}" > "${isofs_dir}/loader/entries/${_conf##*/}"
-    done
-
-    # edk2-shell based UEFI shell
-    # shellx64.efi is picked up automatically when on /
-    if [[ -e "${pacstrap_dir}/usr/share/edk2-shell/x64/Shell_Full.efi" ]]; then
-        install -m 0644 -- "${pacstrap_dir}/usr/share/edk2-shell/x64/Shell_Full.efi" "${isofs_dir}/shellx64.efi"
-    fi
-    _msg_info "Done!"
-}
-
-# Prepare kernel/initramfs on efiboot.img
+# Copy kernel and initramfs to FAT image
 _make_boot_on_fat() {
     local ucode_image all_ucode_images=()
     _msg_info "Preparing kernel and initramfs for the FAT file system..."
@@ -508,9 +489,30 @@ _make_boot_on_fat() {
     _msg_info "Done!"
 }
 
-# Prepare efiboot.img::/EFI for EFI boot mode
+# Create a FAT image (efiboot.img) which will serve as the EFI system partition
+# $1: image size in bytes
+_make_efibootimg() {
+    local imgsize="0"
+
+    # Convert from bytes to KiB and round up to the next full MiB with an additional MiB for reserved sectors.
+    imgsize="$(awk 'function ceil(x){return int(x)+(x>int(x))}
+            function byte_to_kib(x){return x/1024}
+            function mib_to_kib(x){return x*1024}
+            END {print mib_to_kib(ceil((byte_to_kib($1)+1024)/1024))}' <<< "${1}"
+    )"
+    # The FAT image must be created with mkfs.fat not mformat, as some systems have issues with mformat made images:
+    # https://lists.gnu.org/archive/html/grub-devel/2019-04/msg00099.html
+    [[ -e "${work_dir}/efiboot.img" ]] && rm -f -- "${work_dir}/efiboot.img"
+    _msg_info "Creating FAT image of size: ${imgsize} KiB..."
+    mkfs.fat -C -n ARCHISO_EFI "${work_dir}/efiboot.img" "${imgsize}"
+
+    # Create the default/fallback boot path in which a boot loaders will be placed later.
+    mmd -i "${work_dir}/efiboot.img" ::/EFI ::/EFI/BOOT
+}
+
+# Prepare system-boot for booting when written to a disk (isohybrid)
 _make_bootmode_uefi-x64.systemd-boot.esp() {
-    local _file efiboot_imgsize="0"
+    local _file efiboot_imgsize
     local _available_ucodes=()
     _msg_info "Setting up systemd-boot for UEFI booting..."
 
@@ -519,7 +521,7 @@ _make_bootmode_uefi-x64.systemd-boot.esp() {
             _available_ucodes+=("${pacstrap_dir}/boot/${_file}")
         fi
     done
-    # the required image size in KiB (rounded up to the next full MiB with an additional MiB for reserved sectors)
+    # Calculate the required FAT image size in bytes
     efiboot_imgsize="$(du -bc \
         "${pacstrap_dir}/usr/lib/systemd/boot/efi/systemd-bootx64.efi" \
         "${pacstrap_dir}/usr/share/edk2-shell/x64/Shell_Full.efi" \
@@ -527,21 +529,15 @@ _make_bootmode_uefi-x64.systemd-boot.esp() {
         "${pacstrap_dir}/boot/vmlinuz-"* \
         "${pacstrap_dir}/boot/initramfs-"*".img" \
         "${_available_ucodes[@]}" \
-        2>/dev/null | awk 'function ceil(x){return int(x)+(x>int(x))}
-            function byte_to_kib(x){return x/1024}
-            function mib_to_kib(x){return x*1024}
-            END {print mib_to_kib(ceil((byte_to_kib($1)+1024)/1024))}'
-        )"
-    # The FAT image must be created with mkfs.fat not mformat, as some systems have issues with mformat made images:
-    # https://lists.gnu.org/archive/html/grub-devel/2019-04/msg00099.html
-    [[ -e "${work_dir}/efiboot.img" ]] && rm -f -- "${work_dir}/efiboot.img"
-    _msg_info "Creating FAT image of size: ${efiboot_imgsize} KiB..."
-    mkfs.fat -C -n ARCHISO_EFI "${work_dir}/efiboot.img" "$efiboot_imgsize"
+        2>/dev/null | awk 'END { print $1 }')"
+    # Create a FAT image for the EFI system partition
+    _make_efibootimg "$efiboot_imgsize"
 
-    mmd -i "${work_dir}/efiboot.img" ::/EFI ::/EFI/BOOT
+    # Copy systemd-boot EFI binary to the default/fallback boot path
     mcopy -i "${work_dir}/efiboot.img" \
         "${pacstrap_dir}/usr/lib/systemd/boot/efi/systemd-bootx64.efi" ::/EFI/BOOT/BOOTx64.EFI
 
+    # Copy systemd-boot configuration files
     mmd -i "${work_dir}/efiboot.img" ::/loader ::/loader/entries
     mcopy -i "${work_dir}/efiboot.img" "${profile}/efiboot/loader/loader.conf" ::/loader/
     for _conf in "${profile}/efiboot/loader/entries/"*".conf"; do
@@ -557,17 +553,46 @@ _make_bootmode_uefi-x64.systemd-boot.esp() {
             "${pacstrap_dir}/usr/share/edk2-shell/x64/Shell_Full.efi" ::/shellx64.efi
     fi
 
-    # Copy kernel and initramfs
+    # Copy kernel and initramfs to FAT image.
+    # systemd-boot can only access files from the EFI system partition it was launched from.
     _make_boot_on_fat
 
     _msg_info "Done! systemd-boot set up for UEFI booting successfully."
 }
 
-# Prepare efiboot.img::/EFI for "El Torito" EFI boot mode
+# Prepare system-boot for El Torito booting
 _make_bootmode_uefi-x64.systemd-boot.eltorito() {
+    # El Torito UEFI boot requires an image containing the EFI system partition.
+    # uefi-x64.systemd-boot.eltorito has the same requirements as uefi-x64.systemd-boot.esp
     _run_once _make_bootmode_uefi-x64.systemd-boot.esp
-    # Set up /EFI on ISO-9660 to allow preparing an installation medium by manually copying files
-    _run_once _make_efi_dir_on_iso9660
+
+    # Additionally set up system-boot in ISO 9660. This allows creating a medium for the live environment by using
+    # manual partitioning and simply copying the ISO 9660 file system contents.
+    # This is not related to El Torito booting and no firmware uses these files.
+    _msg_info "Preparing an /EFI directory for the ISO 9660 file system..."
+    install -d -m 0755 -- "${isofs_dir}/EFI/BOOT"
+
+    # Copy systemd-boot EFI binary to the default/fallback boot path
+    install -m 0644 -- "${pacstrap_dir}/usr/lib/systemd/boot/efi/systemd-bootx64.efi" \
+        "${isofs_dir}/EFI/BOOT/BOOTx64.EFI"
+
+    # Copy systemd-boot configuration files
+    install -d -m 0755 -- "${isofs_dir}/loader/entries"
+    install -m 0644 -- "${profile}/efiboot/loader/loader.conf" "${isofs_dir}/loader/"
+    for _conf in "${profile}/efiboot/loader/entries/"*".conf"; do
+        sed "s|%ARCHISO_LABEL%|${iso_label}|g;
+             s|%INSTALL_DIR%|${install_dir}|g;
+             s|%ARCH%|${arch}|g" \
+            "${_conf}" > "${isofs_dir}/loader/entries/${_conf##*/}"
+    done
+
+    # edk2-shell based UEFI shell
+    # shellx64.efi is picked up automatically when on /
+    if [[ -e "${pacstrap_dir}/usr/share/edk2-shell/x64/Shell_Full.efi" ]]; then
+        install -m 0644 -- "${pacstrap_dir}/usr/share/edk2-shell/x64/Shell_Full.efi" "${isofs_dir}/shellx64.efi"
+    fi
+
+    _msg_info "Done!"
 }
 
 _validate_requirements_bootmode_bios.syslinux.mbr() {
@@ -609,6 +634,7 @@ _validate_requirements_bootmode_bios.syslinux.mbr() {
 }
 
 _validate_requirements_bootmode_bios.syslinux.eltorito() {
+    # bios.syslinux.eltorito has the exact same requirements as bios.syslinux.mbr
     _validate_requirements_bootmode_bios.syslinux.mbr
 }
 
@@ -772,7 +798,7 @@ _add_xorrisofs_options_bios.syslinux.eltorito() {
     )
 }
 
-# SYSLINUX MBR
+# SYSLINUX MBR (isohybrid)
 _add_xorrisofs_options_bios.syslinux.mbr() {
     xorrisofs_options+=(
         # SYSLINUX MBR bootstrap code; does not work without "-eltorito-boot syslinux/isolinux.bin"
