@@ -2,6 +2,26 @@
 Changelog
 #########
 
+[57] - 2021-07-30
+=================
+
+Added
+-----
+
+- Add a missing line in the systemd-networkd-wait-online.service in the baseline profile
+
+Changed
+-------
+
+- Adapt systemd-networkd configuration to systemd ≥ 249
+- Improve documentation in ``mkarchiso`` and systemd-networkd related configuration files
+- Fix an issue that may prevent continuing an aborted build of the ``netboot`` or ``iso`` buildmode
+
+Removed
+-------
+
+- Remove SPDX license identifier from files that are not eligible for copyright (e.g. configuration files)
+
 [56.1] - 2021-07-11
 ===================
 
