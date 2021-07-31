@@ -120,23 +120,18 @@ To install archiso system-wide use the included ``Makefile``:
 
    make install
 
-Optionally install archiso's mkinitcpio hooks:
-
-.. code:: sh
-
-   make install-initcpio
-
 Optional features
 
 The iso image contains a GRUB environment block holding the iso name and version. This allows to
 boot the iso image from GRUB with a version specific cow directory to mitigate overlay clashes.
 
 .. code:: sh
-     loopback loop archlinux.iso
-     load_env -f (loop)/arch/grubenv
-     linux (loop)/arch/boot/x86_64/vmlinuz-linux ... \
-         cow_directory=${NAME}/${VERSION} ...
-     initrd (loop)/arch/boot/x86_64/initramfs-linux-lts.img
+
+   loopback loop archlinux.iso
+   load_env -f (loop)/arch/grubenv
+   linux (loop)/arch/boot/x86_64/vmlinuz-linux ... \
+       cow_directory=${NAME}/${VERSION} ...
+   initrd (loop)/arch/boot/x86_64/initramfs-linux-lts.img
 
 Contribute
 ==========
