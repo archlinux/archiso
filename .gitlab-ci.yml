@@ -24,7 +24,7 @@ check:
   before_script:
     - pacman --noconfirm -Syu --needed make shellcheck
   script:
-    - make lint
+    - make check
   stage: check
 
 build_short:
