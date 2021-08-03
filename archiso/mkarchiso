@@ -67,22 +67,6 @@ _msg_error() {
     fi
 }
 
-_mount_airootfs() {
-    trap "_umount_airootfs" EXIT HUP INT TERM
-    install -d -m 0755 -- "${work_dir}/mnt/airootfs"
-    _msg_info "Mounting '${pacstrap_dir}.img' on '${work_dir}/mnt/airootfs'..."
-    mount -- "${pacstrap_dir}.img" "${work_dir}/mnt/airootfs"
-    _msg_info "Done!"
-}
-
-_umount_airootfs() {
-    _msg_info "Unmounting '${work_dir}/mnt/airootfs'..."
-    umount -d -- "${work_dir}/mnt/airootfs"
-    _msg_info "Done!"
-    rmdir -- "${work_dir}/mnt/airootfs"
-    trap - EXIT HUP INT TERM
-}
-
 # Show help usage, with an exit status.
 # $1: exit status number.
 _usage() {
@@ -186,22 +170,26 @@ _run_mksquashfs() {
 # Create an ext4 image containing the root file system and pack it inside a squashfs image.
 # Save the squashfs image on the ISO 9660 file system.
 _mkairootfs_ext4+squashfs() {
+    local ext4_hash_seed mkfs_ext4_options=()
     [[ -e "${pacstrap_dir}" ]] || _msg_error "The path '${pacstrap_dir}' does not exist" 1
 
-    _msg_info "Creating ext4 image of 32 GiB..."
-    if [[ "${quiet}" == "y" ]]; then
-        mkfs.ext4 -q -O '^has_journal,^resize_inode' -E 'lazy_itable_init=0' -m 0 -F -- "${pacstrap_dir}.img" 32G
-    else
-        mkfs.ext4 -O '^has_journal,^resize_inode' -E 'lazy_itable_init=0' -m 0 -F -- "${pacstrap_dir}.img" 32G
-    fi
+    _msg_info "Creating ext4 image of 32 GiB and copying '${pacstrap_dir}/' to it..."
+
+    ext4_hash_seed="$(uuidgen --sha1 --namespace 93a870ff-8565-4cf3-a67b-f47299271a96 \
+        --name "${SOURCE_DATE_EPOCH} ext4 hash seed")"
+    mkfs_ext4_options=(
+        '-d' "${pacstrap_dir}"
+        '-O' '^has_journal,^resize_inode'
+        '-E' "lazy_itable_init=0,root_owner=0:0,hash_seed=${ext4_hash_seed}"
+        '-m' '0'
+        '-F'
+        '-U' 'clear'
+    )
+    [[ ! "${quiet}" == "y" ]] || mkfs_ext4_options+=('-q')
+    E2FSPROGS_FAKE_TIME="${SOURCE_DATE_EPOCH}" mkfs.ext4 "${mkfs_ext4_options[@]}" -- "${pacstrap_dir}.img" 32G
     tune2fs -c 0 -i 0 -- "${pacstrap_dir}.img" > /dev/null
     _msg_info "Done!"
-    _mount_airootfs
-    _msg_info "Copying '${pacstrap_dir}/' to '${work_dir}/mnt/airootfs/'..."
-    cp -aT -- "${pacstrap_dir}/" "${work_dir}/mnt/airootfs/"
-    chown -- 0:0 "${work_dir}/mnt/airootfs/"
-    _msg_info "Done!"
-    _umount_airootfs
+
     install -d -m 0755 -- "${isofs_dir}/${install_dir}/${arch}"
     _msg_info "Creating SquashFS image, this may take some time..."
     _run_mksquashfs "${pacstrap_dir}.img"
