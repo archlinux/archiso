@@ -238,15 +238,17 @@ _mkchecksum() {
 
 # GPG sign the root file system image.
 _mksignature() {
+    local airootfs_image_filename
     _msg_info "Signing rootfs image..."
-    cd -- "${isofs_dir}/${install_dir}/${arch}"
-    # always use the .sig file extension, as that is what mkinitcpio-archiso's hooks expect
     if [[ -e "${isofs_dir}/${install_dir}/${arch}/airootfs.sfs" ]]; then
-        gpg --output airootfs.sfs.sig --detach-sign --default-key "${gpg_key}" airootfs.sfs
+        airootfs_image_filename="${isofs_dir}/${install_dir}/${arch}/airootfs.sfs"
     elif [[ -e "${isofs_dir}/${install_dir}/${arch}/airootfs.erofs" ]]; then
-        gpg --output airootfs.erofs.sig --detach-sign --default-key "${gpg_key}" airootfs.erofs
+        airootfs_image_filename="${isofs_dir}/${install_dir}/${arch}/airootfs.erofs"
     fi
-    cd -- "${OLDPWD}"
+    rm -f -- "${airootfs_image_filename}.sig"
+    # always use the .sig file extension, as that is what mkinitcpio-archiso's hooks expect
+    gpg --batch --no-armor --no-include-key-block --output "${airootfs_image_filename}.sig" --detach-sign \
+        --default-key "${gpg_key}" "${airootfs_image_filename}"
     _msg_info "Done!"
 }
 
@@ -1126,7 +1128,8 @@ _set_overrides() {
 }
 
 _export_gpg_publickey() {
-    gpg --batch --output "${work_dir}/pubkey.gpg" --export "${gpg_key}"
+    rm -f -- "${work_dir}/pubkey.gpg"
+    gpg --batch --no-armor --output "${work_dir}/pubkey.gpg" --export "${gpg_key}"
 }
 
 _make_version() {
