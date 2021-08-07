@@ -199,6 +199,8 @@ EOF
         | awk -F':' '{if($1 ~ /sec/){ print $5 }}'
   )"
 
+  pgp_sender="Arch Linux Release Engineering (Ephemeral Signing Key) <arch-releng@lists.archlinux.org>"
+
   print_section_end "ephemeral_pgp_key"
 }
 
@@ -240,6 +242,7 @@ run_mkarchiso() {
       -D "${install_dir}" \
       -c "${codesigning_cert} ${codesigning_key}" \
       -g "${pgp_key_id}" \
+      -G "${pgp_sender}" \
       -o "${output}/" \
       -w "${tmpdir}/" \
       -m "${buildmode}" \
