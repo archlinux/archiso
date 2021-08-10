@@ -1,15 +1,16 @@
+# TODO: might need archlinuxarm-keyring and archlinux-keyring (note that archlinux-keyring has never existed in the x86_64 iso installer)
 alsa-utils
-amd-ucode
+#amd-ucode
 arch-install-scripts
 archinstall
 b43-fwcutter
 base
 bind-tools
 brltty
-broadcom-wl
+#broadcom-wl
 btrfs-progs
 clonezilla
-cloud-init
+#cloud-init
 crda
 cryptsetup
 darkhttpd
@@ -21,7 +22,7 @@ dmraid
 dnsmasq
 dosfstools
 e2fsprogs
-edk2-shell
+#edk2-shell
 efibootmgr
 espeakup
 ethtool
@@ -35,9 +36,9 @@ gpm
 gptfdisk
 grml-zsh-config
 hdparm
-intel-ucode
-ipw2100-fw
-ipw2200-fw
+#intel-ucode
+#ipw2100-fw
+#ipw2200-fw
 irssi
 iw
 iwd
@@ -47,7 +48,8 @@ less
 lftp
 libfido2
 libusb-compat
-linux
+#linux
+linux-aarch64
 linux-atm
 linux-firmware
 livecd-sounds
@@ -58,7 +60,7 @@ man-db
 man-pages
 mc
 mdadm
-memtest86+
+#memtest86+
 mkinitcpio
 mkinitcpio-archiso
 mkinitcpio-nfs-utils
@@ -83,7 +85,7 @@ ppp
 pptpclient
 pv
 qemu-guest-agent
-reflector
+#reflector
 reiserfsprogs
 rp-pppoe
 rsync
@@ -95,7 +97,7 @@ smartmontools
 sof-firmware
 squashfs-tools
 sudo
-syslinux
+#syslinux
 systemd-resolvconf
 tcpdump
 terminus-font
@@ -107,7 +109,7 @@ usb_modeswitch
 usbmuxd
 usbutils
 vim
-virtualbox-guest-utils-nox
+#virtualbox-guest-utils-nox
 vpnc
 wireless-regdb
 wireless_tools
