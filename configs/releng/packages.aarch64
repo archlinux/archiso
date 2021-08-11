@@ -1,6 +1,6 @@
 # TODO: might need archlinuxarm-keyring and archlinux-keyring (note that archlinux-keyring has never existed in the x86_64 iso installer)
 alsa-utils
-#amd-ucode
+amd-ucode
 arch-install-scripts
 archinstall
 b43-fwcutter
