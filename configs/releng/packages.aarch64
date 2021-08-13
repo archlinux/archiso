@@ -62,7 +62,7 @@ mc
 mdadm
 #memtest86+
 mkinitcpio
-mkinitcpio-archiso
+#mkinitcpio-archiso
 mkinitcpio-nfs-utils
 modemmanager
 mtools
