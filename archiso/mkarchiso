@@ -505,7 +505,13 @@ _make_efibootimg() {
     # https://lists.gnu.org/archive/html/grub-devel/2019-04/msg00099.html
     rm -f -- "${work_dir}/efiboot.img"
     _msg_info "Creating FAT image of size: ${imgsize} KiB..."
-    mkfs.fat -C -n ARCHISO_EFI "${work_dir}/efiboot.img" "${imgsize}"
+    if [[ "${quiet}" == "y" ]]; then
+        # mkfs.fat does not have a -q/--quiet option, so redirect stdout to /dev/null instead
+        # https://github.com/dosfstools/dosfstools/issues/103
+        mkfs.fat -C -n ARCHISO_EFI "${work_dir}/efiboot.img" "${imgsize}" > /dev/null
+    else
+        mkfs.fat -C -n ARCHISO_EFI "${work_dir}/efiboot.img" "${imgsize}"
+    fi
 
     # Create the default/fallback boot path in which a boot loaders will be placed later.
     mmd -i "${work_dir}/efiboot.img" ::/EFI ::/EFI/BOOT
