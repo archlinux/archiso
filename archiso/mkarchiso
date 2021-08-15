@@ -1137,7 +1137,7 @@ _make_version() {
     rm -f -- "${pacstrap_dir}/version"
     printf '%s\n' "${iso_version}" > "${pacstrap_dir}/version"
 
-    if [[ "${buildmode}" == "iso" ]]; then
+    if [[ "${buildmode}" == @("iso"|"netboot") ]]; then
         install -d -m 0755 -- "${isofs_dir}/${install_dir}"
         # Write version file to ISO 9660
         printf '%s\n' "${iso_version}" > "${isofs_dir}/${install_dir}/version"
