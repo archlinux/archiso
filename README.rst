@@ -1,4 +1,53 @@
-=======
+About this fork
+===============
+This is a fork of archiso with support for creating aarch64 (ARM64) Arch Linux ARM (referred to as ALARM) generic UEFI ISOs.
+
+Why?
+----
+I wanted to be able to easily install ALARM in a Parallels VM on my M1 Mac. This repo will allow anyone to fairly easily
+create ALARM ISOs to be able to run in VMs on their aarch64 computers. It will almost certainly be helpful to people wanting
+to install ALARM on their aarch64 computers that have UEFI firmwares that allow for booting from multiple storage devices
+(e.g., devices that can boot from USB flash drives).
+
+Changes here vs archiso
+-----------------------
+- Modified `archiso/mkarchiso <archiso/mkarchiso/>`_ script with aarch64 support, removed hardcoded `ucodes` that are unavailable on aarch64
+- Modified `configs/releng/pacman.conf <configs/releng/pacman.conf>`_ to remove packages that are unavailable on aarch64, and add ``linux-aarch64`` kernel
+- Removed config files + systemd services for packages have been removed
+- Updated various files with aarch64 branding (e.g., replace "x64" strings with "aarch64")
+- Replace x64 Arch Linux specific config files with ALARM versions (e.g., use ALARM pacman config + mirrorlist)
+- Add new `journald.conf.d <configs/releng/airootfs/etc/systemd/journald.conf.d>`_ config "`audit.conf <configs/releng/airootfs/etc/systemd/journald.conf.d/audit.conf>`_" to disable outputting audit messages to the Linux TTY
+   - TTY would otherwise get filled with audit messages, which would make it very hard to install ALARM
+- Move archiso ``initcpio`` files directly into the `releng airootfs <configs/releng/airootfs>`_
+   - Modified `archiso_kms <configs/releng/airootfs/usr/lib/initcpio/install/archiso_kms>`_ hooks to not show warnings
+     when running archiso in the mkintcpio section, as there are modules which are unavailable in ``linux-aarch64``
+   - Note: this fork is currently based off of the ``v57`` release, which is the last version that has these files included in
+     in the archiso project. They have since been moved `here <https://gitlab.archlinux.org/mkinitcpio/mkinitcpio-archiso/>`_,
+     as x64 Arch Linux now has those files added to the ISO through the ``mkinitcpio-archiso`` package. This package *IS* available
+     from the ALARM packages (as the package is flagged as "any" architecture), however those files can't be modified with the changes
+     noted above. Maybe at some point the changes can get merged upstream or an ALARM-specifc fork can be created,
+     but for now, having them inside the ``airootfs`` is fine
+
+Check the commits to this repo to see all the changes.
+
+How to use?
+-----------
+**Note: I will occasionally push new ISOs to the releases section of this repository, so if you don't want
+to build the ISO yourself, check there first**
+
+*I assume these commands are being run from an existing Arch Linux install, whether that be x64 or ARM)*
+
+1. Install the packages mentioned in `Requirements`_. Note that you don't need the virtualized test environment packages.
+2. ``git clone`` this repository and ``cd`` into it
+3. run ``sudo ./archiso/mkarchiso -v configs/releng``. This will download all the packages and build the ISO
+4. You can find the generated ISO in in `work <work/>`_ once it has been built
+5. If you want to run it again (e.g., you want to build a more up-to-date ISO, or you want to add packages to be installed
+   to the ISO), first run ``sudo rm -rf work`` and ``sudo rm -rf out`` to delete the working tree and ISO.
+   Then re-run from step #3.
+
+**The original README for archiso continues below:**
+====================================================
+
 archiso
 =======
 
