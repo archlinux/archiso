@@ -583,7 +583,7 @@ _make_bootmode_uefi-x64.systemd-boot.esp() {
 _make_bootmode_uefi-aarch64.systemd-boot.esp() {
     local _file efiboot_imgsize
     local _available_ucodes=()
-    _msg_info "Setting up systemd-boot for UEFI booting..."
+    _msg_info "Setting up systemd-boot for aarch64 UEFI booting..."
 
     for _file in "${ucodes[@]}"; do
         if [[ -e "${pacstrap_dir}/boot/${_file}" ]]; then
@@ -620,7 +620,7 @@ _make_bootmode_uefi-aarch64.systemd-boot.esp() {
     # systemd-boot can only access files from the EFI system partition it was launched from.
     _make_boot_on_fat_aarch64
 
-    _msg_info "Done! systemd-boot set up for UEFI booting successfully."
+    _msg_info "Done! systemd-boot set up for aarch64 UEFI booting successfully."
 }
 
 # Prepare system-boot for El Torito booting
@@ -667,7 +667,7 @@ _make_bootmode_uefi-aarch64.systemd-boot.eltorito() {
     # Additionally set up system-boot in ISO 9660. This allows creating a medium for the live environment by using
     # manual partitioning and simply copying the ISO 9660 file system contents.
     # This is not related to El Torito booting and no firmware uses these files.
-    _msg_info "Preparing an /EFI directory for the ISO 9660 file system..."
+    _msg_info "Preparing an /EFI directory for the aarch64 ISO 9660 file system..."
     install -d -m 0755 -- "${isofs_dir}/EFI/BOOT"
 
     # Copy systemd-boot EFI binary to the default/fallback boot path
@@ -988,24 +988,8 @@ _add_xorrisofs_options_uefi-aarch64.systemd-boot.esp() {
     [[ " ${xorrisofs_options[*]} " =~ ' -partition_offset ' ]] || xorrisofs_options+=('-partition_offset' '16')
     # Attach efiboot.img as a second partition and set its partition type to "EFI system partition"
     xorrisofs_options+=('-append_partition' '2' 'C12A7328-F81F-11D2-BA4B-00A0C93EC93B' "${work_dir}/efiboot.img")
-    # Ensure GPT is used as some systems do not support UEFI booting without it
-    # shellcheck disable=SC2076
-    if [[ " ${bootmodes[*]} " =~ ' bios.syslinux.mbr ' ]]; then
-        # A valid GPT prevents BIOS booting on some systems, instead use an invalid GPT (without a protective MBR).
-        # The attached partition will have the EFI system partition type code in MBR, but in the invalid GPT it will
-        # have a Microsoft basic partition type code.
-        if [[ ! " ${bootmodes[*]} " =~ ' uefi-x64.systemd-boot.eltorito ' ]]; then
-            # If '-isohybrid-gpt-basdat' is specified before '-e', then the appended EFI system partition will have the
-            # EFI system partition type ID/GUID in both MBR and GPT. If '-isohybrid-gpt-basdat' is specified after '-e',
-            # the appended EFI system partition will have the Microsoft basic data type GUID in GPT.
-            if [[ ! " ${xorrisofs_options[*]} " =~ ' -isohybrid-gpt-basdat ' ]]; then
-                xorrisofs_options+=('-isohybrid-gpt-basdat')
-            fi
-        fi
-    else
-        # Use valid GPT if BIOS booting support will not be required
-        xorrisofs_options+=('-appended_part_as_gpt')
-    fi
+    # Use valid GPT as BIOS booting support will not be required
+    xorrisofs_options+=('-appended_part_as_gpt')
 }
 
 # systemd-boot via El Torito
@@ -1063,15 +1047,6 @@ _add_xorrisofs_options_uefi-aarch64.systemd-boot.eltorito() {
             # Boot image is not emulating floppy or hard disk; required for all known boot loaders
             '-no-emul-boot'
         )
-        # A valid GPT prevents BIOS booting on some systems, use an invalid GPT instead.
-        if [[ " ${bootmodes[*]} " =~ ' bios.syslinux.mbr ' ]]; then
-            # If '-isohybrid-gpt-basdat' is specified before '-e', then the appended EFI system partition will have the
-            # EFI system partition type ID/GUID in both MBR and GPT. If '-isohybrid-gpt-basdat' is specified after '-e',
-            # the appended EFI system partition will have the Microsoft basic data type GUID in GPT.
-            if [[ ! " ${xorrisofs_options[*]} " =~ ' -isohybrid-gpt-basdat ' ]]; then
-                xorrisofs_options+=('-isohybrid-gpt-basdat')
-            fi
-        fi
     else
         # The ISO will not contain a GPT partition table, so to be able to reference efiboot.img, place it as a
         # file inside the ISO 9660 file system
@@ -1087,9 +1062,6 @@ _add_xorrisofs_options_uefi-aarch64.systemd-boot.eltorito() {
             '-no-emul-boot'
         )
     fi
-    # Specify where to save the El Torito boot catalog file in case it is not already set by bios.syslinux.eltorito
-    # shellcheck disable=SC2076
-    [[ " ${bootmodes[*]} " =~ ' bios.' ]] || xorrisofs_options+=('-eltorito-catalog' 'EFI/boot.cat')
 }
 
 # Build bootstrap image
