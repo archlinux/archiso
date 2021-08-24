@@ -978,7 +978,7 @@ _validate_options() {
     if [[ -e "${packages}" ]]; then
         mapfile -t pkg_list_from_file < <(sed '/^[[:blank:]]*#.*/d;s/#.*//;/^[[:blank:]]*$/d' "${packages}")
         pkg_list+=("${pkg_list_from_file[@]}")
-        if (( ${#pkg_list_from_file} < 1 )); then
+        if (( ${#pkg_list_from_file[@]} < 1 )); then
             (( validation_error=validation_error+1 ))
             _msg_error "No package specified in '${packages}'." 0
         fi
@@ -993,7 +993,7 @@ _validate_options() {
             mapfile -t bootstrap_pkg_list_from_file < \
                 <(sed '/^[[:blank:]]*#.*/d;s/#.*//;/^[[:blank:]]*$/d' "${bootstrap_packages}")
             bootstrap_pkg_list+=("${bootstrap_pkg_list_from_file[@]}")
-            if (( ${#bootstrap_pkg_list_from_file} < 1 )); then
+            if (( ${#bootstrap_pkg_list_from_file[@]} < 1 )); then
                 (( validation_error=validation_error+1 ))
                 _msg_error "No package specified in '${bootstrap_packages}'." 0
             fi
@@ -1014,7 +1014,7 @@ _validate_options() {
         done
         cert_list=("${_override_cert_list[@]}")
         # Check if there are at least two certificate files
-        if (( "${#cert_list[@]}" < 2 )); then
+        if (( ${#cert_list[@]} < 2 )); then
             (( validation_error=validation_error+1 ))
             _msg_error "Two certificates are required for codesigning, but '${cert_list[*]}' is provided." 0
         fi
@@ -1074,7 +1074,7 @@ _validate_options() {
 _set_overrides() {
     # Set variables that have command line overrides
     [[ ! -v override_buildmodes ]] || buildmodes=("${override_buildmodes[@]}")
-    if (( "${#buildmodes[@]}" < 1 )); then
+    if (( ${#buildmodes[@]} < 1 )); then
         buildmodes+=('iso')
     fi
     if [[ -v override_work_dir ]]; then
