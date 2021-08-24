@@ -804,6 +804,10 @@ _validate_common_requirements_buildmode_iso_netboot() {
     fi
 
     # Check if the specified bootmodes are supported
+    if (( ${#bootmodes[@]} < 1 )); then
+        (( validation_error=validation_error+1 ))
+        _msg_error "No boot modes specified in '${profile}/profiledef.sh'." 0
+    fi
     for bootmode in "${bootmodes[@]}"; do
         if typeset -f "_make_bootmode_${bootmode}" &> /dev/null; then
             if typeset -f "_validate_requirements_bootmode_${bootmode}" &> /dev/null; then
