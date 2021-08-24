@@ -67,22 +67,6 @@ _msg_error() {
     fi
 }
 
-_mount_airootfs() {
-    trap "_umount_airootfs" EXIT HUP INT TERM
-    install -d -m 0755 -- "${work_dir}/mnt/airootfs"
-    _msg_info "Mounting '${pacstrap_dir}.img' on '${work_dir}/mnt/airootfs'..."
-    mount -- "${pacstrap_dir}.img" "${work_dir}/mnt/airootfs"
-    _msg_info "Done!"
-}
-
-_umount_airootfs() {
-    _msg_info "Unmounting '${work_dir}/mnt/airootfs'..."
-    umount -d -- "${work_dir}/mnt/airootfs"
-    _msg_info "Done!"
-    rmdir -- "${work_dir}/mnt/airootfs"
-    trap - EXIT HUP INT TERM
-}
-
 # Show help usage, with an exit status.
 # $1: exit status number.
 _usage() {
@@ -176,6 +160,7 @@ _cleanup_pacstrap_dir() {
 # $@: options to pass to mksquashfs
 _run_mksquashfs() {
     local image_path="${isofs_dir}/${install_dir}/${arch}/airootfs.sfs"
+    rm -f -- "${image_path}"
     if [[ "${quiet}" == "y" ]]; then
         mksquashfs "$@" "${image_path}" -noappend "${airootfs_image_tool_options[@]}" -no-progress > /dev/null
     else
@@ -186,22 +171,27 @@ _run_mksquashfs() {
 # Create an ext4 image containing the root file system and pack it inside a squashfs image.
 # Save the squashfs image on the ISO 9660 file system.
 _mkairootfs_ext4+squashfs() {
+    local ext4_hash_seed mkfs_ext4_options=()
     [[ -e "${pacstrap_dir}" ]] || _msg_error "The path '${pacstrap_dir}' does not exist" 1
 
-    _msg_info "Creating ext4 image of 32 GiB..."
-    if [[ "${quiet}" == "y" ]]; then
-        mkfs.ext4 -q -O '^has_journal,^resize_inode' -E 'lazy_itable_init=0' -m 0 -F -- "${pacstrap_dir}.img" 32G
-    else
-        mkfs.ext4 -O '^has_journal,^resize_inode' -E 'lazy_itable_init=0' -m 0 -F -- "${pacstrap_dir}.img" 32G
-    fi
+    _msg_info "Creating ext4 image of 32 GiB and copying '${pacstrap_dir}/' to it..."
+
+    ext4_hash_seed="$(uuidgen --sha1 --namespace 93a870ff-8565-4cf3-a67b-f47299271a96 \
+        --name "${SOURCE_DATE_EPOCH} ext4 hash seed")"
+    mkfs_ext4_options=(
+        '-d' "${pacstrap_dir}"
+        '-O' '^has_journal,^resize_inode'
+        '-E' "lazy_itable_init=0,root_owner=0:0,hash_seed=${ext4_hash_seed}"
+        '-m' '0'
+        '-F'
+        '-U' 'clear'
+    )
+    [[ ! "${quiet}" == "y" ]] || mkfs_ext4_options+=('-q')
+    rm -f -- "${pacstrap_dir}.img"
+    E2FSPROGS_FAKE_TIME="${SOURCE_DATE_EPOCH}" mkfs.ext4 "${mkfs_ext4_options[@]}" -- "${pacstrap_dir}.img" 32G
     tune2fs -c 0 -i 0 -- "${pacstrap_dir}.img" > /dev/null
     _msg_info "Done!"
-    _mount_airootfs
-    _msg_info "Copying '${pacstrap_dir}/' to '${work_dir}/mnt/airootfs/'..."
-    cp -aT -- "${pacstrap_dir}/" "${work_dir}/mnt/airootfs/"
-    chown -- 0:0 "${work_dir}/mnt/airootfs/"
-    _msg_info "Done!"
-    _umount_airootfs
+
     install -d -m 0755 -- "${isofs_dir}/${install_dir}/${arch}"
     _msg_info "Creating SquashFS image, this may take some time..."
     _run_mksquashfs "${pacstrap_dir}.img"
@@ -225,6 +215,7 @@ _mkairootfs_erofs() {
 
     install -d -m 0755 -- "${isofs_dir}/${install_dir}/${arch}"
     local image_path="${isofs_dir}/${install_dir}/${arch}/airootfs.erofs"
+    rm -f -- "${image_path}"
     # Generate reproducible file system UUID from SOURCE_DATE_EPOCH
     fsuuid="$(uuidgen --sha1 --namespace 93a870ff-8565-4cf3-a67b-f47299271a96 --name "${SOURCE_DATE_EPOCH}")"
     _msg_info "Creating EROFS image, this may take some time..."
@@ -502,7 +493,7 @@ _make_efibootimg() {
     )"
     # The FAT image must be created with mkfs.fat not mformat, as some systems have issues with mformat made images:
     # https://lists.gnu.org/archive/html/grub-devel/2019-04/msg00099.html
-    [[ -e "${work_dir}/efiboot.img" ]] && rm -f -- "${work_dir}/efiboot.img"
+    rm -f -- "${work_dir}/efiboot.img"
     _msg_info "Creating FAT image of size: ${imgsize} KiB..."
     mkfs.fat -C -n ARCHISO_EFI "${work_dir}/efiboot.img" "${imgsize}"
 
@@ -915,6 +906,7 @@ _build_iso_image() {
         typeset -f "_add_xorrisofs_options_${bootmode}" &> /dev/null && "_add_xorrisofs_options_${bootmode}"
     done
 
+    rm -f -- "${out_dir}/${image_name}"
     _msg_info "Creating ISO image..."
     xorriso -as mkisofs \
             -iso-level 3 \
