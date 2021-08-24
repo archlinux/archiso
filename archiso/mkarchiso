@@ -19,6 +19,7 @@ quiet=""
 work_dir=""
 out_dir=""
 gpg_key=""
+gpg_sender=""
 iso_name=""
 iso_label=""
 iso_publisher=""
@@ -88,7 +89,10 @@ usage: ${app_name} [options] <profile_dir>
                       Multiple files are provided as quoted, space delimited list.
                       The first file is considered as the signing certificate,
                       the second as the key.
-     -g <gpg_key>     Set the PGP key ID to be used for signing the rootfs image
+     -g <gpg_key>     Set the PGP key ID to be used for signing the rootfs image.
+                      Passed to gpg as the value for --default-key
+     -G <mbox>        Set the PGP signer (must include an email address)
+                      Passed to gpg as the value for --sender
      -h               This message
      -m [mode ..]     Build mode(s) to use (valid modes are: 'bootstrap', 'iso' and 'netboot').
                       Multiple build modes are provided as quoted, space delimited list.
@@ -119,6 +123,7 @@ _show_config() {
     _msg_info "       Current build mode:   ${buildmode}"
     _msg_info "              Build modes:   ${buildmodes[*]}"
     _msg_info "                  GPG key:   ${gpg_key:-None}"
+    _msg_info "               GPG signer:   ${gpg_sender:-None}"
     _msg_info "Code signing certificates:   ${cert_list[*]}"
     _msg_info "                  Profile:   ${profile}"
     _msg_info "Pacman configuration file:   ${pacman_conf}"
@@ -238,15 +243,19 @@ _mkchecksum() {
 
 # GPG sign the root file system image.
 _mksignature() {
+    local airootfs_image_filename gpg_options=()
     _msg_info "Signing rootfs image..."
-    cd -- "${isofs_dir}/${install_dir}/${arch}"
-    # always use the .sig file extension, as that is what mkinitcpio-archiso's hooks expect
     if [[ -e "${isofs_dir}/${install_dir}/${arch}/airootfs.sfs" ]]; then
-        gpg --output airootfs.sfs.sig --detach-sign --default-key "${gpg_key}" airootfs.sfs
+        airootfs_image_filename="${isofs_dir}/${install_dir}/${arch}/airootfs.sfs"
     elif [[ -e "${isofs_dir}/${install_dir}/${arch}/airootfs.erofs" ]]; then
-        gpg --output airootfs.erofs.sig --detach-sign --default-key "${gpg_key}" airootfs.erofs
+        airootfs_image_filename="${isofs_dir}/${install_dir}/${arch}/airootfs.erofs"
     fi
-    cd -- "${OLDPWD}"
+    rm -f -- "${airootfs_image_filename}.sig"
+    # Add gpg sender option if the value is provided
+    [[ -z "${gpg_sender}" ]] || gpg_options+=('--sender' "${gpg_sender}")
+    # always use the .sig file extension, as that is what mkinitcpio-archiso's hooks expect
+    gpg --batch --no-armor --no-include-key-block --output "${airootfs_image_filename}.sig" --detach-sign \
+        --default-key "${gpg_key}" "${gpg_options[@]}" "${airootfs_image_filename}"
     _msg_info "Done!"
 }
 
@@ -1109,6 +1118,7 @@ _set_overrides() {
         install_dir="${app_name}"
     fi
     [[ ! -v override_gpg_key ]] || gpg_key="$override_gpg_key"
+    [[ ! -v override_gpg_sender ]] || gpg_sender="$override_gpg_sender"
     if [[ -v override_cert_list ]]; then
         sign_netboot_artifacts="y"
     fi
@@ -1126,7 +1136,8 @@ _set_overrides() {
 }
 
 _export_gpg_publickey() {
-    gpg --batch --output "${work_dir}/pubkey.gpg" --export "${gpg_key}"
+    rm -f -- "${work_dir}/pubkey.gpg"
+    gpg --batch --no-armor --output "${work_dir}/pubkey.gpg" --export "${gpg_key}"
 }
 
 _make_version() {
@@ -1258,7 +1269,7 @@ _build() {
     done
 }
 
-while getopts 'c:p:C:L:P:A:D:w:m:o:g:vh?' arg; do
+while getopts 'c:p:C:L:P:A:D:w:m:o:g:G:vh?' arg; do
     case "${arg}" in
         p) read -r -a override_pkg_list <<< "${OPTARG}" ;;
         C) override_pacman_conf="${OPTARG}" ;;
@@ -1271,6 +1282,7 @@ while getopts 'c:p:C:L:P:A:D:w:m:o:g:vh?' arg; do
         m) read -r -a override_buildmodes <<< "${OPTARG}" ;;
         o) override_out_dir="${OPTARG}" ;;
         g) override_gpg_key="${OPTARG}" ;;
+        G) override_gpg_sender="${OPTARG}" ;;
         v) override_quiet="n" ;;
         h|?) _usage 0 ;;
         *)
