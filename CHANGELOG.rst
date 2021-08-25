@@ -2,6 +2,31 @@
 Changelog
 #########
 
+[58] - 2021-08-25
+=================
+
+Added
+-----
+
+- Add support for ``gpg``'s ``--sender`` option
+
+Changed
+-------
+
+- Change the way ``mkarchiso`` uses ext4 images to copying files to it directly instead of mounting (this action now
+  does not require elevated privileges anymore)
+- Add version files when using ``netboot`` buildmode as well
+- Update the sshd configuration to be compatible with openssh 8.7p1
+- Overhaul the used ``gpg`` options
+- Fix use of potentially unbound variables
+- Refactor the validation functions to have fewer large functions and less code duplication
+
+Removed
+-------
+
+- Remove all files related to ``mkinitcpio`` integration, as they now live in
+  https://gitlab.archlinux.org/mkinitcpio/mkinitcpio-archiso
+
 [57] - 2021-07-30
 =================
 
