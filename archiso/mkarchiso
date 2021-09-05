@@ -7,7 +7,8 @@ set -e -u
 # Control the environment
 umask 0022
 export LC_ALL="C"
-export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-"$(date +%s)"}"
+[[ -v SOURCE_DATE_EPOCH ]] || printf -v SOURCE_DATE_EPOCH '%(%s)T' -1
+export SOURCE_DATE_EPOCH
 
 # Set application name from the script's file name
 app_name="${0##*/}"
@@ -113,7 +114,7 @@ ENDUSAGETEXT
 # Shows configuration options.
 _show_config() {
     local build_date
-    build_date="$(date --utc --iso-8601=seconds -d "@${SOURCE_DATE_EPOCH}")"
+    printf -v build_date '%(%FT%R%z)T' "${SOURCE_DATE_EPOCH}"
     _msg_info "${app_name} configuration settings"
     _msg_info "             Architecture:   ${arch}"
     _msg_info "        Working directory:   ${work_dir}"
