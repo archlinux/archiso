@@ -995,12 +995,17 @@ _build_bootstrap_image() {
 
 # Build ISO
 _build_iso_image() {
-    local xorrisofs_options=()
+    local xorriso_options=() xorrisofs_options=()
     local bootmode
 
     [[ -d "${out_dir}" ]] || install -d -- "${out_dir}"
 
-    [[ "${quiet}" == "y" ]] && xorrisofs_options+=('-quiet')
+    if [[ "${quiet}" == "y" ]]; then
+        # The when xorriso is run in mkisofs compatibility mode (xorrisofs), the mkisofs option -quiet is interpreted
+        # too late (e.g. messages about SOURCE_DATE_EPOCH still get shown).
+        # Instead use native xorriso option to silence the output.
+        xorriso_options=('-report_about' 'SORRY' "${xorriso_options[@]}")
+    fi
 
     # Add required xorrisofs options for each boot mode
     for bootmode in "${bootmodes[@]}"; do
@@ -1009,7 +1014,7 @@ _build_iso_image() {
 
     rm -f -- "${out_dir}/${image_name}"
     _msg_info "Creating ISO image..."
-    xorriso -as mkisofs \
+    xorriso "${xorriso_options[@]}" -as mkisofs \
             -iso-level 3 \
             -full-iso9660-filenames \
             -joliet \
