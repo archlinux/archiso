@@ -704,7 +704,7 @@ _export_netboot_artifacts() {
     install -d -m 0755 "${out_dir}"
     cp -a -- "${isofs_dir}/${install_dir}/" "${out_dir}/"
     _msg_info "Done!"
-    du -h -- "${out_dir}/${install_dir}"
+    du -hs -- "${out_dir}/${install_dir}"
 }
 
 # sign build artifacts for netboot
