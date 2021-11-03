@@ -132,7 +132,7 @@ _show_config() {
     _msg_info "         ISO volume label:   ${iso_label}"
     _msg_info "            ISO publisher:   ${iso_publisher}"
     _msg_info "          ISO application:   ${iso_application}"
-    _msg_info "               Boot modes:   ${bootmodes[*]}"
+    _msg_info "               Boot modes:   ${bootmodes[*]:-None}"
     _msg_info "            Packages File:   ${buildmode_packages}"
     _msg_info "                 Packages:   ${buildmode_pkg_list[*]}"
 }
@@ -804,6 +804,22 @@ _validate_common_requirements_buildmode_iso_netboot() {
         _msg_error "Packages file '${packages}' does not exist." 0
     fi
 
+    # Check if the specified airootfs_image_type is supported
+    if typeset -f "_mkairootfs_${airootfs_image_type}" &> /dev/null; then
+        if typeset -f "_validate_requirements_airootfs_image_type_${airootfs_image_type}" &> /dev/null; then
+            "_validate_requirements_airootfs_image_type_${airootfs_image_type}"
+        else
+            _msg_warning "Function '_validate_requirements_airootfs_image_type_${airootfs_image_type}' does not exist. Validating the requirements of '${airootfs_image_type}' airootfs image type will not be possible."
+        fi
+    else
+        (( validation_error=validation_error+1 ))
+        _msg_error "Unsupported image type: '${airootfs_image_type}'" 0
+    fi
+}
+
+_validate_requirements_buildmode_iso() {
+    _validate_common_requirements_buildmode_iso_netboot
+    _validate_common_requirements_buildmode_all
     # Check if the specified bootmodes are supported
     if (( ${#bootmodes[@]} < 1 )); then
         (( validation_error=validation_error+1 ))
@@ -822,22 +838,6 @@ _validate_common_requirements_buildmode_iso_netboot() {
         fi
     done
 
-    # Check if the specified airootfs_image_type is supported
-    if typeset -f "_mkairootfs_${airootfs_image_type}" &> /dev/null; then
-        if typeset -f "_validate_requirements_airootfs_image_type_${airootfs_image_type}" &> /dev/null; then
-            "_validate_requirements_airootfs_image_type_${airootfs_image_type}"
-        else
-            _msg_warning "Function '_validate_requirements_airootfs_image_type_${airootfs_image_type}' does not exist. Validating the requirements of '${airootfs_image_type}' airootfs image type will not be possible."
-        fi
-    else
-        (( validation_error=validation_error+1 ))
-        _msg_error "Unsupported image type: '${airootfs_image_type}'" 0
-    fi
-}
-
-_validate_requirements_buildmode_iso() {
-    _validate_common_requirements_buildmode_iso_netboot
-    _validate_common_requirements_buildmode_all
     if ! command -v awk &> /dev/null; then
         (( validation_error=validation_error+1 ))
         _msg_error "Validating build mode '${_buildmode}': awk is not available on this host. Install 'awk'!" 0
@@ -1227,7 +1227,11 @@ _build_iso_base() {
     _run_once _make_version
     _run_once _make_customize_airootfs
     _run_once _make_pkglist
-    _make_bootmodes
+    if [[ "${buildmode}" == 'netboot' ]]; then
+        _run_once _make_boot_on_iso9660
+    else
+        _make_bootmodes
+    fi
     _run_once _cleanup_pacstrap_dir
     _run_once _prepare_airootfs_image
 }
