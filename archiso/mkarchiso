@@ -165,13 +165,10 @@ _cleanup_pacstrap_dir() {
 # Create a squashfs image and place it in the ISO 9660 file system.
 # $@: options to pass to mksquashfs
 _run_mksquashfs() {
-    local image_path="${isofs_dir}/${install_dir}/${arch}/airootfs.sfs"
+    local mksquashfs_options=() image_path="${isofs_dir}/${install_dir}/${arch}/airootfs.sfs"
     rm -f -- "${image_path}"
-    if [[ "${quiet}" == "y" ]]; then
-        mksquashfs "$@" "${image_path}" -noappend "${airootfs_image_tool_options[@]}" -no-progress > /dev/null
-    else
-        mksquashfs "$@" "${image_path}" -noappend "${airootfs_image_tool_options[@]}"
-    fi
+    [[ ! "${quiet}" == "y" ]] || mksquashfs_options+=('-no-progress' '-quiet')
+    mksquashfs "$@" "${image_path}" -noappend "${airootfs_image_tool_options[@]}" "${mksquashfs_options[@]}"
 }
 
 # Create an ext4 image containing the root file system and pack it inside a squashfs image.
