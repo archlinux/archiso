@@ -2,6 +2,27 @@
 Changelog
 #########
 
+[59] - 2021-11-30
+=================
+
+Added
+-----
+
+- Add mailmap file for easier author integration with git
+- Add grub and refind to the package list of the releng profile
+
+Changed
+-------
+
+- Replace use of date with printf
+- Silence command output more efficiently when using --quiet
+- Modify curl call to retry up to ten times before giving up on downloading an automated script
+
+Removed
+-------
+
+- Remove requirement on setting a Boot mode when building a netboot image
+
 [58] - 2021-08-25
 =================
 
