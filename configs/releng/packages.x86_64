@@ -34,6 +34,7 @@ gpart
 gpm
 gptfdisk
 grml-zsh-config
+grub
 hdparm
 intel-ucode
 ipw2100-fw
@@ -83,6 +84,7 @@ ppp
 pptpclient
 pv
 qemu-guest-agent
+refind
 reflector
 reiserfsprogs
 rp-pppoe
