@@ -18,6 +18,7 @@ Fixed
 -----
 
 - Sign the root file system image only once.
+- Make sure xorriso does not read its configuration files to prevent interference and unintended behavior.
 
 Removed
 -------

@@ -1501,11 +1501,16 @@ _build_iso_image() {
 
     [[ -d "${out_dir}" ]] || install -d -- "${out_dir}"
 
+    # Do not read xorriso startup files to prevent interference and unintended behavior.
+    # For it to work, -no_rc must be the first argument passed to xorriso.
+    xorriso_options=('-no_rc')
+
+
     if [[ "${quiet}" == "y" ]]; then
         # The when xorriso is run in mkisofs compatibility mode (xorrisofs), the mkisofs option -quiet is interpreted
         # too late (e.g. messages about SOURCE_DATE_EPOCH still get shown).
         # Instead use native xorriso option to silence the output.
-        xorriso_options=('-report_about' 'SORRY' "${xorriso_options[@]}")
+        xorriso_options+=('-report_about' 'SORRY')
     fi
 
     # Add required xorrisofs options for each boot mode
