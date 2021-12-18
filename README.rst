@@ -153,16 +153,24 @@ All past and present authors of archiso are listed in `AUTHORS <AUTHORS.rst>`_.
 Releases
 ========
 
-`Releases of archiso <https://gitlab.archlinux.org/archlinux/archiso/-/tags>`_ are created by its current maintainer
-`David Runge <https://gitlab.archlinux.org/dvzrv>`_. Tags are signed using the PGP key with the ID
-``C7E7849466FE2358343588377258734B41C31549``.
+`Releases of archiso <https://gitlab.archlinux.org/archlinux/archiso/-/tags>`_ are created by their current maintainers
 
-To verify a tag, first import the relevant PGP key:
+- `David Runge <https://gitlab.archlinux.org/dvzrv>`_ (``C7E7849466FE2358343588377258734B41C31549``)
+- `nl6720 <https://gitlab.archlinux.org/nl6720>`_ (``BB8E6F1B81CF0BB301D74D1CBF425A01E68B38EF``)
+
+Tags are signed using respective PGP keys.
+
+To verify a tag, first import the relevant PGP key(s):
 
 .. code:: sh
 
   gpg --auto-key-locate wkd --search-keys dvzrv@archlinux.org
 
+or
+
+.. code:: sh
+
+  gpg --auto-key-locate keyserver --recv-keys BB8E6F1B81CF0BB301D74D1CBF425A01E68B38EF
 
 Afterwards a tag can be verified from a clone of this repository:
 
