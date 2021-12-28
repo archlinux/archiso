@@ -14,6 +14,25 @@ Changed
 Removed
 -------
 
+[60] - 2021-12-28
+=================
+
+Added
+-----
+
+- Add `BB8E6F1B81CF0BB301D74D1CBF425A01E68B38EF` in the Releases section of the README, giving maintainer power to
+  nl6720.
+
+Changed
+-------
+
+- Show a more descriptive message when no code signing certificate is used
+
+Removed
+-------
+
+- Remove unused archiso_shutdown hook from the releng profile's mkinitcpio config
+
 [59] - 2021-11-30
 =================
 
