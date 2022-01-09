@@ -653,6 +653,7 @@ _validate_requirements_bootmode_uefi-x64.systemd-boot.esp() {
 
     # Check if mmd and mcopy are available
     if ! { command -v mmd &> /dev/null && command -v mcopy &> /dev/null; }; then
+        (( validation_error=validation_error+1 ))
         _msg_error "Validating '${bootmode}': mmd and/or mcopy are not available on this host. Install 'mtools'!" 0
     fi
 
