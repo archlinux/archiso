@@ -1048,6 +1048,7 @@ _read_profile() {
         . "${profile}/profiledef.sh"
 
         # Resolve paths of files that are expected to reside in the profile's directory
+        [[ -n "$arch" ]] || arch="$(uname -m)"
         [[ -n "$packages" ]] || packages="${profile}/packages.${arch}"
         packages="$(realpath -- "${packages}")"
         pacman_conf="$(realpath -- "${pacman_conf}")"
@@ -1155,7 +1156,6 @@ _set_overrides() {
     fi
 
     # Set variables that do not have overrides
-    [[ -n "$arch" ]] || arch="$(uname -m)"
     [[ -n "$airootfs_image_type" ]] || airootfs_image_type="squashfs"
     [[ -n "$iso_name" ]] || iso_name="${app_name}"
 }
