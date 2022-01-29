@@ -22,6 +22,11 @@ stages:
 
 check:
   before_script:
+    # NOTE: Install latest archlinux-keyring before upgrading system. In the
+    # future this should not be needed anymore when we can guarantee a valid
+    # keyring for longer:
+    # https://gitlab.archlinux.org/archlinux/archlinux-keyring/-/issues/4
+    - pacman -Sy --needed --noconfirm archlinux-keyring
     - pacman --noconfirm -Syu --needed make shellcheck
   script:
     - make check
