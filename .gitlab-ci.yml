@@ -38,6 +38,13 @@ build_short:
     matrix:
       - BUILD_SCRIPT_ARGS: baseline bootstrap
       - BUILD_SCRIPT_ARGS: releng bootstrap
+  only:
+    changes:
+      - archiso/*
+      - configs/**/*
+      - Makefile
+      - .gitlab-ci.yml
+      - .gitlab/ci/*
 
 build_long:
   extends: .build
@@ -49,3 +56,10 @@ build_long:
       - BUILD_SCRIPT_ARGS: releng netboot
   tags:
     - fast-single-thread
+  only:
+    changes:
+      - archiso/*
+      - configs/**/*
+      - Makefile
+      - .gitlab-ci.yml
+      - .gitlab/ci/*
