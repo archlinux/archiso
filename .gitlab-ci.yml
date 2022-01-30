@@ -31,6 +31,7 @@ check:
   script:
     - make check
   stage: check
+  interruptible: true
 
 build_short:
   extends: .build
@@ -45,6 +46,7 @@ build_short:
       - Makefile
       - .gitlab-ci.yml
       - .gitlab/ci/*
+  interruptible: true
 
 build_long:
   extends: .build
@@ -63,3 +65,4 @@ build_long:
       - Makefile
       - .gitlab-ci.yml
       - .gitlab/ci/*
+  interruptible: true
