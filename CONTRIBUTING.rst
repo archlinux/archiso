@@ -19,6 +19,14 @@ All ash and bash scripts are linted using shellcheck:
 
     make lint
 
+Changelog
+=========
+
+When adding, changing or removing something in a merge request, add a sentence to the `CHANGELOG.rst <CHANGELOG.rst>`_
+explaining it.
+The changelog entry needs to be added to the unreleased section at the top, as that section is used for the next
+release.
+
 Testing
 =======
 
