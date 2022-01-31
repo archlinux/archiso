@@ -40,6 +40,9 @@ build_short:
       - BUILD_SCRIPT_ARGS: baseline bootstrap
       - BUILD_SCRIPT_ARGS: releng bootstrap
   only:
+    refs:
+      - master
+      - merge_requests
     changes:
       - archiso/*
       - configs/**/*
@@ -59,6 +62,9 @@ build_long:
   tags:
     - fast-single-thread
   only:
+    refs:
+      - master
+      - merge_requests
     changes:
       - archiso/*
       - configs/**/*
