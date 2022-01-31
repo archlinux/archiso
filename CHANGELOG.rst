@@ -14,6 +14,27 @@ Changed
 Removed
 -------
 
+[61] - 2022-01-31
+=================
+
+Added
+-----
+
+- Add linux-firmware-marvell to the list of packages in the releng profile (e.g. for Surface Pro 6 WiFi support)
+- Add documentation to systemd-networkd configuration files
+- Add information about the use of changelog and merge requests to the contributing guidelines
+- Make the CI pipelines more efficient by automatically cancelling running pipelines if they are superseded by a newer
+  commit and by only running build pipelines on code or profile changes
+
+Changed
+-------
+
+- Fix an issue where mkarchiso is failing to raise an error when the ``mmd`` and ``mcopy`` commands are not found
+- Fix an issue where the architecture detection in mkarchiso fails due to an unset ``arch`` variable in the profile
+
+Removed
+-------
+
 [60] - 2021-12-28
 =================
 
