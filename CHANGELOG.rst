@@ -8,6 +8,8 @@ Changelog
 Added
 -----
 
+- Add dmidecode to the list of packages in the releng profile.
+
 Changed
 -------
 
