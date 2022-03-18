@@ -11,6 +11,9 @@ Added
 Changed
 -------
 
+- Fix the PXE support. PXELINUX was having trouble finding the kernel and initrds. Now, archiso forces syslinux to
+  interpret all TFTP paths as absolute. That seems to have solved the issue.
+
 Removed
 -------
 
