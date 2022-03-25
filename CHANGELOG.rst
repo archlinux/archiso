@@ -9,6 +9,8 @@ Added
 -----
 
 - Add a man page for ``mkarchiso``.
+- Implement configurable bootstrap tarball compression. It is configured in ``profiledef.sh`` using a bash array called
+  ``bootstrap_tarball_compression``.
 
 Changed
 -------

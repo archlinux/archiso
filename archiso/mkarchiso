@@ -40,6 +40,7 @@ buildmodes=()
 bootmodes=()
 airootfs_image_type=""
 airootfs_image_tool_options=()
+bootstrap_tarball_compression=""
 cert_list=()
 declare -A file_permissions=()
 efibootimg=""
@@ -1356,6 +1357,32 @@ _validate_requirements_buildmode_bootstrap() {
         (( validation_error=validation_error+1 ))
         _msg_error "Validating build mode '${_buildmode}': bsdtar is not available on this host. Install 'libarchive'!" 0
     fi
+
+    # Check if the compressor is installed
+    if (( ${#bootstrap_tarball_compression[@]} )); then
+        case "${bootstrap_tarball_compression[0]}" in
+            'bzip'|'gzip'|'lrzip'|'lzip'|'lzop'|'zstd'|'zstdmt')
+                if ! command -v "${bootstrap_tarball_compression[0]}" &>/dev/null; then
+                    (( validation_error=validation_error+1 ))
+                    _msg_error "Validating build mode '${_buildmode}': '${bootstrap_tarball_compression[0]}' is not available on this host. Install '${bootstrap_tarball_compression[0]/zstdmt/zstd}'!" 0
+                fi
+                ;;
+            'cat')
+                if ! command -v cat &>/dev/null; then
+                    (( validation_error=validation_error+1 ))
+                    _msg_error "Validating build mode '${_buildmode}': 'cat' is not available on this host. Install 'coreutils'!" 0
+                fi
+                if (( ${#bootstrap_tarball_compression[@]} > 1 )); then
+                    (( validation_error=validation_error+1 ))
+                    _msg_error "Validating build mode '${_buildmode}': 'cat' compression does not accept arguments!" 0
+                fi
+                ;;
+            *)
+                (( validation_error=validation_error+1 ))
+                _msg_error "Validating build mode '${_buildmode}': '${bootstrap_tarball_compression[0]}' is not a supported compression method!" 0
+                ;;
+        esac
+    fi
 }
 
 _validate_common_requirements_buildmode_iso_netboot() {
@@ -1632,6 +1659,25 @@ _add_xorrisofs_options_uefi-x64.grub.eltorito() {
 
 # Build bootstrap image
 _build_bootstrap_image() {
+    local tarball_ext
+
+    # Set default tarball compression to uncompressed
+    if (( ! "${#bootstrap_tarball_compression[@]}" )); then
+        bootstrap_tarball_compression=('cat')
+    fi
+
+    # Set tarball extension
+    case "${bootstrap_tarball_compression[0]}" in
+        'cat') tarball_ext='' ;;
+        'bzip') tarball_ext='.b2z' ;;
+        'gzip') tarball_ext='.gz' ;;
+        'lrzip') tarball_ext='.lrz' ;;
+        'lzip') tarball_ext='.lz' ;;
+        'lzop') tarball_ext='.lzo' ;;
+        'zstd'|'zstdmt') tarball_ext='.zst' ;;
+        *) _msg_error 'Unsupported compression!' 1 ;;
+    esac
+
     local _bootstrap_parent
     _bootstrap_parent="$(dirname -- "${pacstrap_dir}")"
 
@@ -1640,9 +1686,10 @@ _build_bootstrap_image() {
     cd -- "${_bootstrap_parent}"
 
     _msg_info "Creating bootstrap image..."
-    bsdtar -cf - "root.${arch}" | gzip -cn9 >"${out_dir}/${image_name}"
+    rm -f -- "${out_dir:?}/${image_name:?}${tarball_ext}"
+    bsdtar -cf - "root.${arch}" | "${bootstrap_tarball_compression[@]}" >"${out_dir}/${image_name}${tarball_ext}"
     _msg_info "Done!"
-    du -h -- "${out_dir}/${image_name}"
+    du -h -- "${out_dir}/${image_name}${tarball_ext}"
     cd -- "${OLDPWD}"
 }
 
@@ -1945,7 +1992,7 @@ _build_iso_base() {
 
 # Build the bootstrap buildmode
 _build_buildmode_bootstrap() {
-    local image_name="${iso_name}-bootstrap-${iso_version}-${arch}.tar.gz"
+    local image_name="${iso_name}-bootstrap-${iso_version}-${arch}.tar"
     local run_once_mode="${buildmode}"
     local buildmode_packages="${bootstrap_packages}"
     # Set the package list to use
