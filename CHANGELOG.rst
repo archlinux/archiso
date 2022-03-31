@@ -11,13 +11,19 @@ Added
 Changed
 -------
 
+Removed
+-------
+
+[62] - 2022-03-31
+=================
+
+Changed
+-------
+
 - Fix the PXE support. PXELINUX was having trouble finding the kernel and initrds. Now, archiso forces syslinux to
   interpret all TFTP paths as absolute. That seems to have solved the issue.
 - Disable systemd-gpt-auto-generator, which we do not need, in both baseline and releng profiles. It avoids the error
   message about it failing during boot.
-
-Removed
--------
 
 [61] - 2022-01-31
 =================
