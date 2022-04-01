@@ -11,6 +11,8 @@ Added
 Changed
 -------
 
+- Mount /etc/pacman.d/gnupg on ramfs instead of tmpfs to ensure its contents never land in swap.
+
 Removed
 -------
 
