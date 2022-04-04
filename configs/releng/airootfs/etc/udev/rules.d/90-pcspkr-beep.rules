@@ -1,2 +1,0 @@
-# Add write access to the PC speaker for the "beep" group
-ACTION=="add", SUBSYSTEM=="input", ATTRS{name}=="PC Speaker", ENV{DEVNAME}!="", RUN+="/usr/bin/setfacl -m u:beep:w '$env{DEVNAME}'"

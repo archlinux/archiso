@@ -4,7 +4,6 @@ arch-install-scripts
 archinstall
 b43-fwcutter
 base
-beep
 bind-tools
 brltty
 broadcom-wl
