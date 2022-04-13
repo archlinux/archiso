@@ -15,6 +15,7 @@ Changed
 -------
 
 - Mount /etc/pacman.d/gnupg on ramfs instead of tmpfs to ensure its contents never land in swap.
+- Configure reflector to return only mirrors that support both IPv4 and IPv6.
 
 Removed
 -------
