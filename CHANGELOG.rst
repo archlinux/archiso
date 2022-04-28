@@ -9,6 +9,7 @@ Added
 -----
 
 - Add dmidecode to the list of packages in the releng profile.
+- Add open-iscsi to the list of packages in the releng profile to allow installing Arch on an iSCSI target.
 
 Changed
 -------
