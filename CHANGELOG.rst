@@ -10,6 +10,8 @@ Added
 
 - Add dmidecode to the list of packages in the releng profile.
 - Add open-iscsi to the list of packages in the releng profile to allow installing Arch on an iSCSI target.
+- Add open-vm-tools and hyperv to the list of packages and enable their services to provide better integration with the
+  VMware and Hyper-V hypervisors.
 
 Changed
 -------
