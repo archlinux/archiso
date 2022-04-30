@@ -8,6 +8,18 @@ Changelog
 Added
 -----
 
+Changed
+-------
+
+Removed
+-------
+
+[63] - 2022-04-30
+=================
+
+Added
+-----
+
 - Add dmidecode to the list of packages in the releng profile.
 - Add open-iscsi to the list of packages in the releng profile to allow installing Arch on an iSCSI target.
 - Add open-vm-tools and hyperv to the list of packages and enable their services to provide better integration with the
@@ -19,8 +31,6 @@ Changed
 - Mount /etc/pacman.d/gnupg on ramfs instead of tmpfs to ensure its contents never land in swap.
 - Configure reflector to return only mirrors that support both IPv4 and IPv6.
 
-Removed
--------
 
 [62.1] - 2022-04-05
 ===================
