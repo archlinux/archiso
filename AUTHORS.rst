@@ -36,3 +36,4 @@ Archiso Authors
 * Øyvind Heggstad <heggstad@gmail.com>
 * plain linen <bcdedit@hotmail.com>
 * Pellegrino Prevete <pellegrinoprevete@gmail.com>
+* Anton Hvornum <anton@hvornum.se>

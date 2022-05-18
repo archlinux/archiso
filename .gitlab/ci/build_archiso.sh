@@ -30,6 +30,8 @@ gnupg_homedir=""
 codesigning_dir=""
 codesigning_cert=""
 codesigning_key=""
+ca_cert=""
+ca_key=""
 pgp_key_id=""
 
 print_section_start() {
@@ -204,29 +206,89 @@ EOF
   print_section_end "ephemeral_pgp_key"
 }
 
-create_ephemeral_codesigning_key() {
+create_ephemeral_codesigning_keys() {
   # create ephemeral certificates used for codesigning
-  print_section_start "ephemeral_codesigning_key" "Creating ephemeral codesigning key"
+  print_section_start "ephemeral_codesigning_key" "Creating ephemeral codesigning keys"
 
+  # The exact steps in creating a CA with Codesigning being signed was taken from
+  # https://jamielinux.com/docs/openssl-certificate-authority/introduction.html
+  # (slight modifications to the process to not disturb default values of /etc/ssl/openssl.cnf)
+  
   codesigning_dir="${tmpdir}/.codesigning/"
-  local codesigning_conf="${codesigning_dir}/openssl.cnf"
+  local ca_dir="${codesigning_dir}/ca/"
+
+  local ca_conf="${ca_dir}/certificate_authority.cnf"
+  local ca_subj="/C=DE/ST=Berlin/L=Berlin/O=Arch Linux/OU=Release Engineering/CN=archlinux.org"
+  ca_cert="${ca_dir}/cacert.pem"
+  ca_key="${ca_dir}/private/cakey.pem"
+
+  local codesigning_conf="${codesigning_dir}/code_signing.cnf"
   local codesigning_subj="/C=DE/ST=Berlin/L=Berlin/O=Arch Linux/OU=Release Engineering/CN=archlinux.org"
   codesigning_cert="${codesigning_dir}/codesign.crt"
   codesigning_key="${codesigning_dir}/codesign.key"
+
+  mkdir -p "${ca_dir}/"{private,newcerts,crl}
   mkdir -p "${codesigning_dir}"
   cp -- /etc/ssl/openssl.cnf "${codesigning_conf}"
-  printf "\n[codesigning]\nkeyUsage=digitalSignature\nextendedKeyUsage=codeSigning\n" >> "${codesigning_conf}"
+  cp -- /etc/ssl/openssl.cnf "${ca_conf}"
+  touch "${ca_dir}/index.txt"
+  echo "1000" > "${ca_dir}/serial"
+
+  # Prepare the ca configuration for the change in directory
+  sed -i "s#/etc/ssl#${ca_dir}#g" "${ca_conf}"
+
+  # Create the Certificate Authority
+  openssl req \
+      -newkey rsa:4096 \
+      -sha256 \
+      -nodes \
+      -x509 \
+      -new \
+      -sha256 \
+      -keyout "${ca_key}" \
+      -config "${ca_conf}" \
+      -subj "${ca_subj}" \
+      -out "${ca_cert}"
+
+  cat << EOF >> "${ca_conf}"
+
+[ v3_intermediate_ca ]
+# Extensions for a typical intermediate CA ('man x509v3_config').
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints = critical, CA:true, pathlen:0
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign
+
+EOF
+
+  cat << EOF >> "${codesigning_conf}"
+
+[codesigning]
+keyUsage=digitalSignature
+extendedKeyUsage=codeSigning, clientAuth, emailProtection
+
+EOF
+
   openssl req \
       -newkey rsa:4096 \
       -keyout "${codesigning_key}" \
       -nodes \
       -sha256 \
-      -x509 \
-      -days 365 \
-      -out "${codesigning_cert}" \
+      -out "${codesigning_cert}.csr" \
       -config "${codesigning_conf}" \
       -subj "${codesigning_subj}" \
       -extensions codesigning
+
+  # Sign the code signing certificate with the CA
+  openssl ca \
+      -batch \
+      -config "${ca_conf}" \
+      -extensions v3_intermediate_ca \
+      -days 3650 \
+      -notext \
+      -md sha256 \
+      -in "${codesigning_cert}.csr" \
+      -out "${codesigning_cert}"
 
   print_section_end "ephemeral_codesigning_key"
 }
@@ -234,13 +296,13 @@ create_ephemeral_codesigning_key() {
 run_mkarchiso() {
   # run mkarchiso
   create_ephemeral_pgp_key
-  create_ephemeral_codesigning_key
+  create_ephemeral_codesigning_keys
 
   print_section_start "mkarchiso" "Running mkarchiso"
   mkdir -p "${output}/" "${tmpdir}/"
   GNUPGHOME="${gnupg_homedir}" ./archiso/mkarchiso \
       -D "${install_dir}" \
-      -c "${codesigning_cert} ${codesigning_key}" \
+      -c "${codesigning_cert} ${codesigning_key} ${ca_cert}" \
       -g "${pgp_key_id}" \
       -G "${pgp_sender}" \
       -o "${output}/" \

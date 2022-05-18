@@ -8,6 +8,8 @@ Changelog
 Added
 -----
 
+- The ability to generate rootfs signatures using openssl CMS module if ``-c`` is given.
+
 Changed
 -------
 
