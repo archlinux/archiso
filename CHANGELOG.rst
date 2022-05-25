@@ -8,6 +8,9 @@ Changelog
 Added
 -----
 
+- Add ``uefi-ia32.grub.esp`` boot mode to support IA32 UEFI boot on x86_64 machines.
+- Add GRUB configuration files to profiles.
+
 Changed
 -------
 
