@@ -17,6 +17,7 @@ The following packages need to be installed to be able to create an image with t
 * e2fsprogs
 * erofs-utils (optional)
 * findutils
+* grub
 * gzip
 * libarchive
 * libisoburn
