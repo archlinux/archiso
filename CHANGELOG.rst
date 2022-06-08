@@ -8,11 +8,18 @@ Changelog
 Added
 -----
 
+- Configure the locale for the baseline profile to ``C.UTF-8`` so that a UTF-8 locale is used.
+
 Changed
 -------
 
+- Change the releng profile's locale from ``en_US.UTF-8`` to ``C.UTF-8``.
+
 Removed
 -------
+
+- Remove the custom pacman hook that ran ``locale-gen`` on glibc install from the releng profile. The used locale now
+  ships with the glibc package itself.
 
 [64] - 2022-05-30
 =================
