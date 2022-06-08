@@ -14,6 +14,8 @@ Changed
 -------
 
 - Change the releng profile's locale from ``en_US.UTF-8`` to ``C.UTF-8``.
+- Set ``LC_ALL`` to ``C.UTF-8`` instead of ``C`` in mkarchiso since it is now available and non-UTF-8 locales should be
+  avoided.
 
 Removed
 -------
