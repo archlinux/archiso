@@ -73,6 +73,8 @@ Removed
 
 - Remove the custom pacman hook that ran ``locale-gen`` on glibc install from the releng profile. The used locale now
   ships with the glibc package itself.
+- Remove "Copy to RAM" boot entries since the ``archiso`` mkinitcpio hook enables it automatically when there is enough
+  free RAM.
 
 [64] - 2022-05-30
 =================
