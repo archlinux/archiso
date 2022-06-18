@@ -544,6 +544,7 @@ _make_bootmode_uefi-ia32.grub.esp() {
                       --modules="part_gpt part_msdos fat iso9660" \
                       --locales="en@quot" \
                       --themes="" \
+                      --sbat=/usr/share/grub/sbat.csv \
                       -o "${work_dir}/BOOTIA32.EFI" "boot/grub/grub.cfg=${work_dir}/grub-embed.cfg"
     # Add GRUB to the list of files used to calculate the required FAT image size.
     efiboot_files+=("${work_dir}/BOOTIA32.EFI"
@@ -619,6 +620,7 @@ _make_bootmode_uefi-x64.grub.esp() {
                       --modules="part_gpt part_msdos fat iso9660" \
                       --locales="en@quot" \
                       --themes="" \
+                      --sbat=/usr/share/grub/sbat.csv \
                       -o "${work_dir}/BOOTx64.EFI" "boot/grub/grub.cfg=${work_dir}/grub-embed.cfg"
     # Add GRUB to the list of files used to calculate the required FAT image size.
     efiboot_files+=("${work_dir}/BOOTx64.EFI"
