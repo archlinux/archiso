@@ -10,7 +10,7 @@ include:
 
 variables:
   BUILD_SCRIPT: ./.gitlab/ci/build_archiso.sh
-  PACKAGE_LIST: dosfstools e2fsprogs erofs-utils jq libisoburn mtools openssl qemu-headless squashfs-tools zsync
+  PACKAGE_LIST: arch-install-scripts bash dosfstools e2fsprogs erofs-utils gnupg grub jq libarchive libisoburn mtools openssl qemu-headless squashfs-tools zsync
   QEMU_BUILD_TIMEOUT: 2400
   QEMU_COPY_ARTIFACTS_TIMEOUT: 120
   QEMU_VM_MEMORY: 3072
