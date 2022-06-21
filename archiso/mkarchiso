@@ -536,8 +536,17 @@ _make_bootmode_uefi-ia32.grub.esp() {
          s|%ARCH%|${arch}|g" \
         "${profile}/grub/grub.cfg" > "${work_dir}/grub.cfg"
 
-    # shellcheck disable=SC2016
-    printf 'configfile ${cmdpath}/grub.cfg\n' > "${work_dir}/grub-embed.cfg"
+    IFS='' read -r -d '' grubembedcfg <<'EOF' || true
+if ! [ -d "$cmdpath" ]; then
+    # On some firmware, GRUB has a wrong cmdpath when booted from an optical disc.
+    # https://gitlab.archlinux.org/archlinux/archiso/-/issues/183
+    if regexp --set=1:isodevice '^(\([^)]+\))\/?[Ee][Ff][Ii]\/[Bb][Oo][Oo][Tt]\/?$' "$cmdpath"; then
+        cmdpath="${isodevice}/EFI/BOOT"
+    fi
+fi
+configfile "${cmdpath}/grub.cfg"
+EOF
+    printf '%s\n' "$grubembedcfg" > "${work_dir}/grub-embed.cfg"
 
     # Create EFI binary
     grub-mkstandalone -O i386-efi \
@@ -612,8 +621,17 @@ _make_bootmode_uefi-x64.grub.esp() {
          s|%ARCH%|${arch}|g" \
         "${profile}/grub/grub.cfg" > "${work_dir}/grub.cfg"
 
-    # shellcheck disable=SC2016
-    printf 'configfile ${cmdpath}/grub.cfg\n' > "${work_dir}/grub-embed.cfg"
+    IFS='' read -r -d '' grubembedcfg <<'EOF' || true
+if ! [ -d "$cmdpath" ]; then
+    # On some firmware, GRUB has a wrong cmdpath when booted from an optical disc.
+    # https://gitlab.archlinux.org/archlinux/archiso/-/issues/183
+    if regexp --set=1:isodevice '^(\([^)]+\))\/?[Ee][Ff][Ii]\/[Bb][Oo][Oo][Tt]\/?$' "$cmdpath"; then
+        cmdpath="${isodevice}/EFI/BOOT"
+    fi
+fi
+configfile "${cmdpath}/grub.cfg"
+EOF
+    printf '%s\n' "$grubembedcfg" > "${work_dir}/grub-embed.cfg"
 
     # Create EFI binary
     grub-mkstandalone -O x86_64-efi \
