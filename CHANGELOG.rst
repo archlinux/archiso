@@ -8,6 +8,18 @@ Changelog
 Added
 -----
 
+Changed
+-------
+
+Removed
+-------
+
+[65] - 2022-06-30
+=================
+
+Added
+-----
+
 - Configure the locale for the baseline profile to ``C.UTF-8`` so that a UTF-8 locale is used.
 - Add ``uefi-x64.grub.esp`` and ``uefi-x64.grub.eltorito`` boot mode to support x86_64 UEFI boot on x86_64 machines.
 - Use ``mkfs.erofs``'s ``ztailpacking`` option in the baseline profile to reduce the image size.
