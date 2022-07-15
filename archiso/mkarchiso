@@ -39,6 +39,7 @@ airootfs_image_tool_options=()
 cert_list=()
 sign_netboot_artifacts=""
 declare -A file_permissions=()
+efibootimg=""
 efiboot_files=()
 # adapted from GRUB_EARLY_INITRD_LINUX_STOCK in https://git.savannah.gnu.org/cgit/grub.git/tree/util/grub-mkconfig.in
 readonly ucodes=('intel-uc.img' 'intel-ucode.img' 'amd-uc.img' 'amd-ucode.img' 'early_ucode.cpio' 'microcode.cpio')
@@ -475,9 +476,9 @@ _make_bootmode_bios.syslinux.eltorito() {
 _make_boot_on_fat() {
     local ucode_image all_ucode_images=()
     _msg_info "Preparing kernel and initramfs for the FAT file system..."
-    mmd -i "${work_dir}/efiboot.img" \
+    mmd -i "${efibootimg}" \
         "::/${install_dir}" "::/${install_dir}/boot" "::/${install_dir}/boot/${arch}"
-    mcopy -i "${work_dir}/efiboot.img" "${pacstrap_dir}/boot/vmlinuz-"* \
+    mcopy -i "${efibootimg}" "${pacstrap_dir}/boot/vmlinuz-"* \
         "${pacstrap_dir}/boot/initramfs-"*".img" "::/${install_dir}/boot/${arch}/"
     for ucode_image in "${ucodes[@]}"; do
         if [[ -e "${pacstrap_dir}/boot/${ucode_image}" ]]; then
@@ -485,7 +486,7 @@ _make_boot_on_fat() {
         fi
     done
     if (( ${#all_ucode_images[@]} )); then
-        mcopy -i "${work_dir}/efiboot.img" "${all_ucode_images[@]}" "::/${install_dir}/boot/"
+        mcopy -i "${efibootimg}" "${all_ucode_images[@]}" "::/${install_dir}/boot/"
     fi
     _msg_info "Done!"
 }
@@ -509,23 +510,23 @@ _make_efibootimg() {
     )"
     # The FAT image must be created with mkfs.fat not mformat, as some systems have issues with mformat made images:
     # https://lists.gnu.org/archive/html/grub-devel/2019-04/msg00099.html
-    rm -f -- "${work_dir}/efiboot.img"
+    rm -f -- "${efibootimg}"
     _msg_info "Creating FAT image of size: ${imgsize_kib} KiB..."
     if [[ "${quiet}" == "y" ]]; then
         # mkfs.fat does not have a -q/--quiet option, so redirect stdout to /dev/null instead
         # https://github.com/dosfstools/dosfstools/issues/103
-        mkfs.fat -C -n ARCHISO_EFI "${work_dir}/efiboot.img" "${imgsize_kib}" > /dev/null
+        mkfs.fat -C -n ARCHISO_EFI "${efibootimg}" "${imgsize_kib}" > /dev/null
     else
-        mkfs.fat -C -n ARCHISO_EFI "${work_dir}/efiboot.img" "${imgsize_kib}"
+        mkfs.fat -C -n ARCHISO_EFI "${efibootimg}" "${imgsize_kib}"
     fi
 
     # Create the default/fallback boot path in which a boot loaders will be placed later.
-    mmd -i "${work_dir}/efiboot.img" ::/EFI ::/EFI/BOOT
+    mmd -i "${efibootimg}" ::/EFI ::/EFI/BOOT
 }
 
 # Copy the grub.cfg file in efiboot.img which is used by both IA32 UEFI and x64 UEFI.
 _make_efibootimg_grubcfg() {
-    mcopy -i "${work_dir}/efiboot.img" \
+    mcopy -i "${efibootimg}" \
         "${work_dir}/grub.cfg" ::/EFI/BOOT/grub.cfg
 }
 
@@ -572,14 +573,14 @@ EOF
     fi
 
     # Copy GRUB EFI binary to the default/fallback boot path
-    mcopy -i "${work_dir}/efiboot.img" \
+    mcopy -i "${efibootimg}" \
         "${work_dir}/BOOTIA32.EFI" ::/EFI/BOOT/BOOTIA32.EFI
 
     # Copy GRUB configuration files
     _run_once _make_efibootimg_grubcfg
 
     if [[ -e "${pacstrap_dir}/usr/share/edk2-shell/ia32/Shell_Full.efi" ]]; then
-        mcopy -i "${work_dir}/efiboot.img" \
+        mcopy -i "${efibootimg}" \
             "${pacstrap_dir}/usr/share/edk2-shell/ia32/Shell_Full.efi" ::/shellia32.efi
     fi
 
@@ -651,13 +652,13 @@ EOF
     _make_efibootimg "$efiboot_imgsize"
 
     # Copy grub EFI binary to the default/fallback boot path
-    mcopy -i "${work_dir}/efiboot.img" \
+    mcopy -i "${efibootimg}" \
         "${work_dir}/BOOTx64.EFI" ::/EFI/BOOT/BOOTx64.EFI
 
     _run_once _make_efibootimg_grubcfg
 
     if [[ -e "${pacstrap_dir}/usr/share/edk2-shell/x64/Shell_Full.efi" ]]; then
-        mcopy -i "${work_dir}/efiboot.img" \
+        mcopy -i "${efibootimg}" \
             "${pacstrap_dir}/usr/share/edk2-shell/x64/Shell_Full.efi" ::/shellx64.efi
     fi
 
@@ -715,22 +716,22 @@ _make_bootmode_uefi-x64.systemd-boot.esp() {
     _make_efibootimg "$efiboot_imgsize"
 
     # Copy systemd-boot EFI binary to the default/fallback boot path
-    mcopy -i "${work_dir}/efiboot.img" \
+    mcopy -i "${efibootimg}" \
         "${pacstrap_dir}/usr/lib/systemd/boot/efi/systemd-bootx64.efi" ::/EFI/BOOT/BOOTx64.EFI
 
     # Copy systemd-boot configuration files
-    mmd -i "${work_dir}/efiboot.img" ::/loader ::/loader/entries
-    mcopy -i "${work_dir}/efiboot.img" "${profile}/efiboot/loader/loader.conf" ::/loader/
+    mmd -i "${efibootimg}" ::/loader ::/loader/entries
+    mcopy -i "${efibootimg}" "${profile}/efiboot/loader/loader.conf" ::/loader/
     for _conf in "${profile}/efiboot/loader/entries/"*".conf"; do
         sed "s|%ARCHISO_LABEL%|${iso_label}|g;
              s|%INSTALL_DIR%|${install_dir}|g;
              s|%ARCH%|${arch}|g" \
-            "${_conf}" | mcopy -i "${work_dir}/efiboot.img" - "::/loader/entries/${_conf##*/}"
+            "${_conf}" | mcopy -i "${efibootimg}" - "::/loader/entries/${_conf##*/}"
     done
 
     # shellx64.efi is picked up automatically when on /
     if [[ -e "${pacstrap_dir}/usr/share/edk2-shell/x64/Shell_Full.efi" ]]; then
-        mcopy -i "${work_dir}/efiboot.img" \
+        mcopy -i "${efibootimg}" \
             "${pacstrap_dir}/usr/share/edk2-shell/x64/Shell_Full.efi" ::/shellx64.efi
     fi
 
@@ -1199,7 +1200,7 @@ _add_xorrisofs_options_uefi-x64.systemd-boot.esp() {
     # shellcheck disable=SC2076
     [[ " ${xorrisofs_options[*]} " =~ ' -partition_offset ' ]] || xorrisofs_options+=('-partition_offset' '16')
     # Attach efiboot.img as a second partition and set its partition type to "EFI system partition"
-    xorrisofs_options+=('-append_partition' '2' 'C12A7328-F81F-11D2-BA4B-00A0C93EC93B' "${work_dir}/efiboot.img")
+    xorrisofs_options+=('-append_partition' '2' 'C12A7328-F81F-11D2-BA4B-00A0C93EC93B' "${efibootimg}")
     # Ensure GPT is used as some systems do not support UEFI booting without it
     # shellcheck disable=SC2076
     if [[ " ${bootmodes[*]} " =~ ' bios.syslinux.mbr ' ]]; then
@@ -1246,7 +1247,7 @@ _add_xorrisofs_options_uefi-x64.systemd-boot.eltorito() {
         # The ISO will not contain a GPT partition table, so to be able to reference efiboot.img, place it as a
         # file inside the ISO 9660 file system
         install -d -m 0755 -- "${isofs_dir}/EFI/archiso"
-        cp -a -- "${work_dir}/efiboot.img" "${isofs_dir}/EFI/archiso/efiboot.img"
+        cp -a -- "${efibootimg}" "${isofs_dir}/EFI/archiso/efiboot.img"
         # systemd-boot in an embedded efiboot.img via El Torito
         xorrisofs_options+=(
             # Start a new El Torito boot entry for UEFI
@@ -1270,7 +1271,7 @@ _add_xorrisofs_options_uefi-x64.grub.esp() {
     # shellcheck disable=SC2076
     [[ " ${xorrisofs_options[*]} " =~ ' -partition_offset ' ]] || xorrisofs_options+=('-partition_offset' '16')
     # Attach efiboot.img as a second partition and set its partition type to "EFI system partition"
-    xorrisofs_options+=('-append_partition' '2' 'C12A7328-F81F-11D2-BA4B-00A0C93EC93B' "${work_dir}/efiboot.img")
+    xorrisofs_options+=('-append_partition' '2' 'C12A7328-F81F-11D2-BA4B-00A0C93EC93B' "${efibootimg}")
     # Ensure GPT is used as some systems do not support UEFI booting without it
     # shellcheck disable=SC2076
     if [[ " ${bootmodes[*]} " =~ ' bios.syslinux.mbr ' ]]; then
@@ -1318,7 +1319,7 @@ _add_xorrisofs_options_uefi-x64.grub.eltorito() {
         # The ISO will not contain a GPT partition table, so to be able to reference efiboot.img, place it as a
         # file inside the ISO 9660 file system
         install -d -m 0755 -- "${isofs_dir}/EFI/archiso"
-        cp -a -- "${work_dir}/efiboot.img" "${isofs_dir}/EFI/archiso/efiboot.img"
+        cp -a -- "${efibootimg}" "${isofs_dir}/EFI/archiso/efiboot.img"
         # grub in an embedded efiboot.img via El Torito
         xorrisofs_options+=(
             # Start a new El Torito boot entry for UEFI
@@ -1641,6 +1642,7 @@ _build_buildmode_netboot() {
 _build_buildmode_iso() {
     local image_name="${iso_name}-${iso_version}-${arch}.iso"
     local run_once_mode="${buildmode}"
+    efibootimg="${work_dir}/efiboot.img"
     _build_iso_base
     _run_once _build_iso_image
 }

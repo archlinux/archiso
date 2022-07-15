@@ -35,3 +35,4 @@ Archiso Authors
 * nl6720 <nl6720@gmail.com>
 * Øyvind Heggstad <heggstad@gmail.com>
 * plain linen <bcdedit@hotmail.com>
+* Pellegrino Prevete <pellegrinoprevete@gmail.com>
