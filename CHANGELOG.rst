@@ -8,6 +8,8 @@ Changelog
 Added
 -----
 
+- Add ``efibootimg`` to ``mkarchiso`` to abstract the FAT image path.
+
 Changed
 -------
 
