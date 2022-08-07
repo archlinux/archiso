@@ -11,6 +11,9 @@ Added
 Changed
 -------
 
+- Order ``pacman-init.service`` before ``archlinux-keyring-wkd-sync.service`` since
+  ``archlinux-keyring-wkd-sync.service`` needs an initialized pacman keyring.
+
 Removed
 -------
 
