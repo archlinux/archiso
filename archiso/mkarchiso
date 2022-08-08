@@ -583,15 +583,24 @@ EOF
 }
 
 _make_bootmode_uefi-ia32.grub.esp() {
+    local grubmodules=()
+
     # Prepare configuration files
     _run_once _make_common_bootmode_grub_cfg
 
     # Create EFI binary
+    # Module list from https://bugs.archlinux.org/task/71382#comment202911
+    grubmodules=(all_video at_keyboard boot btrfs cat chain configfile echo efifwsetup efinet ext2 f2fs fat font \
+                 gfxmenu gfxterm gzio halt hfsplus iso9660 jpeg keylayouts linux loadenv loopback lsefi lsefimmap \
+                 minicmd normal part_apple part_gpt part_msdos png read reboot regexp search search_fs_file \
+                 search_fs_uuid search_label serial sleep tpm usb usbserial_common usbserial_ftdi usbserial_pl2303 \
+                 usbserial_usbdebug video xfs zstd)
     grub-mkstandalone -O i386-efi \
-                      --modules="part_gpt part_msdos fat iso9660" \
+                      --modules="${grubmodules[*]}" \
                       --locales="en@quot" \
                       --themes="" \
                       --sbat=/usr/share/grub/sbat.csv \
+                      --disable-shim-lock \
                       -o "${work_dir}/BOOTIA32.EFI" "boot/grub/grub.cfg=${work_dir}/grub-embed.cfg"
     # Add GRUB to the list of files used to calculate the required FAT image size.
     efiboot_files+=("${work_dir}/BOOTIA32.EFI"
@@ -651,15 +660,24 @@ _make_bootmode_uefi-ia32.grub.eltorito() {
 }
 
 _make_bootmode_uefi-x64.grub.esp() {
+    local grubmodules=()
+
     # Prepare configuration files
     _run_once _make_common_bootmode_grub_cfg
 
     # Create EFI binary
+    # Module list from https://bugs.archlinux.org/task/71382#comment202911
+    grubmodules=(all_video at_keyboard boot btrfs cat chain configfile echo efifwsetup efinet ext2 f2fs fat font \
+                 gfxmenu gfxterm gzio halt hfsplus iso9660 jpeg keylayouts linux loadenv loopback lsefi lsefimmap \
+                 minicmd normal part_apple part_gpt part_msdos png read reboot regexp search search_fs_file \
+                 search_fs_uuid search_label serial sleep tpm usb usbserial_common usbserial_ftdi usbserial_pl2303 \
+                 usbserial_usbdebug video xfs zstd)
     grub-mkstandalone -O x86_64-efi \
-                      --modules="part_gpt part_msdos fat iso9660" \
+                      --modules="${grubmodules[*]}" \
                       --locales="en@quot" \
                       --themes="" \
                       --sbat=/usr/share/grub/sbat.csv \
+                      --disable-shim-lock \
                       -o "${work_dir}/BOOTx64.EFI" "boot/grub/grub.cfg=${work_dir}/grub-embed.cfg"
     # Add GRUB to the list of files used to calculate the required FAT image size.
     efiboot_files+=("${work_dir}/BOOTx64.EFI"

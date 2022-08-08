@@ -14,6 +14,9 @@ Added
 Changed
 -------
 
+- Disable GRUB's shim_lock verifier and preload more modules. This allows reusing the GRUB EFI binaries when repacking
+  the ISO to support Secure Boot with custom signatures.
+
 Removed
 -------
 
