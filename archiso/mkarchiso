@@ -1590,6 +1590,11 @@ _make_version() {
         [[ ! -e "${_os_release}" ]] || sed -i '/^IMAGE_ID=/d;/^IMAGE_VERSION=/d' "${_os_release}"
         printf 'IMAGE_ID=%s\nIMAGE_VERSION=%s\n' "${iso_name}" "${iso_version}" >> "${_os_release}"
     fi
+
+    # Touch /usr/lib/clock-epoch to give another hint on date and time
+    # for systems with screwed or broken RTC.
+    touch -m -d"@${SOURCE_DATE_EPOCH}" -- "${pacstrap_dir}/usr/lib/clock-epoch"
+
     _msg_info "Done!"
 }
 

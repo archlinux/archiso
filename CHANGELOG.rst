@@ -10,6 +10,7 @@ Added
 
 - Add ``efibootimg`` to ``mkarchiso`` to abstract the FAT image path.
 - Copy all files from the ``grub`` directory to ISO9660 and the FAT image, not just only ``grub.cfg``.
+- Touching ``/usr/lib/clock-epoch`` to to help ``systemd`` with screwed or broken RTC.
 
 Changed
 -------
