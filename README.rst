@@ -156,7 +156,7 @@ Releases
 
 `Releases of archiso <https://gitlab.archlinux.org/archlinux/archiso/-/tags>`_ are created by their current maintainers
 
-- `David Runge <https://gitlab.archlinux.org/dvzrv>`_ (``C7E7849466FE2358343588377258734B41C31549``)
+- `David Runge <https://gitlab.archlinux.org/dvzrv>`_ (``991F6E3F0765CF6295888586139B09DA5BF0D338``)
 - `nl6720 <https://gitlab.archlinux.org/nl6720>`_ (``BB8E6F1B81CF0BB301D74D1CBF425A01E68B38EF``)
 
 Tags are signed using respective PGP keys.
