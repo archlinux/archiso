@@ -13,6 +13,8 @@ Changed
 
 - Order ``pacman-init.service`` before ``archlinux-keyring-wkd-sync.service`` since
   ``archlinux-keyring-wkd-sync.service`` needs an initialized pacman keyring.
+- Order ``pacman-init.service`` after ``time-sync.target`` since ``pacman-init.service`` may otherwise create local
+  signatures that are not valid on target systems after installation.
 
 Removed
 -------
