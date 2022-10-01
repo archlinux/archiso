@@ -11,6 +11,8 @@ Added
 Changed
 -------
 
+- Do not explicitly enable ``qemu-guest-agent.service`` as it will be started by a udev rule.
+
 Removed
 -------
 
