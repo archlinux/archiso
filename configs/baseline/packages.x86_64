@@ -15,6 +15,7 @@ xorg
 xorg-drivers
 xorg-xinit
 xorg-apps
+nvidia-lts
 openssh
 polkit
 
