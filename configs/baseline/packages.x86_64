@@ -2,6 +2,8 @@ syslinux
 cloud-init
 hyperv
 
+amd-ucode
+intel-ucode
 base
 base-devel
 linux
