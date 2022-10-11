@@ -9,6 +9,7 @@ linux-firmware
 mkinitcpio
 mkinitcpio-archiso
 
+xorg
 xorg-drivers
 xorg-xinit
 xorg-apps
