@@ -6,7 +6,7 @@ amd-ucode
 intel-ucode
 base
 base-devel
-linux
+linux-lts
 linux-firmware
 mkinitcpio
 mkinitcpio-archiso
