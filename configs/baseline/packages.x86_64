@@ -1,4 +1,6 @@
 syslinux
+cloud-init
+hyperv
 
 base
 base-devel
@@ -7,7 +9,13 @@ linux-firmware
 mkinitcpio
 mkinitcpio-archiso
 
-cloud-init
-hyperv
+xorg-drivers
+xorg-xinit
+xorg-apps
 openssh
+
+zsh
+git
+neovim
+firefox
 
