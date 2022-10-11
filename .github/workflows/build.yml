@@ -14,7 +14,9 @@ jobs:
       - uses: actions/checkout@v3
       - run: |
           pacman -Syy
-          pacman -S --noconfirm archiso
+          pacman -S --noconfirm archiso git
+          mkdir -p work out
+          mkarchiso -w work -o out ./configs/baseline/
       - uses: actions/upload-artifact@v3
         with:
           name: archiso
