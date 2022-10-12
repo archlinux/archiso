@@ -15,7 +15,7 @@ jobs:
           pacman -Syy
           pacman -S --noconfirm archiso git
           mkdir -p work out
-          mkarchiso -v -w work -o out ./configs/baseline/
+          mkarchiso -v -w work -o out ./configs/
       - uses: actions/upload-artifact@v3
         with:
           name: archiso
