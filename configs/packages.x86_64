@@ -1,28 +1,26 @@
 syslinux
-grub
+edk2-shell
 efibootmgr
 amd-ucode
 intel-ucode
 cloud-init
-hyperv
+arch-install-scripts
 
 base
 base-devel
-linux
+linux-lts
 linux-firmware
 mkinitcpio
 mkinitcpio-archiso
 
-xorg
-xorg-drivers
 xorg-xinit
-xorg-apps
-nvidia-lts
+xorg-server
 openssh
-polkit
+iproute2
+iwd
 
 zsh
-git
 neovim
+git
 firefox
 
