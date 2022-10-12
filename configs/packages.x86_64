@@ -1,9 +1,11 @@
 syslinux
+grub
+efibootmgr
+amd-ucode
+intel-ucode
 cloud-init
 hyperv
 
-amd-ucode
-intel-ucode
 base
 base-devel
 linux
