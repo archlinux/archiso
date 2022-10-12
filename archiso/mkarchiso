@@ -254,7 +254,7 @@ _mk_pgp_signature() {
     local gpg_options=()
     local airootfs_image_filename="${1}"
     _msg_info "Signing rootfs image using GPG..."
-   
+
     rm -f -- "${airootfs_image_filename}.sig"
     # Add gpg sender option if the value is provided
     [[ -z "${gpg_sender}" ]] || gpg_options+=('--sender' "${gpg_sender}")
@@ -1054,7 +1054,7 @@ _cms_sign_artifact() {
     fi
 
     _msg_info "Signing ${artifact} image using openssl cms..."
-   
+
     rm -f -- "${artifact}.cms.sig"
 
     openssl cms "${openssl_flags[@]}"
@@ -1073,7 +1073,8 @@ _sign_netboot_artifacts() {
             _files_to_sign+=("${_dir}${_file}")
         fi
     done
-    for _file in "${_files_to_sign[@]}" "${_dir}${arch}/vmlinuz-"* "${_dir}${arch}/initramfs-"*.img; do
+    for _file in "${_files_to_sign[@]}" "${_dir}${arch}/vmlinuz-"!(*.sig) "${_dir}${arch}/initramfs-"*.img; do
+        rm -f -- "${_file}".ipxe.sig
         openssl cms \
             -sign \
             -binary \

@@ -12,6 +12,8 @@ Changed
 -------
 
 - Do not explicitly enable ``qemu-guest-agent.service`` as it will be started by a udev rule.
+- Remove existing signature (``.sig``) files and do not sign them when signing netboot artifacts. This is mostly
+  applicable when re-running ``mkarchiso``  after a failure.
 
 Removed
 -------
