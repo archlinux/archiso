@@ -17,6 +17,7 @@ mkinitcpio-nfs-utils
 nvidia-lts
 nvidia-utils
 nvidia-settings
+xf86-video-amdgpu
 xorg-xinit
 xorg-server
 xorg-apps
