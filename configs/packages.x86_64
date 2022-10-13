@@ -1,5 +1,6 @@
-syslinux
+memtest86+
 edk2-shell
+syslinux
 efibootmgr
 amd-ucode
 intel-ucode
@@ -15,6 +16,7 @@ mkinitcpio-archiso
 
 xorg-xinit
 xorg-server
+xorg-apps
 openssh
 iproute2
 iwd
