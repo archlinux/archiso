@@ -15,9 +15,9 @@ echo 'LANG=en_US.UTF-8' > /etc/locale.conf
 locale-gen
 
 chsh -s /bin/zsh
-cp /etc/X11/xinit/xinitrc $HOME/.xinitrc
-sed -i '/^twm/,$d' $HOME/.xinitrc
-echo 'exec dwm' >> $HOME/.xinitrc
+cp /etc/X11/xinit/xinitrc /root/.xinitrc
+sed -i '/^twm/,$d' /root/.xinitrc
+echo 'exec dwm' >> /root/.xinitrc
 echo 'if [ -z "${DISPLAY}" ] && [ "${XDG_VTNR}" -eq 1 ]; then
   exec startx
 fi' >> $HOME/.zprofile
