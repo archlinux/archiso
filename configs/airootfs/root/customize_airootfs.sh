@@ -14,14 +14,7 @@ echo -e 'en_US.UTF-8 UTF-8\nzh_CN.UTF-8 UTF-8' >> /etc/locale.gen
 echo 'LANG=en_US.UTF-8' > /etc/locale.conf
 locale-gen
 
-chsh -s /bin/zsh
-cp /etc/X11/xinit/xinitrc /root/.xinitrc
-sed -i '/^twm/,$d' /root/.xinitrc
-echo 'exec dwm' >> /root/.xinitrc
-echo 'if [ -z "${DISPLAY}" ] && [ "${XDG_VTNR}" -eq 1 ]; then
-  exec startx
-fi' >> $HOME/.zprofile
-
+# setup dwm
 git clone https://gitee.com/xundaoxd/dogeystamp-dwm.git
 cd dogeystamp-dwm
 make
@@ -37,3 +30,12 @@ cd dogeystamp-dmenu
 make
 sudo make install
 cd ..
+
+chsh -s /bin/zsh
+cp /etc/X11/xinit/xinitrc /root/.xinitrc
+sed -i '/^twm/,$d' /root/.xinitrc
+echo 'exec dwm' >> /root/.xinitrc
+echo 'if [ -z "${DISPLAY}" ] && [ "${XDG_VTNR}" -eq 1 ]; then
+  exec startx
+fi' >> /root/.zprofile
+
