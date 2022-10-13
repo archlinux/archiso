@@ -1,4 +1,4 @@
-memtest86+
+pv
 edk2-shell
 syslinux
 efibootmgr
@@ -12,6 +12,7 @@ linux-lts
 linux-firmware
 mkinitcpio
 mkinitcpio-archiso
+mkinitcpio-nfs-utils
 
 nvidia-lts
 nvidia-utils
