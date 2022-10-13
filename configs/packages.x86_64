@@ -1,3 +1,4 @@
+# hardware
 pv
 edk2-shell
 syslinux
@@ -6,6 +7,7 @@ amd-ucode
 intel-ucode
 arch-install-scripts
 
+# kernel
 base
 base-devel
 linux-lts
@@ -13,32 +15,31 @@ linux-firmware
 mkinitcpio
 mkinitcpio-archiso
 mkinitcpio-nfs-utils
+nbd
 
-xorg-xinput
-xorg-xinit
-xorg-server
-xorg-apps
-
-xf86-input-libinput
-xf86-video-fbdev
-xf86-video-vesa
-xf86-video-intel
-xf86-video-amdgpu
-xf86-video-ati
-xf86-video-nouveau
-nvidia-lts
-nvidia-utils
-nvidia-settings
-
+# service
 openssh
 iproute2
 iwd
 
+# app
 zsh
 neovim
 git
 firefox
 
 # debug
+sddm
+openbox
 xorg-twm
-xterm
+xorg-xinit
+xorg-server
+xorg-apps
+
+# xf86-video-fbdev
+# xf86-video-vesa
+# xf86-video-intel
+# xf86-video-amdgpu
+# xf86-video-ati
+# nvidia
+
