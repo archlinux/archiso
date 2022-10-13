@@ -18,19 +18,3 @@ systemctl enable systemd-networkd
 systemctl enable systemd-resolved
 systemctl enable sshd
 
-# setup dwm
-git clone https://gitee.com/xundaoxd/dogeystamp-dmenu.git
-(cd dogeystamp-dmenu && make && make install)
-git clone https://gitee.com/xundaoxd/dogeystamp-st.git
-(cd dogeystamp-st && make && make install)
-git clone https://gitee.com/xundaoxd/archlinux-dwm.git
-(cd archlinux-dwm && make && make install)
-
-chsh -s /bin/zsh
-cp /etc/X11/xinit/xinitrc /root/.xinitrc
-sed -i '/^twm/,$d' /root/.xinitrc
-echo 'exec dwm' >> /root/.xinitrc
-echo 'if [ -z "${DISPLAY}" ] && [ "${XDG_VTNR}" -eq 1 ]; then
-  exec startx
-fi' >> /root/.zprofile
-

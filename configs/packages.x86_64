@@ -4,7 +4,6 @@ syslinux
 efibootmgr
 amd-ucode
 intel-ucode
-cloud-init
 arch-install-scripts
 
 base
@@ -14,6 +13,9 @@ linux-firmware
 mkinitcpio
 mkinitcpio-archiso
 
+nvidia-lts
+nvidia-utils
+nvidia-settings
 xorg-xinit
 xorg-server
 xorg-apps
