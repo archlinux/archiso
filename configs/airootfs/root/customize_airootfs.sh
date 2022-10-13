@@ -18,3 +18,5 @@ systemctl enable systemd-networkd
 systemctl enable systemd-resolved
 systemctl enable sshd
 
+usermog -aG wheel xundaoxd
+
