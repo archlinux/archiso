@@ -18,28 +18,20 @@ mkinitcpio-nfs-utils
 nbd
 
 # service
-iwd
+networkmanager
 iproute2
 openssh
+
+xorg
+xorg-xinit
+polkit
+sudo
+man-db
+man-pages
 
 # app
 zsh
 neovim
 git
 firefox
-
-# debug
-xorg-xinit
-xorg-server
-xorg-apps
-
-sddm
-openbox
-xorg-twm
-# xf86-video-fbdev
-# xf86-video-vesa
-# xf86-video-intel
-# xf86-video-amdgpu
-# xf86-video-ati
-# nvidia
 
