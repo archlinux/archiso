@@ -17,11 +17,11 @@ systemctl enable iwd
 systemctl enable systemd-networkd
 systemctl enable systemd-resolved
 systemctl enable sshd
-systemctl enable sddm
 
 usermod -aG wheel xundaoxd
 
 # debug
+systemctl enable sddm
 cat > /usr/share/xsessions/twm.desktop << EOF
 [Desktop Entry]
 Name=twm

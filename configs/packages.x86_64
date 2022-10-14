@@ -18,9 +18,9 @@ mkinitcpio-nfs-utils
 nbd
 
 # service
-openssh
-iproute2
 iwd
+iproute2
+openssh
 
 # app
 zsh
@@ -29,13 +29,13 @@ git
 firefox
 
 # debug
-sddm
-openbox
-xorg-twm
 xorg-xinit
 xorg-server
 xorg-apps
 
+sddm
+openbox
+xorg-twm
 # xf86-video-fbdev
 # xf86-video-vesa
 # xf86-video-intel
