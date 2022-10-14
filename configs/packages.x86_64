@@ -35,3 +35,8 @@ neovim
 git
 firefox
 
+# dwm
+dmenu
+alacritty
+picom
+
