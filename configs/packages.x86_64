@@ -10,7 +10,7 @@ arch-install-scripts
 # kernel
 base
 base-devel
-linux-lts
+linux
 linux-firmware
 mkinitcpio
 mkinitcpio-archiso
@@ -24,7 +24,7 @@ openssh
 
 # desktop
 sddm
-openbox
+plasma-meta
 
 # misc
 polkit

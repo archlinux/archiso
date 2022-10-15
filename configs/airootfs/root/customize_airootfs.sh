@@ -13,10 +13,9 @@ sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist
 pacman-key --init
 pacman-key --populate
 
-systemctl enable systemd-resolved
 systemctl enable NetworkManager
-systemctl enable sshd
 systemctl enable sddm
+systemctl enable sshd
 
 usermod -aG wheel,input,video,audio,kvm xundaoxd
 sed -E -i '/^#\s*%wheel.*NOPASSWD/{s/^#\s*//}' /etc/sudoers
