@@ -17,4 +17,5 @@ systemctl enable NetworkManager
 systemctl enable sshd
 
 usermod -aG wheel,input,video,audio,kvm xundaoxd
+sed -E -i '/^#\s*%wheel.*NOPASSWD/{s/^#\s*//}' /etc/sudoers
 
