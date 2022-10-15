@@ -15,6 +15,7 @@ pacman-key --populate
 
 systemctl enable NetworkManager
 systemctl enable sshd
+systemctl enable sddm
 
 usermod -aG wheel,input,video,audio,kvm xundaoxd
 sed -E -i '/^#\s*%wheel.*NOPASSWD/{s/^#\s*//}' /etc/sudoers

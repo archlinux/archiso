@@ -23,21 +23,17 @@ iproute2
 openssh
 
 # desktop
-xorg
-xorg-xinit
-polkit
-sudo
+sddm
+openbox
 
 # misc
+polkit
+sudo
 man-db
 man-pages
+
 zsh
 neovim
 git
 firefox
-
-# dwm
-dmenu
-alacritty
-picom
 
