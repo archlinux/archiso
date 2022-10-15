@@ -16,5 +16,5 @@ pacman-key --populate
 systemctl enable NetworkManager
 systemctl enable sshd
 
-usermod -aG wheel,input xundaoxd
+usermod -aG wheel,input,video,audio,kvm xundaoxd
 
