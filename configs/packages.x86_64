@@ -22,6 +22,17 @@ networkmanager
 iproute2
 openssh
 
+# sound
+alsa-utils
+alsa-firmware
+pulseaudio
+pulseaudio-alsa
+pulseaudio-bluetooth
+
+# bluetooth
+bluez
+bluez-utils
+
 # desktop
 nvidia
 xf86-video-amdgpu
