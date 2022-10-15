@@ -17,19 +17,20 @@ mkinitcpio-archiso
 mkinitcpio-nfs-utils
 nbd
 
-# service
+# network
 networkmanager
 iproute2
 openssh
 
+# desktop
 xorg
 xorg-xinit
 polkit
 sudo
+
+# misc
 man-db
 man-pages
-
-# app
 zsh
 neovim
 git
