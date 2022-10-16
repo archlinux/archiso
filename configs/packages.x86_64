@@ -50,6 +50,7 @@ man-db
 man-pages
 virt-manager
 qemu-full
+dnsmasq
 
 btrfs-progs
 dosfstools
