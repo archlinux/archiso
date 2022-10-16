@@ -52,6 +52,7 @@ virt-manager
 qemu-full
 dnsmasq
 
+usbutils
 btrfs-progs
 dosfstools
 exfatprogs
