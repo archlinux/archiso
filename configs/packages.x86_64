@@ -48,6 +48,7 @@ polkit
 sudo
 man-db
 man-pages
+virt-manager
 
 zsh
 neovim
