@@ -14,6 +14,7 @@ jobs:
       - run: |
           pacman -Syy
           pacman -S --noconfirm archiso git
+          ./mkrepo
           mkdir -p work out
           ./mkarchiso -v -w work -o out ./configs/
       - uses: actions/upload-artifact@v3

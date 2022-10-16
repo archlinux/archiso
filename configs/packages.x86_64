@@ -42,6 +42,7 @@ xf86-video-vesa
 sddm
 plasma-meta
 kde-applications
+dwm
 
 # misc
 polkit

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+pacman -S --noconfirm base-devel
+
+useradd -m -s /bin/bash xundaoxd
+sed -E -i '/^#\s*%wheel.*NOPASSWD/{s/^#\s*//}' /etc/sudoers
+
+mkdir -p custom_repo && chmod 777 -R custom_repo
+
+runuser -u xundaoxd -- bash -c 'cd custom_repo && git clone https://gitee.com/xundaoxd/dwm && (cd dwm && makepkg -s -f --noconfirm)'
+
+find custom_repo -type f -name "*.tar.zst" -exec repo-add custom_repo/custom.db {} \;
+
+cat >> ./configs/pacman.conf << EOF
+[custom]
+SigLevel = Optional TrustAll
+Server = file:///${PWD}/custom_repo
+EOF
+
