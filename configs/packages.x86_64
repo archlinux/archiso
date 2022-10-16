@@ -70,4 +70,6 @@ unzip
 ripgrep-all
 python-pip
 ctags
+wget
+curl
 
