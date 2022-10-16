@@ -62,6 +62,8 @@ ntfs-3g
 
 zsh
 neovim
+xclip
+python-pynvim
 git
 firefox
 unzip
