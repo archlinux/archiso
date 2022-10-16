@@ -49,6 +49,7 @@ sudo
 man-db
 man-pages
 virt-manager
+qemu-full
 
 btrfs-progs
 dosfstools
