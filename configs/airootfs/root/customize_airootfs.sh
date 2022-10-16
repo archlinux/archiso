@@ -22,6 +22,6 @@ systemctl enable sshd
 systemctl enable bluetooth
 
 systemctl enable libvirtd
-sed -i 's/^#unix_sock_group/#unix_sock_group/;s/^#unix_sock_rw_perms/unix_sock_rw_perms/' /etc/libvirt/libvirtd.conf
+sed -i 's/^#unix_sock_group/unix_sock_group/;s/^#unix_sock_rw_perms/unix_sock_rw_perms/' /etc/libvirt/libvirtd.conf
 usermod -aG libvirt xundaoxd
 
