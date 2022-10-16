@@ -50,6 +50,13 @@ man-db
 man-pages
 virt-manager
 
+btrfs-progs
+dosfstools
+exfatprogs
+e2fsprogs
+e2fsprogs
+ntfs-3g
+
 zsh
 neovim
 git
