@@ -12,7 +12,9 @@ useradd -m -s /bin/bash -g wheel xundao
 sed -E -i '/^#\s*%wheel.*NOPASSWD/{s/^#\s*//}' /etc/sudoers
 
 mkdir -p local_repo && chmod 777 -R local_repo
-pkgs=(https://gitee.com/xundaoxd/dwm)
+pkgs=(
+    https://gitee.com/xundaoxd/dwm
+)
 for pkg in ${pkgs[@]}; do
     mkpackage $pkg
 done

@@ -39,10 +39,14 @@ xf86-video-amdgpu
 xf86-video-ati
 xf86-video-fbdev
 xf86-video-vesa
+
 sddm
 plasma-meta
 kde-applications
 dwm
+picom
+feh
+neofetch
 
 # misc
 polkit
