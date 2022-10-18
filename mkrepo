@@ -14,6 +14,7 @@ sed -E -i '/^#\s*%wheel.*NOPASSWD/{s/^#\s*//}' /etc/sudoers
 mkdir -p local_repo && chmod 777 -R local_repo
 pkgs=(
     https://gitee.com/xundaoxd/dwm
+    https://aur.archlinux.org/zfs-linux.git
 )
 for pkg in ${pkgs[@]}; do
     mkpackage $pkg
