@@ -471,11 +471,10 @@ _make_bootmode_bios.syslinux.mbr() {
 
     # Add other aditional/extra files to ${install_dir}/boot/
     if [[ -e "${pacstrap_dir}/boot/memtest86+/memtest.bin" ]]; then
+        install -d -m 0755 -- "${isofs_dir}/boot/memtest86+/"
         # rename for PXE: https://wiki.archlinux.org/title/Syslinux#Using_memtest
-        install -m 0644 -- "${pacstrap_dir}/boot/memtest86+/memtest.bin" "${isofs_dir}/${install_dir}/boot/memtest"
-        install -d -m 0755 -- "${isofs_dir}/${install_dir}/boot/licenses/memtest86+/"
-        install -m 0644 -- "${pacstrap_dir}/usr/share/licenses/common/GPL2/license.txt" \
-            "${isofs_dir}/${install_dir}/boot/licenses/memtest86+/"
+        install -m 0644 -- "${pacstrap_dir}/boot/memtest86+/memtest.bin" "${isofs_dir}/boot/memtest86+/memtest"
+        install -m 0644 -- "${pacstrap_dir}/usr/share/licenses/common/GPL2/license.txt" "${isofs_dir}/boot/memtest86+/"
     fi
     _msg_info "Done! SYSLINUX set up for BIOS booting from a disk successfully."
 }
@@ -722,10 +721,9 @@ _make_bootmode_uefi-x64.grub.esp() {
 
     # Add other aditional/extra files to ${install_dir}/boot/
     if [[ -e "${pacstrap_dir}/boot/memtest86+/memtest.efi" ]]; then
-        install -m 0644 -- "${pacstrap_dir}/boot/memtest86+/memtest.efi" "${isofs_dir}/${install_dir}/boot/memtest.efi"
-        install -d -m 0755 -- "${isofs_dir}/${install_dir}/boot/licenses/memtest86+/"
-        install -m 0644 -- "${pacstrap_dir}/usr/share/licenses/common/GPL2/license.txt" \
-            "${isofs_dir}/${install_dir}/boot/licenses/memtest86+/"
+        install -d -m 0755 -- "${isofs_dir}/boot/memtest86+/"
+        install -m 0644 -- "${pacstrap_dir}/boot/memtest86+/memtest.efi" "${isofs_dir}/boot/memtest86+/memtest.efi"
+        install -m 0644 -- "${pacstrap_dir}/usr/share/licenses/common/GPL2/license.txt" "${isofs_dir}/boot/memtest86+/"
     fi
 
     _msg_info "Done! GRUB set up for UEFI booting successfully."

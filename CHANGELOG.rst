@@ -23,6 +23,8 @@ Changed
 Removed
 -------
 
+- Do not place memtest86+ in netboot artifacts.
+
 [69] - 2022-12-24
 =================
 
