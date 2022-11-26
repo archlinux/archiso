@@ -336,15 +336,15 @@ _make_packages() {
     _msg_info "Installing packages to '${pacstrap_dir}/'..."
 
     if [[ -v gpg_publickey ]]; then
-        exec {ARCHISO_GNUPG_FD}<>"$gpg_publickey"
+        exec {ARCHISO_GNUPG_FD}<"$gpg_publickey"
         export ARCHISO_GNUPG_FD
     fi
     if [[ -v cert_list[0] ]]; then
-        exec {ARCHISO_TLS_FD}<>"${cert_list[0]}"
+        exec {ARCHISO_TLS_FD}<"${cert_list[0]}"
         export ARCHISO_TLS_FD
     fi
     if [[ -v cert_list[2] ]]; then
-        exec {ARCHISO_TLSCA_FD}<>"${cert_list[2]}"
+        exec {ARCHISO_TLSCA_FD}<"${cert_list[2]}"
         export ARCHISO_TLSCA_FD
     fi
 
