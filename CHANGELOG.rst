@@ -12,6 +12,8 @@ Added
 Changed
 -------
 
+- Check if the GPG public key file was successfully placed in the work directory before trying to use it.
+
 Removed
 -------
 

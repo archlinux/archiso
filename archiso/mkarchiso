@@ -335,8 +335,8 @@ _make_custom_airootfs() {
 _make_packages() {
     _msg_info "Installing packages to '${pacstrap_dir}/'..."
 
-    if [[ -n "${gpg_key}" ]]; then
-        exec {ARCHISO_GNUPG_FD}<>"${work_dir}/pubkey.gpg"
+    if [[ -v gpg_publickey ]]; then
+        exec {ARCHISO_GNUPG_FD}<>"$gpg_publickey"
         export ARCHISO_GNUPG_FD
     fi
     if [[ -v cert_list[0] ]]; then
@@ -364,7 +364,7 @@ _make_packages() {
         exec {ARCHISO_TLSCA_FD}<&-
         unset ARCHISO_TLSCA_FD
     fi
-    if [[ -n "${gpg_key}" ]]; then
+    if [[ -v gpg_publickey ]]; then
         exec {ARCHISO_GNUPG_FD}<&-
         unset ARCHISO_GNUPG_FD
     fi
@@ -1614,8 +1614,10 @@ _set_overrides() {
 }
 
 _export_gpg_publickey() {
-    rm -f -- "${work_dir}/pubkey.gpg"
-    gpg --batch --no-armor --output "${work_dir}/pubkey.gpg" --export "${gpg_key}"
+    gpg_publickey="${work_dir}/pubkey.gpg"
+    rm -f -- "$gpg_publickey"
+    gpg --batch --no-armor --output "$gpg_publickey" --export "${gpg_key}"
+    [[ -s "$gpg_publickey" ]] || return
 }
 
 _make_version() {
