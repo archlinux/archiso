@@ -15,6 +15,7 @@ Changed
 - Check if the GPG public key file was successfully placed in the work directory before trying to use it.
 - Open the file descriptors for code signing certificates and GPG public key as read only. Nothing from the within the
   ``pacstrap`` invoked chroot should ever be allowed to write outside of it.
+- Error out early if any of the code signing certificate files passed with option ``-c`` do not exist.
 
 Removed
 -------
