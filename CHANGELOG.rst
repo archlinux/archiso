@@ -7,6 +7,7 @@ Changelog
 
 Added
 -----
+- Add Memtest86+ to x86_64 UEFI GRUB boot menu.
 
 Changed
 -------
