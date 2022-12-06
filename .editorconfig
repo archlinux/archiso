@@ -16,6 +16,10 @@ charset = utf-8
 indent_style = space
 indent_size = 4
 max_line_length = 120
+# for shfmt
+switch_case_indent = true
+binary_next_line = true
+
 
 [*.{yml,yaml}]
 end_of_line = lf
@@ -32,3 +36,6 @@ trim_trailing_whitespace = true
 charset = utf-8
 indent_style = space
 indent_size = 2
+
+[Makefile]
+indent_style = tab

@@ -11,7 +11,6 @@
 # - qemu
 # - edk2-ovmf (when UEFI booting)
 
-
 set -eu
 
 print_help() {
