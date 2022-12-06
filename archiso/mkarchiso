@@ -712,6 +712,14 @@ _make_bootmode_uefi-x64.grub.esp() {
         mcopy -i "${efibootimg}" "${pacstrap_dir}/usr/share/edk2-shell/x64/Shell_Full.efi" ::/shellx64.efi
     fi
 
+    # Add other aditional/extra files to ${install_dir}/boot/
+    if [[ -e "${pacstrap_dir}/boot/memtest86+/memtest.efi" ]]; then
+        install -m 0644 -- "${pacstrap_dir}/boot/memtest86+/memtest.efi" "${isofs_dir}/${install_dir}/boot/memtest.efi"
+        install -d -m 0755 -- "${isofs_dir}/${install_dir}/boot/licenses/memtest86+/"
+        install -m 0644 -- "${pacstrap_dir}/usr/share/licenses/common/GPL2/license.txt" \
+            "${isofs_dir}/${install_dir}/boot/licenses/memtest86+/"
+    fi
+
     _msg_info "Done! GRUB set up for UEFI booting successfully."
 }
 
@@ -996,6 +1004,9 @@ _validate_requirements_bootmode_uefi-x64.grub.esp() {
     # shellcheck disable=SC2076
     if [[ ! " ${pkg_list[*]} " =~ ' edk2-shell ' ]]; then
         _msg_info "'edk2-shell' is not in the package list. The ISO will not contain a bootable UEFI shell."
+    fi
+    if [[ ! " ${pkg_list[*]} " =~ ' memtest86+-efi ' ]]; then
+        _msg_info "Validating '${bootmode}': 'memtest86+-efi' is not in the package list. Memory testing will not be available from GRUB."
     fi
 }
 
