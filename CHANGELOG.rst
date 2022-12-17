@@ -16,6 +16,8 @@ Changed
 - Open the file descriptors for code signing certificates and GPG public key as read only. Nothing from the within the
   ``pacstrap`` invoked chroot should ever be allowed to write outside of it.
 - Error out early if any of the code signing certificate files passed with option ``-c`` do not exist.
+- Use LZMA compressed EROFS image for the baseline profile. Now that xz 5.4 is out and erofs-utils is built with LZMA
+  support, using a higher compression is possible.
 
 Removed
 -------
