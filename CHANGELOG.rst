@@ -18,6 +18,9 @@ Changed
 - Error out early if any of the code signing certificate files passed with option ``-c`` do not exist.
 - Use LZMA compressed EROFS image for the baseline profile. Now that xz 5.4 is out and erofs-utils is built with LZMA
   support, using a higher compression is possible.
+- Add ``/etc/machine-id`` with special value ``uninitialized``. The final id is generated at boot time, and systemd's
+  first-boot mechanim (see ``First Boot Semantics`` in ``machine-id(5)``) applies. No functional change unless that
+  ``ConditionFirstBoot=yes`` is true and passive unit ``first-boot-complete.target`` activates for ordering.
 
 Removed
 -------
