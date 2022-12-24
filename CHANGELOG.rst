@@ -7,6 +7,19 @@ Changelog
 
 Added
 -----
+
+Changed
+-------
+
+Removed
+-------
+
+[69] - 2022-12-24
+=================
+
+Added
+-----
+
 - Add Memtest86+ to x86_64 UEFI GRUB boot menu.
 
 Changed
@@ -21,9 +34,6 @@ Changed
 - Add ``/etc/machine-id`` with special value ``uninitialized``. The final id is generated at boot time, and systemd's
   first-boot mechanim (see ``First Boot Semantics`` in ``machine-id(5)``) applies. No functional change unless that
   ``ConditionFirstBoot=yes`` is true and passive unit ``first-boot-complete.target`` activates for ordering.
-
-Removed
--------
 
 [68] - 2022-10-30
 =================
