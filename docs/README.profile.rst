@@ -137,7 +137,7 @@ The following *custom template identifiers* are understood and will be replaced 
 respective variables in ``profiledef.sh``:
 
 * ``%ARCHISO_LABEL%``: Set this using the ``iso_label`` variable in ``profiledef.sh``.
-* ``%INSTALL_DIR%``: Set this using the ``iso_label`` variable in ``profiledef.sh``.
+* ``%INSTALL_DIR%``: Set this using the ``install_dir`` variable in ``profiledef.sh``.
 * ``%ARCH%``: Set this using the ``arch`` variable in ``profiledef.sh``.
 
 
