@@ -8,8 +8,15 @@ Changelog
 Added
 -----
 
+- Support *file system transposition* to simplify boot medium preparation for UEFI boot via extracting the ISO image
+  contents to a drive. ``grub.cfg`` does not hardcode the ISO volume label anymore, instead GRUB will search for volume
+  with a ``/.disk/%UUID_SEARCH_FILENAME%.uuid`` file on it.
+
 Changed
 -------
+
+- Identify the ISO volume via a UUID instead of a file system label to avoid collisions of multiple ISOs created in the
+  same month.
 
 Removed
 -------
