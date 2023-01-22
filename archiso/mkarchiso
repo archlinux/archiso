@@ -569,7 +569,13 @@ _make_common_bootmode_grub_copy_to_isofs() {
 
 # Prepare GRUB configuration files
 _make_common_bootmode_grub_cfg(){
-    local _cfg
+    local _cfg uuid_search_filename
+
+    # Create a .uuid file and place it in /.disk/ on ISO 9660 to provide a way for GRUB to search for the volume
+    uuid_search_filename="$(uuidgen --sha1 --namespace 93a870ff-8565-4cf3-a67b-f47299271a96 \
+        --name "${SOURCE_DATE_EPOCH} disk search UUID")"
+    install -d -m 0755 -- "${isofs_dir}/.disk"
+    : > "${isofs_dir}/.disk/${uuid_search_filename}.uuid"
 
     install -d -- "${work_dir}/grub"
 
@@ -577,7 +583,8 @@ _make_common_bootmode_grub_cfg(){
     for _cfg in "${profile}/grub/"*'.cfg'; do
         sed "s|%ARCHISO_LABEL%|${iso_label}|g;
              s|%INSTALL_DIR%|${install_dir}|g;
-             s|%ARCH%|${arch}|g" \
+             s|%ARCH%|${arch}|g;
+             s|%UUID_SEARCH_FILENAME%|${uuid_search_filename}|g" \
              "${_cfg}" > "${work_dir}/grub/${_cfg##*/}"
     done
     # Add all GRUB files to the list of files used to calculate the required FAT image size.
