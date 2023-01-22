@@ -612,11 +612,11 @@ _make_bootmode_uefi-ia32.grub.esp() {
 
     # Create EFI binary
     # Module list from https://bugs.archlinux.org/task/71382#comment202911
-    grubmodules=(all_video at_keyboard boot btrfs cat chain configfile echo efifwsetup efinet ext2 f2fs fat font \
+    grubmodules=(all_video at_keyboard boot btrfs cat chain configfile echo efifwsetup efinet exfat ext2 f2fs fat font \
                  gfxmenu gfxterm gzio halt hfsplus iso9660 jpeg keylayouts linux loadenv loopback lsefi lsefimmap \
-                 minicmd normal part_apple part_gpt part_msdos png read reboot regexp search search_fs_file \
-                 search_fs_uuid search_label serial sleep tpm usb usbserial_common usbserial_ftdi usbserial_pl2303 \
-                 usbserial_usbdebug video xfs zstd)
+                 minicmd normal ntfs ntfscomp part_apple part_gpt part_msdos png read reboot regexp search \
+                 search_fs_file search_fs_uuid search_label serial sleep tpm udf usb usbserial_common usbserial_ftdi \
+                 usbserial_pl2303 usbserial_usbdebug video xfs zstd)
     grub-mkstandalone -O i386-efi \
                       --modules="${grubmodules[*]}" \
                       --locales="en@quot" \
@@ -689,11 +689,11 @@ _make_bootmode_uefi-x64.grub.esp() {
 
     # Create EFI binary
     # Module list from https://bugs.archlinux.org/task/71382#comment202911
-    grubmodules=(all_video at_keyboard boot btrfs cat chain configfile echo efifwsetup efinet ext2 f2fs fat font \
+    grubmodules=(all_video at_keyboard boot btrfs cat chain configfile echo efifwsetup efinet exfat ext2 f2fs fat font \
                  gfxmenu gfxterm gzio halt hfsplus iso9660 jpeg keylayouts linux loadenv loopback lsefi lsefimmap \
-                 minicmd normal part_apple part_gpt part_msdos png read reboot regexp search search_fs_file \
-                 search_fs_uuid search_label serial sleep tpm usb usbserial_common usbserial_ftdi usbserial_pl2303 \
-                 usbserial_usbdebug video xfs zstd)
+                 minicmd normal ntfs ntfscomp part_apple part_gpt part_msdos png read reboot regexp search \
+                 search_fs_file search_fs_uuid search_label serial sleep tpm udf usb usbserial_common usbserial_ftdi \
+                 usbserial_pl2303 usbserial_usbdebug video xfs zstd)
     grub-mkstandalone -O x86_64-efi \
                       --modules="${grubmodules[*]}" \
                       --locales="en@quot" \
