@@ -590,10 +590,13 @@ _make_common_bootmode_grub_cfg(){
     efiboot_files+=("${work_dir}/grub/"
                     "${profile}/grub/"!(*.cfg))
 
+    # Prepare grub.cfg that will be embedded inside the GRUB binaries
     IFS='' read -r -d '' grubembedcfg <<'EOF' || true
 if ! [ -d "$cmdpath" ]; then
-    # On some firmware, GRUB has a wrong cmdpath when booted from an optical disc.
-    # https://gitlab.archlinux.org/archlinux/archiso/-/issues/183
+    # On some firmware, GRUB has a wrong cmdpath when booted from an optical disc. During El Torito boot, GRUB is
+    # launched from a case-insensitive FAT-formatted EFI system partition, but it seemingly cannot access that partition
+    # and sets cmdpath to the whole cd# device which has case-sensitive ISO 9660 + Rock Ridge + Joliet file systems.
+    # See https://gitlab.archlinux.org/archlinux/archiso/-/issues/183 and https://savannah.gnu.org/bugs/?62886
     if regexp --set=1:isodevice '^(\([^)]+\))\/?[Ee][Ff][Ii]\/[Bb][Oo][Oo][Tt]\/?$' "$cmdpath"; then
         cmdpath="${isodevice}/EFI/BOOT"
     fi
