@@ -27,6 +27,7 @@ Changed
 - Move ``grubenv`` to ``/boot/grub/grubenv`` on ISO 9660 so that it is together with the rest of GRUB-specific files.
   Additionally write more variables in it. The previous ``/${install_dir}/grubenv`` (``/arch/grubenv`` for releng)
   is deprecated and a future archiso release will not create this file anymore.
+- Moved syslinux directory from ``/syslinux/`` to ``/boot/syslinux/`` to keep most boot loader files in ``/boot/``.
 
 Removed
 -------
