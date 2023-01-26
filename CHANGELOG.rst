@@ -11,6 +11,8 @@ Added
 - Add bolt to releng for authorizing and otherwise managing Thunderbolt and USB4 devices.
 - Add ``uefi-ia32.systemd-boot.esp`` and ``uefi-ia32.systemd-boot.eltorito`` boot modes that use systemd-boot for IA32
   UEFI. The boot modes of baseline and releng are not changed.
+- Add GRUB configuration file ``/boot/grub/loopback.cfg`` to the releng and baseline profiles. It sets the necessary
+  boot parameters required for booting the ISO image as a file on a file system.
 
 Changed
 -------
