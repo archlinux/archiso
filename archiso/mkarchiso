@@ -618,6 +618,18 @@ fi
 EOF
     grubembedcfg="${grubembedcfg//'%UUID_SEARCH_FILENAME%'/"${uuid_search_filename}"}"
     printf '%s\n' "$grubembedcfg" > "${work_dir}/grub-embed.cfg"
+
+    # Write grubenv
+    printf '%.1024s' \
+        "$(printf '# GRUB Environment Block\nNAME=%s\nVERSION=%s\nARCHISO_LABEL=%s\nINSTALL_DIR=%s\nARCH=%s\nUUID_SEARCH_FILENAME=%s\n%s' \
+            "${iso_name}" \
+            "${iso_version}" \
+            "${iso_label}" \
+            "${install_dir}" \
+            "${arch}" \
+            "${uuid_search_filename}" \
+            "$(printf '%0.1s' "#"{1..1024})")" \
+        > "${work_dir}/grub/grubenv"
 }
 
 _make_bootmode_uefi-ia32.grub.esp() {
@@ -1067,6 +1079,10 @@ _export_netboot_artifacts() {
     _msg_info "Exporting netboot artifacts..."
     install -d -m 0755 "${out_dir}"
     cp -a -- "${isofs_dir}/${install_dir}/" "${out_dir}/"
+
+    # Remove grubenv since it serves no purpose in netboot artifacts
+    rm -f -- "${out_dir}/${install_dir}/grubenv"
+
     _msg_info "Done!"
     du -hs -- "${out_dir}/${install_dir}"
 }
@@ -1663,7 +1679,13 @@ _make_version() {
         install -d -m 0755 -- "${isofs_dir}/${install_dir}"
         # Write version file to ISO 9660
         printf '%s\n' "${iso_version}" > "${isofs_dir}/${install_dir}/version"
+
+    fi
+    if [[ "${buildmode}" == "iso" ]]; then
         # Write grubenv with version information to ISO 9660
+        # TODO: after sufficient time has passed, do not create this file anymore when GRUB boot modes are used.
+        #       _make_common_bootmode_grub_cfg already creates ${isofs_dir}/boot/grub/grubenv
+        rm -f -- "${isofs_dir}/${install_dir}/grubenv"
         printf '%.1024s' "$(printf '# GRUB Environment Block\nNAME=%s\nVERSION=%s\n%s' \
             "${iso_name}" "${iso_version}" "$(printf '%0.1s' "#"{1..1024})")" \
             > "${isofs_dir}/${install_dir}/grubenv"

@@ -24,6 +24,9 @@ Changed
   the ISO volume and load the ``grub.cfg`` from there.
 - Moved GRUB files on ISO 9660 from ``/EFI/BOOT/`` to a boot-platform neutral place ``/boot/grub/``. This does not apply
   to the EFI binaries that remain in the default/fallback boot path.
+- Move ``grubenv`` to ``/boot/grub/grubenv`` on ISO 9660 so that it is together with the rest of GRUB-specific files.
+  Additionally write more variables in it. The previous ``/${install_dir}/grubenv`` (``/arch/grubenv`` for releng)
+  is deprecated and a future archiso release will not create this file anymore.
 
 Removed
 -------

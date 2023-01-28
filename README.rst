@@ -129,7 +129,7 @@ boot the iso image from GRUB with a version specific cow directory to mitigate o
 .. code:: sh
 
    loopback loop archlinux.iso
-   load_env -f (loop)/arch/grubenv
+   load_env -f (loop)/boot/grub/grubenv
    linux (loop)/arch/boot/x86_64/vmlinuz-linux ... \
        cow_directory=${NAME}/${VERSION} ...
    initrd (loop)/arch/boot/x86_64/initramfs-linux-lts.img
