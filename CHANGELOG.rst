@@ -19,6 +19,7 @@ Changed
 
 - Identify the ISO volume via a UUID instead of a file system label to avoid collisions of multiple ISOs created in the
   same month.
+- Honor ``SOURCE_DATE_EPOCH`` in the ``date`` command used by ``profiledef.sh`` of the shipped profiles.
 
 Removed
 -------
