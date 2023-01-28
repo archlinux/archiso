@@ -22,6 +22,8 @@ Changed
 - Honor ``SOURCE_DATE_EPOCH`` in the ``date`` command used by ``profiledef.sh`` of the shipped profiles.
 - Do not duplicate ``grub.cfg`` in both ISO 9660 and the EFI system partition / El Torito image. GRUB will search for
   the ISO volume and load the ``grub.cfg`` from there.
+- Moved GRUB files on ISO 9660 from ``/EFI/BOOT/`` to a boot-platform neutral place ``/boot/grub/``. This does not apply
+  to the EFI binaries that remain in the default/fallback boot path.
 
 Removed
 -------

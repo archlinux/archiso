@@ -552,8 +552,8 @@ _make_common_bootmode_grub_copy_to_isofs() {
     if compgen -G "${profile}/grub/!(*.cfg)" &> /dev/null; then
         files_to_copy+=("${profile}/grub/"!(*.cfg))
     fi
-    install -d -m 0755 -- "${isofs_dir}/EFI/BOOT"
-    install -m 0644 -- "${files_to_copy[@]}" "${isofs_dir}/EFI/BOOT/"
+    install -d -m 0755 -- "${isofs_dir}/boot/grub"
+    install -m 0644 -- "${files_to_copy[@]}" "${isofs_dir}/boot/grub/"
 }
 
 # Prepare GRUB configuration files
@@ -608,12 +608,12 @@ fi
 # Load grub.cfg
 if [ "${ARCHISO_HINT}" == 'memdisk' -o -z "${ARCHISO_HINT}" ]; then
     echo 'Could not find the ISO volume!'
-elif [ -e "(${ARCHISO_HINT})/EFI/BOOT/grub.cfg" ]; then
+elif [ -e "(${ARCHISO_HINT})/boot/grub/grub.cfg" ]; then
     export ARCHISO_HINT
     set root="${ARCHISO_HINT}"
-    configfile "(${ARCHISO_HINT})/EFI/BOOT/grub.cfg"
+    configfile "(${ARCHISO_HINT})/boot/grub/grub.cfg"
 else
-    echo "File '(${ARCHISO_HINT})/EFI/BOOT/grub.cfg' not found!"
+    echo "File '(${ARCHISO_HINT})/boot/grub/grub.cfg' not found!"
 fi
 EOF
     grubembedcfg="${grubembedcfg//'%UUID_SEARCH_FILENAME%'/"${uuid_search_filename}"}"
