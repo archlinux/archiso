@@ -241,7 +241,7 @@ Removed
 -------
 
 - Remove all files related to ``mkinitcpio`` integration, as they now live in
-  https://gitlab.archlinux.org/mkinitcpio/mkinitcpio-archiso
+  https://gitlab.archlinux.org/archlinux/mkinitcpio/mkinitcpio-archiso
 
 [57] - 2021-07-30
 =================
