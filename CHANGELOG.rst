@@ -10,7 +10,7 @@ Added
 
 - Support *file system transposition* to simplify boot medium preparation for UEFI boot via extracting the ISO image
   contents to a drive. ``grub.cfg`` does not hardcode the ISO volume label anymore, instead GRUB will search for volume
-  with a ``/.disk/%UUID_SEARCH_FILENAME%.uuid`` file on it.
+  with a ``/boot/grub/YYYY-mm-dd-HH-MM-SS-00.uuid`` file on it.
 - Preload GRUB's NTFS modules for UEFI that allegedly have native NTFS support. GRUB's exFAT and UDF modules are also
   preloaded in case someone finds them useful.
 

@@ -558,22 +558,24 @@ _make_common_bootmode_grub_copy_to_isofs() {
 
 # Prepare GRUB configuration files
 _make_common_bootmode_grub_cfg(){
-    local _cfg uuid_search_filename
-
-    # Create a .uuid file and place it in /.disk/ on ISO 9660 to provide a way for GRUB to search for the volume
-    uuid_search_filename="$(uuidgen --sha1 --namespace 93a870ff-8565-4cf3-a67b-f47299271a96 \
-        --name "${SOURCE_DATE_EPOCH} disk search UUID")"
-    install -d -m 0755 -- "${isofs_dir}/.disk"
-    : > "${isofs_dir}/.disk/${uuid_search_filename}.uuid"
+    local _cfg archiso_uuid search_filename
 
     install -d -- "${work_dir}/grub"
+
+    # Precalculate the ISO's modification date in UTC, i.e. its "UUID"
+    TZ=UTC printf -v archiso_uuid '%(%F-%H-%M-%S-00)T' "$SOURCE_DATE_EPOCH"
+    # Create a /boot/grub/YYYY-mm-dd-HH-MM-SS-00.uuid file on ISO 9660. GRUB will search for it to find the ISO
+    # volume. This is similar to what grub-mkrescue does, except it places the file in /.disk/, but we opt to use a
+    # directory that does not start with a dot to avoid it being accidentally missed when copying the ISO's contents.
+    : > "${work_dir}/grub/${archiso_uuid}.uuid"
+    search_filename="/boot/grub/${archiso_uuid}.uuid"
 
     # Fill GRUB configuration files
     for _cfg in "${profile}/grub/"*'.cfg'; do
         sed "s|%ARCHISO_LABEL%|${iso_label}|g;
              s|%INSTALL_DIR%|${install_dir}|g;
              s|%ARCH%|${arch}|g;
-             s|%UUID_SEARCH_FILENAME%|${uuid_search_filename}|g" \
+             s|%ARCHISO_SEARCH_FILENAME%|${search_filename}|g" \
              "${_cfg}" > "${work_dir}/grub/${_cfg##*/}"
     done
 
@@ -596,13 +598,13 @@ if [ -z "${ARCHISO_HINT}" ]; then
 fi
 
 # Search for the ISO volume
-if search --no-floppy --set=archiso_device --file '/.disk/%UUID_SEARCH_FILENAME%.uuid' --hint "${ARCHISO_HINT}"; then
+if search --no-floppy --set=archiso_device --file '%ARCHISO_SEARCH_FILENAME%' --hint "${ARCHISO_HINT}"; then
     set ARCHISO_HINT="${archiso_device}"
     if probe --set ARCHISO_UUID --fs-uuid "${ARCHISO_HINT}"; then
         export ARCHISO_UUID
     fi
 else
-    echo "Could not find a volume with a '/.disk/%UUID_SEARCH_FILENAME%.uuid' file on it!"
+    echo "Could not find a volume with a '%ARCHISO_SEARCH_FILENAME%' file on it!"
 fi
 
 # Load grub.cfg
@@ -616,18 +618,18 @@ else
     echo "File '(${ARCHISO_HINT})/boot/grub/grub.cfg' not found!"
 fi
 EOF
-    grubembedcfg="${grubembedcfg//'%UUID_SEARCH_FILENAME%'/"${uuid_search_filename}"}"
+    grubembedcfg="${grubembedcfg//'%ARCHISO_SEARCH_FILENAME%'/"${search_filename}"}"
     printf '%s\n' "$grubembedcfg" > "${work_dir}/grub-embed.cfg"
 
     # Write grubenv
     printf '%.1024s' \
-        "$(printf '# GRUB Environment Block\nNAME=%s\nVERSION=%s\nARCHISO_LABEL=%s\nINSTALL_DIR=%s\nARCH=%s\nUUID_SEARCH_FILENAME=%s\n%s' \
+        "$(printf '# GRUB Environment Block\nNAME=%s\nVERSION=%s\nARCHISO_LABEL=%s\nINSTALL_DIR=%s\nARCH=%s\nARCHISO_SEARCH_FILENAME=%s\n%s' \
             "${iso_name}" \
             "${iso_version}" \
             "${iso_label}" \
             "${install_dir}" \
             "${arch}" \
-            "${uuid_search_filename}" \
+            "${search_filename}" \
             "$(printf '%0.1s' "#"{1..1024})")" \
         > "${work_dir}/grub/grubenv"
 }
