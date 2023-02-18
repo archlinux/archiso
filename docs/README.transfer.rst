@@ -1,133 +1,165 @@
-INDEX
------
+==============================================
+Transfer ISO to target medium (configs/releng)
+==============================================
 
-* Transfer ISO file to target medium (configs/releng)
-  * To -> CD / DVD / BD
-  * To -> USB-key / SD / HDD / SSD
-    * PC-BIOS (MBR)
-    * PC-BIOS (ISOHYBRID-MBR)
-    * PC-EFI (GPT) [x86_64 only]
-    * PC-EFI (ISOHYBRID-GPT) [x86_64 only]
+ISO images names consist of: ``archlinux-YYYY.MM.DD-x86_64.iso``.
 
+Where: ``YYYY`` is the year, ``MM`` the month and ``DD`` the day.
 
+.. contents::
 
-*** Transfer ISO image to target medium (configs/releng)
+Burn to an optical disc
+=======================
 
-ISO images names consist of: archlinux-<YYYY>.<MM>.<DD>-x86_64.iso
+  .. note::
+     All ISO images are BIOS and UEFI bootable via "El Torito" in no-emulation mode.
 
-Where:
-    <YYYY> Year
-    <MM> Month
-    <DD> Day
+Burn the ISO using your favorite disc burning program.
 
+For example:
 
-** To -> CD / DVD / BD
+.. code:: sh
 
-Note: All ISO images are booteable on a PC-BIOS via "El Torito" in no-emulation mode,
-      All x86_64 ISO images are booteable on a PC-EFI via "El Torito" in no-emulation mode.
+   xorriso -as cdrecord -v -sao dev=/dev/sr0 archlinux-YYYY.MM.DD-x86_64.iso
 
-Nomeclature:
-    <B> scsibus number
-    <T> target number
-    <L> lun number
-    (Note: see cdrecord -scanbus, for these numbers)
+Write to an USB flash drive / memory card / hard disk drive / solid state drive / etc.
+======================================================================================
 
-
-1) Write it directly using your favorite recording program.
-# cdrecord dev=<B>,<T>,<L> -dao archlinux-<YYYY>.<MM>.<DD>-x86_64.iso
-
-
-** To -> USB Flash Drive (USB-key) / Memory card (SD) /
-         Hard-Disk Drive (HDD) / Solid-State Drive (SSD)
-
-Note: These steps are the general workflow, you can skip some of them,
-      using another filesystem if your bootloader supports it,
-      installing to another directory than "arch/" or using more than
-      one partition. Just ensure that main boot params options
-      (archisolabel= and archisobasedir=) are set correctly according to your setup.
+  .. tip::
+     See https://wiki.archlinux.org/title/USB_flash_installation_medium for more detailed instructions.
 
 Nomeclature:
-<DEV-TARGET>:   Device node of the drive where ISO contents should be copied
-                (example: /dev/sdx)
-<DEV-TARGET-N>: Device node of the partition on <DEV-TARGET>
-                (example: /dev/sdx1)
-<MNT-TARGET-N>: Mount point path where <DEV-TARGET-N> is mounted
-                (example: /mnt/sdx/1)
-<ISO-SOURCE>:   Path to the ISO file archlinux-<YYYY>.<MM>.<DD>-x86_64.iso
-                (example: ~/archlinux-2017.03.01-x86_64.iso)
-<FS-LABEL>:     Represents the filesystem label of the <ISO-SOURCE>
-                (example: ARCH_201703)
 
+``<DEV-TARGET>``
+  Device node of the drive where ISO contents should be copied (example: ``/dev/sdx``).
+``<DEV-TARGET-N>``
+  Device node of the partition on ``<DEV-TARGET>`` (example: ``/dev/sdx1``).
+``<FS-LABEL>``
+  Represents the file system label of the ``archlinux-YYYY.MM.DD-x86_64.iso`` (example: ``ARCH_201703``).
 
-* PC-BIOS (MBR):
+ISOHYBRID (BIOS and UEFI)
+-------------------------
 
-Note: Using here a MBR partition mode as example, but GPT should also works
-      if machine firmware is not broken.
-      Just ensure that partition is set with attribute "2: legacy BIOS bootable"
-      and use gptmbr.bin instead of mbr.bin for syslinux.
+  .. note::
+     This method is the most easily, quick and dirty, but is the most limited if you want to use your target medium
+     for other purposes. If using this does not work, use the `File system transposition (UEFI only)`_ method instead.
 
-1) Create one partition entry in MBR and mark it as "active" (booteable).
-Note: Type "b" for FAT32, "83" for EXTFS or "7" for NTFS.
-# fdisk <DEV-TARGET>
+Directly write the ISO file to the target medium:
 
-2) Create a FAT32, EXTFS or NTFS filesystem on such partition and setup a label.
-Note: COW is not supported on NTFS.
-# mkfs.fat -F 32 -n <FS-LABEL> <DEV-TARGET-N>
-# mkfs.ext4 -L <FS-LABEL> <DEV-TARGET-N>
-# mkfs.ntfs -L <FS-LABEL> <DEV-TARGET-N>
+.. code:: sh
 
-3) Mount target filesystem.
-# mount <DEV-TARGET-N> <MNT-TARGET-N>
+   dd bs=4M if=archlinux-YYYY.MM.DD-x86_64.iso of=<DEV-TARGET> conv=fsync oflag=direct status=progress
 
-4) Extract ISO image on target filesystem.
-# bsdtar -x --exclude=isolinux/ --exclude=EFI/ --exclude=loader/ -f <ISO-SOURCE> -C <MNT-TARGET-N>
+File system transposition (UEFI only)
+--------------------------------
 
-5) Install syslinux bootloader on target filesystem.
-# extlinux -i <MNT-TARGET-N>/arch/boot/syslinux
+This method extracts the contents of the ISO onto a prepared UEFI-bootable volume.
 
-6) Unmount target filesystem.
-# umount <MNT-TARGET-N>
+If your drive is already partitioned and formatted, skip to the "Mount the target file system" step.
 
-7) Install syslinux MBR boot code on target drive.
-# dd bs=440 count=1 conv=notrunc if=/usr/lib/syslinux/bios/mbr.bin of=<DEV-TARGET>
+  .. note::
+     Using MBR with one FAT formatted active partition is the most compatible method.
 
+1. Partition the drive with *fdisk*.
 
-* PC-BIOS (ISOHYBRID-MBR):
+   .. code:: sh
 
-Note: This method is the most easily, quick and dirty, but is the most limited
-      if you want to use your target medium for other purposes.
-      If using this does not work, use PC-BIOS (MBR) method instead.
+      fdisk <DEV-TARGET>
 
-1) Dump ISO file to target medium.
-# dd if=<ISO-SOURCE> of=<DEV-TARGET>
+   1) Create a new MBR partition table with command ``o``.
 
+     .. warning::
+        This will destroy all data on the drive.
 
-* PC-EFI (GPT) [x86_64 only]
+   2) Create a new primary partition with command ``n`` and set its type code to ``0c`` with command ``t``.
 
-Note: Using here a GPT partition mode as example, but MBR should also works
-      if machine firmware is not broken.
+   3) Mark the partition as bootable with the ``a`` command.
 
-1) Create one partition entry in GPT (of type "ef00")
-# gdisk <DEV-TARGET>
+   4) Write the changes and exit with ``w``.
 
-2) Create a FAT32 filesystem on such partition and setup a label.
-# mkfs.fat -F 32 -n <FS-LABEL> <DEV-TARGET-N>
+2. Format the newly created partition to FAT32
 
-3) Mount target filesystem.
-# mount <DEV-TARGET-N> <MNT-TARGET-N>
+   .. code:: sh
 
-4) Extract ISO image on target filesystem.
-# bsdtar -x --exclude=isolinux/ --exclude=EFI/archiso/ --exclude=arch/boot/syslinux/ -f <ISO-SOURCE> -C <MNT-TARGET-N>
+      mkfs.fat -F 32 /dev/disk/by-id/<TARGET-DEVICE>-part1
 
-5) Unmount target filesystem.
-# umount <MNT-TARGET-N>
+3. Mount the target file system
 
+   .. code:: sh
 
-* PC-EFI (ISOHYBRID-GPT) [x86_64 only]
+      mount <DEV-TARGET-N> /mnt
 
-Note: This method is the most easily, quick and dirty, but is the most limited
-      if you want to use your target medium for other purposes.
-      If using this does not work, use PC-EFI (GPT) method instead.
+4. Extract the ISO image on the target file system.
 
-1) Dump ISO file to target medium.
-# dd if=<ISO-SOURCE> of=<DEV-TARGET>
+   .. code:: sh
+
+      bsdtar -x --exclude=boot/syslinux/ -f archlinux-YYYY.MM.DD-x86_64.iso -C /mnt
+
+5. Unmount the target file system.
+
+   .. code:: sh
+
+      umount /mnt
+
+Manual formatting (BIOS only)
+-----------------------------
+
+  .. note::
+     These steps are the general workflow, you can skip some of them, using another file system if your boot loader
+     supports it, installing to another directory than ``arch/`` or using more than one partition. Just ensure that
+     main boot parameters  (``archisolabel=`` and ``archisobasedir=``) are set correctly according to your setup.
+
+     Using here a MBR partition mode as example, but GPT should also work if the machine firmware is not broken. Just
+     ensure that partition is set with attribute ``2: legacy BIOS bootable`` and use ``gptmbr.bin`` instead of
+     ``mbr.bin`` for syslinux.
+
+1) Create one partition entry in MBR and mark it as "active" (bootable).
+
+     .. note::
+        Type ``b`` for FAT32, ``83`` for EXTFS or ``7`` for NTFS.
+
+   .. code:: sh
+
+      fdisk <DEV-TARGET>
+
+2) Create a FAT32, EXTFS or NTFS file system on such partition and setup a label.
+
+     .. note::
+        COW is not supported on NTFS.
+
+   .. code:: sh
+
+      mkfs.fat -F 32 -n <FS-LABEL> <DEV-TARGET-N>
+      mkfs.ext4 -L <FS-LABEL> <DEV-TARGET-N>
+      mkfs.ntfs -L <FS-LABEL> <DEV-TARGET-N>
+
+3) Mount the target file system.
+
+   .. code:: sh
+
+      mount <DEV-TARGET-N> /mnt
+
+4) Extract the ISO image on the target file system.
+
+   .. code:: sh
+
+      bsdtar -x --exclude=boot/grub/ --exclude=EFI/ -f archlinux-YYYY.MM.DD-x86_64.iso -C /mnt
+
+5) Install the syslinux boot loader on the target file system.
+
+   .. code:: sh
+
+      extlinux -i /mnt/boot/syslinux
+
+6) Unmount the target file system.
+
+   .. code:: sh
+
+      umount /mnt
+
+7) Install syslinux MBR boot code on the target drive.
+
+   .. code:: sh
+
+      dd bs=440 count=1 conv=notrunc if=/usr/lib/syslinux/bios/mbr.bin of=<DEV-TARGET>
+
