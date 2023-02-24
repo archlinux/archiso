@@ -8,6 +8,24 @@ Changelog
 Added
 -----
 
+Changed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+
+Removed
+-------
+
+[70] - 2023-02-27
+=================
+
+Added
+-----
+
 - Support *file system transposition* to simplify boot medium preparation for UEFI boot via extracting the ISO image
   contents to a drive. ``grub.cfg`` does not hardcode the ISO volume label anymore, instead GRUB will search for volume
   with a ``/boot/grub/YYYY-mm-dd-HH-MM-SS-00.uuid`` file on it.
