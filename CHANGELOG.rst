@@ -11,6 +11,7 @@ Added
 - Added classes for Memtest86+ and UEFI Shell menuentries.
 - Add foot-terminfo and wezterm-terminfo packages to releng to support terminal emulators using them. E.g. when
   installing via SSH.
+- Add a new ``-r`` option to ``mkarchiso`` that deletes the working directly after the build.
 
 Changed
 -------
