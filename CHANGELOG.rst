@@ -29,6 +29,7 @@ Changed
   is deprecated and a future archiso release will not create this file anymore.
 - Moved syslinux directory from ``/syslinux/`` to ``/boot/syslinux/`` to keep most boot loader files in ``/boot/``.
 - Update ``README.transfer`` documentation and convert it to reStructuredText.
+- Use ``console`` as grub's ``terminal_output``, as ``gfxterm`` leads to a blank screen on some hardware.
 
 Removed
 -------
