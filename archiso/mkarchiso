@@ -1742,12 +1742,8 @@ _build_iso_base() {
 
     # Create working directory
     [[ -d "${work_dir}" ]] || install -d -- "${work_dir}"
-    # Write build date to file or if the file exists, read it from there
-    if [[ -e "${work_dir}/build_date" ]]; then
-        SOURCE_DATE_EPOCH="$(<"${work_dir}/build_date")"
-    else
-        printf '%s\n' "$SOURCE_DATE_EPOCH" > "${work_dir}/build_date"
-    fi
+    # Write build date to file if it does not exist already
+    [[ -e "${work_dir}/build_date" ]] || printf '%s\n' "$SOURCE_DATE_EPOCH" > "${work_dir}/build_date"
 
     [[ "${quiet}" == "y" ]] || _show_config
     _run_once _make_pacman_conf
@@ -1862,6 +1858,13 @@ fi
 
 # get the absolute path representation of the first non-option argument
 profile="$(realpath -- "${1}")"
+
+# Read SOURCE_DATE_EPOCH from file early
+build_date_file="$(realpath -q -- "${override_work_dir:-./work}/build_date")" || :
+if [[ -f "$build_date_file" ]]; then
+    SOURCE_DATE_EPOCH="$(<"$build_date_file")"
+fi
+unset build_date_file
 
 _read_profile
 _set_overrides

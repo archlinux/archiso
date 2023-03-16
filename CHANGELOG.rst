@@ -23,10 +23,13 @@ Deprecated
 Fixed
 -----
 
+<<<<<<< HEAD
 - Wait for ``network-online.target`` to become active before trying to download the script passed via the ``script=``
   boot parameter.
 - Subdirectories from ``grub/`` are copied to the ISO.
 - Modify the commandline options to a ``cp`` command in ``mkarchiso`` so that the entire script does not exit with failure when a custom ``.bashrc`` file is supplied with the archiso configuration. This fix was needed after **GNU Coreutils** recently changed the behaviour of the ``-n`` (or ``--no-clobber``) commandline option to the ``cp`` command.
+- Ensure ``SOURCE_DATE_EPOCH`` is read from the ``build_date`` file before ``profiledef.sh`` is sourced to ensure the
+  variable has a correct value when used inside ``profiledef.sh``.
 
 Removed
 -------
