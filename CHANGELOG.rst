@@ -15,6 +15,7 @@ Changed
 
 - Increase EROFS compression for the baseline profile by using an extreme LZMA compression level and enabling the
   experimental compressed fragments and data deduplication features.
+- Identify the ISO volume via a UUID instead of a file system label in all boot loader configuration files.
 
 Deprecated
 ----------
