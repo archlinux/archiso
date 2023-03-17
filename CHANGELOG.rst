@@ -11,6 +11,9 @@ Added
 Changed
 -------
 
+- Increase EROFS compression for the baseline profile by using an extreme LZMA compression level and enabling the
+  experimental compressed fragments and data deduplication features.
+
 Deprecated
 ----------
 
