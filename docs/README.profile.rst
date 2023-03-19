@@ -140,6 +140,12 @@ respective variables in ``profiledef.sh``:
 * ``%INSTALL_DIR%``: Set this using the ``install_dir`` variable in ``profiledef.sh``.
 * ``%ARCH%``: Set this using the ``arch`` variable in ``profiledef.sh``.
 
+Additionally there are also *custom template identifiers* have harcoded values set by ``mkarchiso`` that cannot be
+overridden:
+
+* ``%ARCHISO_UUID%``: the ISO 9660 modification date in UTC, i.e. its "UUID",
+* ``%ARCHISO_SEARCH_FILENAME%``: file path on ISO 9660 that can be used by GRUB to find the ISO volume
+  (**for GRUB ``.cfg`` files only**).
 
 efiboot
 -------
