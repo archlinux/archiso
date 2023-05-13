@@ -20,6 +20,9 @@ Deprecated
 Fixed
 -----
 
+- Wait for ``network-online.target`` to become active before trying to download the script passed via the ``script=``
+  boot parameter.
+
 Removed
 -------
 
