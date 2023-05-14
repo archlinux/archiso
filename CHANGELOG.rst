@@ -8,6 +8,8 @@ Changelog
 Added
 -----
 
+- Added classes for Memtest86+ and UEFI Shell menuentries.
+
 Changed
 -------
 
