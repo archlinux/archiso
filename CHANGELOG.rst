@@ -25,7 +25,6 @@ Deprecated
 Fixed
 -----
 
-<<<<<<< HEAD
 - Wait for ``network-online.target`` to become active before trying to download the script passed via the ``script=``
   boot parameter.
 - Subdirectories from ``grub/`` are copied to the ISO.
