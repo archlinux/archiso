@@ -87,7 +87,7 @@ usage: ${app_name} [options] <profile_dir>
                       Default: '${iso_application}'
      -C <file>        pacman configuration file.
                       Default: '${pacman_conf}'
-     -D <install_dir> Set an install_dir. All files will by located here.
+     -D <install_dir> Set an install_dir. All files will be located here.
                       Default: '${install_dir}'
                       NOTE: Max 8 characters, use only [a-z0-9]
      -L <label>       Set the ISO volume label
