@@ -553,7 +553,7 @@ _make_common_bootmode_grub_copy_to_isofs() {
         files_to_copy+=("${profile}/grub/"!(*.cfg))
     fi
     install -d -m 0755 -- "${isofs_dir}/boot/grub"
-    install -m 0644 -- "${files_to_copy[@]}" "${isofs_dir}/boot/grub/"
+    cp -r --remove-destination -- "${files_to_copy[@]}" "${isofs_dir}/boot/grub/"
 }
 
 # Prepare GRUB configuration files
