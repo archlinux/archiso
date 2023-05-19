@@ -8,6 +8,24 @@ Changelog
 Added
 -----
 
+Changed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+
+Removed
+-------
+
+[71] - 2023-05-28
+=================
+
+Added
+-----
+
 - Added classes for Memtest86+ and UEFI Shell menuentries.
 - Add foot-terminfo and wezterm-terminfo packages to releng to support terminal emulators using them. E.g. when
   installing via SSH.
@@ -22,21 +40,18 @@ Changed
 - Identify the ISO volume via a UUID instead of a file system label in all boot loader configuration files.
 - Update ``pacman.conf`` to match the one shipped with pacman 6.0.2-7 which removes the community repository.
 
-Deprecated
-----------
-
 Fixed
 -----
 
 - Wait for ``network-online.target`` to become active before trying to download the script passed via the ``script=``
   boot parameter.
 - Subdirectories from ``grub/`` are copied to the ISO.
-- Modify the commandline options to a ``cp`` command in ``mkarchiso`` so that the entire script does not exit with failure when a custom ``.bashrc`` file is supplied with the archiso configuration. This fix was needed after **GNU Coreutils** recently changed the behaviour of the ``-n`` (or ``--no-clobber``) commandline option to the ``cp`` command.
+- Modify the commandline options to a ``cp`` command in ``mkarchiso`` so that the entire script does not exit with
+  failure when a custom ``.bashrc`` file is supplied with the archiso configuration. This fix was needed after
+  **GNU Coreutils** recently changed the behaviour of the ``-n`` (or ``--no-clobber``) commandline option to the ``cp``
+  command.
 - Ensure ``SOURCE_DATE_EPOCH`` is read from the ``build_date`` file before ``profiledef.sh`` is sourced to ensure the
   variable has a correct value when used inside ``profiledef.sh``.
-
-Removed
--------
 
 [70] - 2023-02-27
 =================
