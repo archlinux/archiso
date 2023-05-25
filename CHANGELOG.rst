@@ -12,6 +12,7 @@ Added
 - Add foot-terminfo and wezterm-terminfo packages to releng to support terminal emulators using them. E.g. when
   installing via SSH.
 - Add a new ``-r`` option to ``mkarchiso`` that deletes the working directly after the build.
+- Add support for mDNS announce and resolve.
 
 Changed
 -------
