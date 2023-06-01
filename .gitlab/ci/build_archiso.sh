@@ -219,12 +219,12 @@ create_ephemeral_codesigning_keys() {
     local ca_dir="${codesigning_dir}/ca/"
 
     local ca_conf="${ca_dir}/certificate_authority.cnf"
-    local ca_subj="/C=DE/ST=Berlin/L=Berlin/O=Arch Linux/OU=Release Engineering/CN=archlinux.org"
+    local ca_subj='/C=DE/ST=Berlin/L=Berlin/O=Arch Linux/OU=Release Engineering/emailAddress=arch-releng@lists.archlinux.org/CN=Arch Linux Release Engineering (Ephemeral Certificate Authority)'
     ca_cert="${ca_dir}/cacert.pem"
     ca_key="${ca_dir}/private/cakey.pem"
 
     local codesigning_conf="${codesigning_dir}/code_signing.cnf"
-    local codesigning_subj="/C=DE/ST=Berlin/L=Berlin/O=Arch Linux/OU=Release Engineering/CN=archlinux.org"
+    local codesigning_subj='/C=DE/ST=Berlin/L=Berlin/O=Arch Linux/OU=Release Engineering/emailAddress=arch-releng@lists.archlinux.org/CN=Arch Linux Release Engineering (Ephemeral Signing Key)'
     codesigning_cert="${codesigning_dir}/codesign.crt"
     codesigning_key="${codesigning_dir}/codesign.key"
 
@@ -249,6 +249,7 @@ create_ephemeral_codesigning_keys() {
         -keyout "${ca_key}" \
         -config "${ca_conf}" \
         -subj "${ca_subj}" \
+        -days 2 \
         -out "${ca_cert}"
 
     cat <<EOF >>"${ca_conf}"
@@ -285,7 +286,7 @@ EOF
         -batch \
         -config "${ca_conf}" \
         -extensions v3_intermediate_ca \
-        -days 3650 \
+        -days 2 \
         -notext \
         -md sha256 \
         -in "${codesigning_cert}.csr" \
