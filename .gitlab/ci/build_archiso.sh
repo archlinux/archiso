@@ -252,24 +252,15 @@ create_ephemeral_codesigning_keys() {
         -days 2 \
         -out "${ca_cert}"
 
-    cat <<EOF >>"${ca_conf}"
-
-[ v3_intermediate_ca ]
-# Extensions for a typical intermediate CA ('man x509v3_config').
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid:always,issuer
-basicConstraints = critical, CA:true, pathlen:0
-keyUsage = critical, digitalSignature, cRLSign, keyCertSign
-
-EOF
-
-    cat <<EOF >>"${codesigning_conf}"
-
+  local extension_text
+  IFS='' read -r -d '' extension_text <<EOF || true
 [codesigning]
 keyUsage=digitalSignature
 extendedKeyUsage=codeSigning, clientAuth, emailProtection
-
 EOF
+
+    printf '%s' "${extension_text}" >> "${ca_conf}"
+    printf '%s' "${extension_text}" >> "${codesigning_conf}"
 
     openssl req \
         -newkey rsa:4096 \
@@ -285,7 +276,7 @@ EOF
     openssl ca \
         -batch \
         -config "${ca_conf}" \
-        -extensions v3_intermediate_ca \
+        -extensions codesigning \
         -days 2 \
         -notext \
         -md sha256 \
