@@ -11,6 +11,8 @@ Added
 Changed
 -------
 
+- Moved custom ``mkinitcpio.conf`` files to ``/etc/mkinitcpio.conf.d/archiso.conf``.
+
 Deprecated
 ----------
 
