@@ -17,6 +17,8 @@ Deprecated
 Fixed
 -----
 
+- Sign the root file system image only once.
+
 Removed
 -------
 

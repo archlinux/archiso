@@ -1813,7 +1813,6 @@ _build_buildmode_netboot() {
 
     if [[ -v cert_list ]]; then
         _run_once _sign_netboot_artifacts
-        _cms_sign_artifact "${airootfs_image_filename}"
     fi
     _run_once _export_netboot_artifacts
 }
