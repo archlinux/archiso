@@ -8,6 +8,8 @@ Changelog
 Added
 -----
 
+- Add a man page for ``mkarchiso``.
+
 Changed
 -------
 

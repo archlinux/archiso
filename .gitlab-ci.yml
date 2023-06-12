@@ -25,7 +25,7 @@ check:
       metrics: output/metrics.txt
   before_script:
     - pacman -Sy --needed --noconfirm archlinux-keyring
-    - pacman -Syu --needed --noconfirm arch-install-scripts bash dosfstools e2fsprogs erofs-utils gnupg grub jq libarchive libisoburn mtools openssl squashfs-tools zsync
+    - pacman -Syu --needed --noconfirm arch-install-scripts bash dosfstools e2fsprogs erofs-utils gnupg grub jq libarchive libisoburn mtools openssl python-docutils squashfs-tools zsync
   script:
     - ./.gitlab/ci/build_archiso.sh ${BUILD_SCRIPT_ARGS}
   stage: build

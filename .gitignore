@@ -10,3 +10,4 @@ out/
 *.pem
 user-data
 meta-data
+man/version.rst
