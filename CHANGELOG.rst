@@ -14,6 +14,7 @@ Changed
 - Moved custom ``mkinitcpio.conf`` files to ``/etc/mkinitcpio.conf.d/archiso.conf``.
 - Mount ``/etc/pacman.d/gnupg`` on tmpfs with option ``noswap`` instead of using ramfs. This ensures there is a limit to
   the file system size.
+- Enable systemd-networkd's support for IPv6 Privacy Extensions globally instead of per-connection.
 
 Deprecated
 ----------
