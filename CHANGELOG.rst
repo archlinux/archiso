@@ -8,6 +8,8 @@ Changelog
 Added
 -----
 
+- Add tpm2-tools to releng to allow clearing, creating and reading keys on the TPM.
+
 Changed
 -------
 
