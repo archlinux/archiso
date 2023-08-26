@@ -8,6 +8,24 @@ Changelog
 Added
 -----
 
+Changed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+
+Removed
+-------
+
+[72] - 2023-08-29
+=================
+
+Added
+-----
+
 - Add tpm2-tools to releng to allow clearing, creating and reading keys on the TPM.
 - Add sequoia-sq and openpgp-card-tools as additional tooling for working with OpenPGP certificates and smartcards.
 
@@ -21,17 +39,11 @@ Changed
 - Moved custom ``sshd_config`` files to ``/ssh/sshd_config.d/10-archiso.conf``
 - Use pcsclite for interfacing with smartcards, since both gnupg and opgpcard support it.
 
-Deprecated
-----------
-
 Fixed
 -----
 
 - Sign the root file system image only once.
 - Make sure xorriso does not read its configuration files to prevent interference and unintended behavior.
-
-Removed
--------
 
 [71] - 2023-05-28
 =================
