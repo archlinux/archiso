@@ -9,6 +9,7 @@ Added
 -----
 
 - Add tpm2-tools to releng to allow clearing, creating and reading keys on the TPM.
+- Add sequoia-sq and openpgp-card-tools as additional tooling for working with OpenPGP certificates and smartcards.
 
 Changed
 -------
