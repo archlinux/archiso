@@ -19,6 +19,7 @@ Changed
   the file system size.
 - Enable systemd-networkd's support for IPv6 Privacy Extensions globally instead of per-connection.
 - Moved custom ``sshd_config`` files to ``/ssh/sshd_config.d/10-archiso.conf``
+- Use pcsclite for interfacing with smartcards, since both gnupg and opgpcard support it.
 
 Deprecated
 ----------
