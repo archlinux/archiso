@@ -48,10 +48,12 @@ The image file is constructed from some of the variables in ``profiledef.sh``: `
   - ``bios.syslinux.eltorito``: Syslinux for x86 BIOS booting from an optical disc
   - ``uefi-ia32.grub.esp``: GRUB for IA32 UEFI booting from a disk
   - ``uefi-ia32.grub.eltorito``: GRUB for IA32 UEFI booting from an optical disc
-  - ``uefi-x64.grub.esp``: GRUB for x86_64 UEFI booting from a disk
-  - ``uefi-x64.grub.eltorito``: GRUB for x86_64 UEFI booting from an optical disc
-  - ``uefi-x64.systemd-boot.esp``: systemd-boot for x86_64 UEFI booting from a disk
-  - ``uefi-x64.systemd-boot.eltorito``: systemd-boot for x86_64 UEFI booting from an optical disc
+  - ``uefi-x64.grub.esp``: GRUB for x64 UEFI booting from a disk
+  - ``uefi-x64.grub.eltorito``: GRUB for x64 UEFI booting from an optical disc
+  - ``uefi-ia32.systemd-boot.esp``: systemd-boot for IA32 UEFI booting from a disk
+  - ``uefi-ia32.systemd-boot.eltorito``: systemd-boot for IA32UEFI booting from an optical disc
+  - ``uefi-x64.systemd-boot.esp``: systemd-boot for x64 UEFI booting from a disk
+  - ``uefi-x64.systemd-boot.eltorito``: systemd-boot for x64 UEFI booting from an optical disc
     Note that BIOS El Torito boot mode must always be listed before UEFI El Torito boot mode.
 * ``arch``: The architecture (e.g. ``x86_64``) to build the image for. This is also used to resolve the name of the packages
   file (e.g. ``packages.x86_64``)

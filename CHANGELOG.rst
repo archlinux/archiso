@@ -9,6 +9,8 @@ Added
 -----
 
 - Add bolt to releng for authorizing and otherwise managing Thunderbolt and USB4 devices.
+- Add ``uefi-ia32.systemd-boot.esp`` and ``uefi-ia32.systemd-boot.eltorito`` boot modes that use systemd-boot for IA32
+  UEFI. The boot modes of baseline and releng are not changed.
 
 Changed
 -------
