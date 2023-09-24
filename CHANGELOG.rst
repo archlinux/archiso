@@ -8,6 +8,8 @@ Changelog
 Added
 -----
 
+- Add bolt to releng for authorizing and otherwise managing Thunderbolt and USB4 devices.
+
 Changed
 -------
 
