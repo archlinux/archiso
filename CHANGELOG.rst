@@ -23,6 +23,9 @@ Deprecated
 Fixed
 -----
 
+- Add ``/etc/localtime`` to the baseline profile to ensure the ISO can be booted successfully without triggering
+  questions from systemd-firstboot.
+
 Removed
 -------
 
