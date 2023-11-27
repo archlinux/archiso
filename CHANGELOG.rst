@@ -8,6 +8,8 @@ Changelog
 Added
 -----
 
+- Add bcachefs-tools to releng for access to bcachefs userspace tools.
+
 Changed
 -------
 
