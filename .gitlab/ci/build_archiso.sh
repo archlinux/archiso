@@ -241,7 +241,6 @@ create_ephemeral_codesigning_keys() {
     # Create the Certificate Authority
     openssl req \
         -newkey rsa:4096 \
-        -sha256 \
         -nodes \
         -x509 \
         -new \
@@ -280,6 +279,8 @@ EOF
         -days 2 \
         -notext \
         -md sha256 \
+        -keyfile "${ca_key}" \
+        -cert "${ca_cert}" \
         -in "${codesigning_cert}.csr" \
         -out "${codesigning_cert}"
 
