@@ -183,8 +183,8 @@ __EOF__
 
     gpg --homedir "${gnupg_homedir}" --gen-key <<EOF
 %echo Generating ephemeral Arch Linux release engineering key pair...
-Key-Type: default
-Key-Length: 3072
+Key-Type: eddsa
+Key-Curve: ed25519
 Key-Usage: sign
 Name-Real: Arch Linux Release Engineering
 Name-Comment: Ephemeral Signing Key
