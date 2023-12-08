@@ -9,6 +9,7 @@ Added
 -----
 
 - Add bcachefs-tools to releng for access to bcachefs userspace tools.
+- Add tftp as a valid protocol for downloading automated boot script.
 
 Changed
 -------
