@@ -14,6 +14,9 @@ Added
 Changed
 -------
 
+- Set ``RequiredForOnline=routable`` in systemd-networkd configuration files to improve the chances that the network
+  really is *online* when ``network-online.target`` is reached.
+
 Deprecated
 ----------
 
