@@ -8,6 +8,24 @@ Changelog
 Added
 -----
 
+Changed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+
+Removed
+-------
+
+[74] - 2023-12-21
+=================
+
+Added
+-----
+
 - Add bcachefs-tools to releng for access to bcachefs userspace tools.
 - Add tftp as a valid protocol for downloading automated boot script.
 
@@ -17,16 +35,10 @@ Changed
 - Set ``RequiredForOnline=routable`` in systemd-networkd configuration files to improve the chances that the network
   really is *online* when ``network-online.target`` is reached.
 
-Deprecated
-----------
-
 Fixed
 -----
 
 - Add missing replacement for the UUID variable in systemd-boot configuration files on ISO 9660.
-
-Removed
--------
 
 [73] - 2023-09-29
 =================

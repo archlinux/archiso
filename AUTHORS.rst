@@ -27,6 +27,7 @@ Archiso Authors
 * Giancarlo Razzolini <grazzolini@archlinux.org>
 * Howard Hicks <deimosian@gmail.com>
 * James Sitegen <jamesm.sitegen@gmail.com>
+* John Lane <archlinux@jelmail.com>
 * Jonathan Liu <net147@gmail.com>
 * Jonathon Fernyhough <jonathon@m2x.dev>
 * Justin Kromlinger <hashworks@archlinux.org>
@@ -51,6 +52,7 @@ Archiso Authors
 * Yu Li-Yu <afg984@gmail.com>
 * Zig Globulin <zig@zigsystem.com>
 * hayao <hayao@fascode.net>
+* kojq su <3145-kojqsu@users.noreply.gitlab.archlinux.org>
 * mono wock <aaronleemorrison@protonmail.com>
 * nl6720 <nl6720@gmail.com>
 * plain linen <bcdedit@hotmail.com>
