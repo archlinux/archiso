@@ -868,6 +868,7 @@ _make_common_bootmode_systemd-boot_conf.isofs() {
     install -m 0644 -- "${profile}/efiboot/loader/loader.conf" "${isofs_dir}/loader/"
     for _conf in "${profile}/efiboot/loader/entries/"*".conf"; do
         sed "s|%ARCHISO_LABEL%|${iso_label}|g;
+             s|%ARCHISO_UUID%|${iso_uuid}|g;
              s|%INSTALL_DIR%|${install_dir}|g;
              s|%ARCH%|${arch}|g" \
             "${_conf}" >"${isofs_dir}/loader/entries/${_conf##*/}"

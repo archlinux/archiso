@@ -23,6 +23,8 @@ Deprecated
 Fixed
 -----
 
+- Add missing replacement for the UUID variable in systemd-boot configuration files on ISO 9660.
+
 Removed
 -------
 
