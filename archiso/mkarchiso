@@ -851,7 +851,7 @@ _make_common_bootmode_systemd-boot() {
         efiboot_files+=("${pacstrap_dir}/usr/lib/systemd/boot/efi/systemd-bootia32.efi"
                         "${pacstrap_dir}/usr/share/edk2-shell/ia32/Shell_Full.efi")
     fi
-    efiboot_files+=("${profile}/efiboot/"
+    efiboot_files+=("${work_dir}/loader/"
                     "${pacstrap_dir}/boot/vmlinuz-"*
                     "${pacstrap_dir}/boot/initramfs-"*".img"
                     "${_available_ucodes[@]}")
@@ -860,40 +860,39 @@ _make_common_bootmode_systemd-boot() {
     _make_efibootimg "$efiboot_imgsize"
 }
 
-_make_common_bootmode_systemd-boot_conf.isofs() {
+_make_common_bootmode_systemd-boot_conf() {
     local _conf
 
-    # Copy systemd-boot configuration files
-    install -d -m 0755 -- "${isofs_dir}/loader/entries"
-    install -m 0644 -- "${profile}/efiboot/loader/loader.conf" "${isofs_dir}/loader/"
+    install -d -m 0755 -- "${work_dir}/loader" "${work_dir}/loader/entries"
+
+    install -m 0644 -- "${profile}/efiboot/loader/loader.conf" "${work_dir}/loader"
     for _conf in "${profile}/efiboot/loader/entries/"*".conf"; do
         sed "s|%ARCHISO_LABEL%|${iso_label}|g;
              s|%ARCHISO_UUID%|${iso_uuid}|g;
              s|%INSTALL_DIR%|${install_dir}|g;
              s|%ARCH%|${arch}|g" \
-            "${_conf}" >"${isofs_dir}/loader/entries/${_conf##*/}"
+            "${_conf}" >"${work_dir}/loader/entries/${_conf##*/}"
     done
 }
 
-_make_common_bootmode_systemd-boot_conf.esp() {
-    local _conf
+# Copy systemd-boot configuration files to ISO 9660
+_make_common_bootmode_systemd-boot_conf.isofs() {
+    cp -r --remove-destination -- "${work_dir}/loader" "${isofs_dir}/"
+}
 
-    # Copy systemd-boot configuration files
-    mmd -i "${efibootimg}" ::/loader ::/loader/entries
-    mcopy -i "${efibootimg}" "${profile}/efiboot/loader/loader.conf" ::/loader/
-    for _conf in "${profile}/efiboot/loader/entries/"*".conf"; do
-        sed "s|%ARCHISO_LABEL%|${iso_label}|g;
-             s|%ARCHISO_UUID%|${iso_uuid}|g;
-             s|%INSTALL_DIR%|${install_dir}|g;
-             s|%ARCH%|${arch}|g" \
-            "${_conf}" | mcopy -i "${efibootimg}" - "::/loader/entries/${_conf##*/}"
-    done
+# Copy systemd-boot configuration files to FAT image
+_make_common_bootmode_systemd-boot_conf.esp() {
+    mcopy -i "${efibootimg}" -s "${work_dir}/loader" ::/
 }
 
 # Prepare systemd-boot for booting when written to a disk (isohybrid)
 _make_bootmode_uefi-x64.systemd-boot.esp() {
     _msg_info "Setting up systemd-boot for x64 UEFI booting..."
 
+    # Prepare configuration files
+    _run_once _make_common_bootmode_systemd-boot_conf
+
+    # Prepare a FAT image for the EFI system partition
     _run_once _make_common_bootmode_systemd-boot
 
     # Copy systemd-boot EFI binary to the default/fallback boot path
@@ -918,6 +917,9 @@ _make_bootmode_uefi-x64.systemd-boot.esp() {
 
 # Prepare systemd-boot for El Torito booting
 _make_bootmode_uefi-x64.systemd-boot.eltorito() {
+    # Prepare configuration files
+    _run_once _make_common_bootmode_systemd-boot_conf
+
     # El Torito UEFI boot requires an image containing the EFI system partition.
     # uefi-x64.systemd-boot.eltorito has the same requirements as uefi-x64.systemd-boot.esp
     _run_once _make_bootmode_uefi-x64.systemd-boot.esp
@@ -947,6 +949,10 @@ _make_bootmode_uefi-x64.systemd-boot.eltorito() {
 _make_bootmode_uefi-ia32.systemd-boot.esp() {
     _msg_info "Setting up systemd-boot for IA32 UEFI booting..."
 
+    # Prepare configuration files
+    _run_once _make_common_bootmode_systemd-boot_conf
+
+    # Prepare a FAT image for the EFI system partition
     _run_once _make_common_bootmode_systemd-boot
 
     # Copy systemd-boot EFI binary to the default/fallback boot path
@@ -970,6 +976,9 @@ _make_bootmode_uefi-ia32.systemd-boot.esp() {
 }
 
 _make_bootmode_uefi-ia32.systemd-boot.eltorito() {
+    # Prepare configuration files
+    _run_once _make_common_bootmode_systemd-boot_conf
+
     # El Torito UEFI boot requires an image containing the EFI system partition.
     # uefi-ia32.systemd-boot.eltorito has the same requirements as uefi-ia32.systemd-boot.esp
     _run_once _make_bootmode_uefi-ia32.systemd-boot.esp
