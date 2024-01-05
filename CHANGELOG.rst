@@ -11,6 +11,9 @@ Added
 Changed
 -------
 
+- Explicitly add ldns to releng (as opposed to it only being pulled in as a dependency of another package) to ensure
+  ``drill`` remains available.
+
 Deprecated
 ----------
 
