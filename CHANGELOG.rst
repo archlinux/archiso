@@ -13,6 +13,8 @@ Changed
 
 - Explicitly add ldns to releng (as opposed to it only being pulled in as a dependency of another package) to ensure
   ``drill`` remains available.
+- Update the releng ISO description to "Arch Linux Live/Rescue DVD" since the ISO size now exceeds the maximum size of
+  a CD (900 MiB).
 
 Deprecated
 ----------
