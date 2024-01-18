@@ -20,6 +20,8 @@ Deprecated
 Fixed
 -----
 
+- Update the location where ``mkarchiso`` looks for the memtest86+ license file.
+
 Removed
 -------
 
