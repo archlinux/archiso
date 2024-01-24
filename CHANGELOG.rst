@@ -11,21 +11,34 @@ Added
 Changed
 -------
 
-- Explicitly add ldns to releng (as opposed to it only being pulled in as a dependency of another package) to ensure
-  ``drill`` remains available.
-- Update the releng ISO description to "Arch Linux Live/Rescue DVD" since the ISO size now exceeds the maximum size of
-  a CD (900 MiB).
-
 Deprecated
 ----------
 
 Fixed
 -----
 
-- Update the location where ``mkarchiso`` looks for the memtest86+ license file.
-
 Removed
 -------
+
+[75] - 2024-01-24
+=================
+
+Added
+-----
+
+- Explicitly add ldns to releng (as opposed to it only being pulled in as a dependency of another package) to ensure
+  ``drill`` remains available.
+
+Changed
+-------
+
+- Update the releng ISO description to "Arch Linux Live/Rescue DVD" since the ISO size now exceeds the maximum size of
+  a CD (900 MiB).
+
+Fixed
+-----
+
+- Update the location where ``mkarchiso`` looks for the memtest86+ license file.
 
 [74] - 2023-12-21
 =================
