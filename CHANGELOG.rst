@@ -22,6 +22,8 @@ Fixed
 Removed
 -------
 
+- Remove workaround for glibc < 2.39. ``LC_ALL=C.UTF-8`` now overrides ``LANGUAGE``, just like ``LC_ALL=C``.
+
 [75] - 2024-01-24
 =================
 

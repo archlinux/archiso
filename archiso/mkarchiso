@@ -8,11 +8,6 @@ shopt -s extglob
 # Control the environment
 umask 0022
 export LC_ALL="C.UTF-8"
-if [[ -v LANGUAGE ]]; then
-    # LC_ALL=C.UTF-8, unlike LC_ALL=C, does not override LANGUAGE.
-    # See https://sourceware.org/bugzilla/show_bug.cgi?id=16621 and https://savannah.gnu.org/bugs/?62815
-    unset LANGUAGE
-fi
 [[ -v SOURCE_DATE_EPOCH ]] || printf -v SOURCE_DATE_EPOCH '%(%s)T' -1
 export SOURCE_DATE_EPOCH
 
