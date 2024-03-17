@@ -46,6 +46,7 @@ efibootimg=""
 efiboot_files=()
 # adapted from GRUB_EARLY_INITRD_LINUX_STOCK in https://git.savannah.gnu.org/cgit/grub.git/tree/util/grub-mkconfig.in
 readonly ucodes=('intel-uc.img' 'intel-ucode.img' 'amd-uc.img' 'amd-ucode.img' 'early_ucode.cpio' 'microcode.cpio')
+declare -i need_external_ucodes=0
 
 
 # Show an INFO message
@@ -430,17 +431,18 @@ _make_boot_on_iso9660() {
     install -m 0644 -- "${pacstrap_dir}/boot/initramfs-"*".img" "${isofs_dir}/${install_dir}/boot/${arch}/"
     install -m 0644 -- "${pacstrap_dir}/boot/vmlinuz-"* "${isofs_dir}/${install_dir}/boot/${arch}/"
 
-    for ucode_image in "${ucodes[@]}"; do
-        if [[ -e "${pacstrap_dir}/boot/${ucode_image}" ]]; then
-            install -m 0644 -- "${pacstrap_dir}/boot/${ucode_image}" "${isofs_dir}/${install_dir}/boot/"
-            if [[ -e "${pacstrap_dir}/usr/share/licenses/${ucode_image%.*}/" ]]; then
-                install -d -m 0755 -- "${isofs_dir}/${install_dir}/boot/licenses/${ucode_image%.*}/"
-                install -m 0644 -- "${pacstrap_dir}/usr/share/licenses/${ucode_image%.*}/"* \
-                    "${isofs_dir}/${install_dir}/boot/licenses/${ucode_image%.*}/"
+    if (( need_external_ucodes )); then
+        for ucode_image in "${ucodes[@]}"; do
+            if [[ -e "${pacstrap_dir}/boot/${ucode_image}" ]]; then
+                install -m 0644 -- "${pacstrap_dir}/boot/${ucode_image}" "${isofs_dir}/${install_dir}/boot/"
+                if [[ -e "${pacstrap_dir}/usr/share/licenses/${ucode_image%.*}/" ]]; then
+                    install -d -m 0755 -- "${isofs_dir}/${install_dir}/boot/licenses/${ucode_image%.*}/"
+                    install -m 0644 -- "${pacstrap_dir}/usr/share/licenses/${ucode_image%.*}/"* \
+                        "${isofs_dir}/${install_dir}/boot/licenses/${ucode_image%.*}/"
+                fi
             fi
-        fi
-    done
-
+        done
+    fi
     _msg_info "Done!"
 }
 
@@ -505,13 +507,15 @@ _make_boot_on_fat() {
         "::/${install_dir}" "::/${install_dir}/boot" "::/${install_dir}/boot/${arch}"
     mcopy -i "${efibootimg}" "${pacstrap_dir}/boot/vmlinuz-"* \
         "${pacstrap_dir}/boot/initramfs-"*".img" "::/${install_dir}/boot/${arch}/"
-    for ucode_image in "${ucodes[@]}"; do
-        if [[ -e "${pacstrap_dir}/boot/${ucode_image}" ]]; then
-            all_ucode_images+=("${pacstrap_dir}/boot/${ucode_image}")
+    if (( need_external_ucodes )); then
+        for ucode_image in "${ucodes[@]}"; do
+            if [[ -e "${pacstrap_dir}/boot/${ucode_image}" ]]; then
+                all_ucode_images+=("${pacstrap_dir}/boot/${ucode_image}")
+            fi
+        done
+        if (( ${#all_ucode_images[@]} )); then
+            mcopy -i "${efibootimg}" "${all_ucode_images[@]}" "::/${install_dir}/boot/"
         fi
-    done
-    if (( ${#all_ucode_images[@]} )); then
-        mcopy -i "${efibootimg}" "${all_ucode_images[@]}" "::/${install_dir}/boot/"
     fi
     _msg_info "Done!"
 }
@@ -548,6 +552,19 @@ _make_efibootimg() {
 
     # Create the default/fallback boot path in which a boot loaders will be placed later.
     mmd -i "${efibootimg}" ::/EFI ::/EFI/BOOT
+}
+
+# Check if initramfs files contain early_cpio
+_check_if_initramfs_has_early_cpio() {
+    local initrd
+
+    for initrd in $(compgen -G "${pacstrap_dir}"'/boot/initramfs-*.img'); do
+        if ! bsdtar -tf "$initrd" early_cpio &>/dev/null; then
+            need_external_ucodes=1
+            _msg_info "Initramfs file does not contain 'early_cpio'. External microcode initramfs images will be copied."
+            return
+        fi
+    done
 }
 
 # Copy GRUB files to ISO 9660 which is used by both IA32 UEFI and x64 UEFI
@@ -819,11 +836,13 @@ _make_common_bootmode_systemd-boot() {
     local _file efiboot_imgsize
     local _available_ucodes=()
 
-    for _file in "${ucodes[@]}"; do
-        if [[ -e "${pacstrap_dir}/boot/${_file}" ]]; then
-            _available_ucodes+=("${pacstrap_dir}/boot/${_file}")
-        fi
-    done
+    if (( need_external_ucodes )); then
+        for _file in "${ucodes[@]}"; do
+            if [[ -e "${pacstrap_dir}/boot/${_file}" ]]; then
+                _available_ucodes+=("${pacstrap_dir}/boot/${_file}")
+            fi
+        done
+    fi
     # Calculate the required FAT image size in bytes
     # shellcheck disable=SC2076
     if [[ " ${bootmodes[*]} " =~ ' uefi-x64.systemd-boot.esp ' || " ${bootmodes[*]} " =~ ' uefi-x64.systemd-boot.eltorito ' ]]; then
@@ -1914,6 +1933,7 @@ _build_iso_base() {
     _run_once _make_version
     _run_once _make_customize_airootfs
     _run_once _make_pkglist
+    _run_once _check_if_initramfs_has_early_cpio
     if [[ "${buildmode}" == 'netboot' ]]; then
         _run_once _make_boot_on_iso9660
     else
