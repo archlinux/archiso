@@ -13,6 +13,10 @@ Added
 Changed
 -------
 
+- Move ``/boot/grub/YYYY-mm-dd-HH-MM-SS-00.uuid`` to ``/boot/YYYY-mm-dd-HH-MM-SS-00.uuid`` and always create the file.
+  Once mkinitcpio-archiso implements searching for the file in early userspace, this file's use will not be limited to
+  just GRUB.
+
 Deprecated
 ----------
 
