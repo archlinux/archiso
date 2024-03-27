@@ -1,7 +1,9 @@
 *~
-archiso-*.tar.gz*
+*.tar
+*.tar.*
 work/
 out/
+codesigning*
 *.iso
 *.img
 *.cer
@@ -10,4 +12,5 @@ out/
 *.pem
 user-data
 meta-data
+network-config
 man/version.rst
