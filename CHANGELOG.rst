@@ -8,6 +8,24 @@ Changelog
 Added
 -----
 
+Changed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+
+Removed
+-------
+
+[76] - 2024-03-30
+=================
+
+Added
+-----
+
 - Add a man page for ``mkarchiso``.
 - Implement configurable bootstrap tarball compression. It is configured in ``profiledef.sh`` using a bash array called
   ``bootstrap_tarball_compression``. baseline tarball now uses zstd compression while releng remains with gzip for now.
@@ -20,12 +38,6 @@ Changed
   just GRUB.
 - Skip including external microcode images in build artifacts if the initramfs file contains ``early_cpio`` (indicating
   an early uncompressed CPIO archive which should have the microcode update files).
-
-Deprecated
-----------
-
-Fixed
------
 
 Removed
 -------
