@@ -1150,7 +1150,7 @@ _validate_requirements_bootmode_uefi-ia32.systemd-boot.eltorito() {
     fi
 
     # uefi-ia32.systemd-boot.eltorito has the exact same requirements as uefi-ia32.systemd-boot.esp
-    _validate_requirements_bootmode_uefi-x64.systemd-boot.esp
+    _validate_requirements_bootmode_uefi-ia32.systemd-boot.esp
 }
 
 _validate_requirements_bootmode_uefi-ia32.grub.esp() {

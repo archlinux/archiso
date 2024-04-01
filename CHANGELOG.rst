@@ -20,6 +20,9 @@ Deprecated
 Fixed
 -----
 
+- Fix requirement validation logic for the ``uefi-ia32.systemd-boot.eltorito`` boot mode. It incorrectly applied the
+  same requirements as ``uefi-x64.systemd-boot.esp``.
+
 Removed
 -------
 
