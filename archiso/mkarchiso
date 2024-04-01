@@ -848,13 +848,16 @@ _make_common_bootmode_systemd-boot() {
     # shellcheck disable=SC2076
     if [[ " ${bootmodes[*]} " =~ ' uefi-x64.systemd-boot.esp ' || " ${bootmodes[*]} " =~ ' uefi-x64.systemd-boot.eltorito ' ]]; then
         efiboot_files+=("${pacstrap_dir}/usr/lib/systemd/boot/efi/systemd-bootx64.efi"
-                        "${pacstrap_dir}/usr/share/edk2-shell/x64/Shell_Full.efi")
+                        "${pacstrap_dir}/usr/share/edk2-shell/x64/Shell_Full.efi"
+                        "${pacstrap_dir}/boot/memtest86+/memtest.efi"
+                        "${pacstrap_dir}/usr/share/licenses/spdx/GPL-2.0-only.txt")
     fi
     # shellcheck disable=SC2076
     if [[ " ${bootmodes[*]} " =~ ' uefi-ia32.systemd-boot.esp ' || " ${bootmodes[*]} " =~ ' uefi-ia32.systemd-boot.eltorito ' ]]; then
         efiboot_files+=("${pacstrap_dir}/usr/lib/systemd/boot/efi/systemd-bootia32.efi"
                         "${pacstrap_dir}/usr/share/edk2-shell/ia32/Shell_Full.efi")
     fi
+
     efiboot_files+=("${work_dir}/loader/"
                     "${pacstrap_dir}/boot/vmlinuz-"*
                     "${pacstrap_dir}/boot/initramfs-"*".img"
@@ -912,6 +915,15 @@ _make_bootmode_uefi-x64.systemd-boot.esp() {
             "${pacstrap_dir}/usr/share/edk2-shell/x64/Shell_Full.efi" ::/shellx64.efi
     fi
 
+    # Copy Memtest86+
+    if [[ -e "${pacstrap_dir}/boot/memtest86+/memtest.efi" ]]; then
+        mmd -i "${efibootimg}" ::/boot ::/boot/memtest86+
+        mcopy -i "${efibootimg}" \
+            "${pacstrap_dir}/boot/memtest86+/memtest.efi" ::/boot/memtest86+/
+        mcopy -i "${efibootimg}" \
+            "${pacstrap_dir}/usr/share/licenses/spdx/GPL-2.0-only.txt" ::/boot/memtest86+/LICENSE
+    fi
+
     # Copy kernel and initramfs to FAT image.
     # systemd-boot can only access files from the EFI system partition it was launched from.
     _run_once _make_boot_on_fat
@@ -945,6 +957,13 @@ _make_bootmode_uefi-x64.systemd-boot.eltorito() {
     # shellx64.efi is picked up automatically when on /
     if [[ -e "${pacstrap_dir}/usr/share/edk2-shell/x64/Shell_Full.efi" ]]; then
         install -m 0644 -- "${pacstrap_dir}/usr/share/edk2-shell/x64/Shell_Full.efi" "${isofs_dir}/shellx64.efi"
+    fi
+
+    # Copy Memtest86+
+    if [[ -e "${pacstrap_dir}/boot/memtest86+/memtest.efi" ]]; then
+        install -d -m 0755 -- "${isofs_dir}/boot/memtest86+/"
+        install -m 0644 -- "${pacstrap_dir}/boot/memtest86+/memtest.efi" "${isofs_dir}/boot/memtest86+/memtest.efi"
+        install -m 0644 -- "${pacstrap_dir}/usr/share/licenses/spdx/GPL-2.0-only.txt" "${isofs_dir}/boot/memtest86+/LICENSE"
     fi
 
     _msg_info "Done!"
@@ -1098,6 +1117,11 @@ _validate_requirements_bootmode_uefi-x64.systemd-boot.esp() {
         _msg_error "Validating '${bootmode}': cannot be used with bootmode uefi-x64.grub.esp!" 0
     fi
     _validate_requirements_common_systemd-boot
+
+    # shellcheck disable=SC2076
+    if [[ ! " ${pkg_list[*]} " =~ ' memtest86+-efi ' ]]; then
+        _msg_info "Validating '${bootmode}': 'memtest86+-efi' is not in the package list. Memory testing will not be available from systemd-boot."
+    fi
 }
 
 _validate_requirements_bootmode_uefi-x64.systemd-boot.eltorito() {

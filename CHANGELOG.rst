@@ -8,6 +8,8 @@ Changelog
 Added
 -----
 
+- Copy Memtest86+ EFI binary to the EFI system partition and ISO 9660 for ``uefi-x86.systemd-boot`` boot modes.
+
 Changed
 -------
 
