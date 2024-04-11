@@ -14,6 +14,8 @@ Added
 Changed
 -------
 
+- Change releng profile's bootstrap tarball compression from gzip to zstd. zstd provides higher and faster compression.
+
 Deprecated
 ----------
 
