@@ -19,6 +19,8 @@ Changed
   Custom PXE setups will need to update their boot loader configuration.
 - Replace ``archisodevice`` boot parameter with ``archisosearchuuid`` in all boot loader configuration. This allows to
   have "file system transposition" without relaying on GRUB-specific features.
+- Replace GRUB with systemd-boot as the UEFI boot loader for the releng profile. While this increases the ISO size, it
+  avoids all GRUB-specific annoyances and oddities.
 
 Deprecated
 ----------
