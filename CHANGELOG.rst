@@ -8,6 +8,24 @@ Changelog
 Added
 -----
 
+Changed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+
+Removed
+-------
+
+[77] - 2024-04-21
+=================
+
+Added
+-----
+
 - Copy Memtest86+ EFI binary to the EFI system partition and ISO 9660 for ``uefi-x86.systemd-boot`` boot modes.
   Additionally, create a boot entry with it for the releng profile.
 
@@ -22,17 +40,11 @@ Changed
 - Replace GRUB with systemd-boot as the UEFI boot loader for the releng profile. While this increases the ISO size, it
   avoids all GRUB-specific annoyances and oddities.
 
-Deprecated
-----------
-
 Fixed
 -----
 
 - Fix requirement validation logic for the ``uefi-ia32.systemd-boot.eltorito`` boot mode. It incorrectly applied the
   same requirements as ``uefi-x64.systemd-boot.esp``.
-
-Removed
--------
 
 [76] - 2024-03-30
 =================
