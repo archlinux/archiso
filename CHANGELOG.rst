@@ -11,6 +11,9 @@ Added
 Changed
 -------
 
+- Moved the ``pkglist.x86_64.txt`` file outside the bootstrap tarball's ``root.x86_64`` directly to avoid polluting the
+  root file system.
+
 Deprecated
 ----------
 

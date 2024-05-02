@@ -33,6 +33,7 @@ arch=""
 pacman_conf=""
 packages=""
 bootstrap_packages=""
+bootstrap_parent=""
 pacstrap_dir=""
 search_filename=""
 declare -i rm_work_dir=0
@@ -1702,16 +1703,13 @@ _build_bootstrap_image() {
         *) _msg_error 'Unsupported compression!' 1 ;;
     esac
 
-    local _bootstrap_parent
-    _bootstrap_parent="$(dirname -- "${pacstrap_dir}")"
-
     [[ -d "${out_dir}" ]] || install -d -- "${out_dir}"
 
-    cd -- "${_bootstrap_parent}"
+    cd -- "${bootstrap_parent}"
 
     _msg_info "Creating bootstrap image..."
     rm -f -- "${out_dir:?}/${image_name:?}${tarball_ext}"
-    bsdtar -cf - "root.${arch}" | "${bootstrap_tarball_compression[@]}" >"${out_dir}/${image_name}${tarball_ext}"
+    bsdtar -cf - "root.${arch}" "pkglist.${arch}.txt" | "${bootstrap_tarball_compression[@]}" >"${out_dir}/${image_name}${tarball_ext}"
     _msg_info "Done!"
     du -h -- "${out_dir}/${image_name}${tarball_ext}"
     cd -- "${OLDPWD}"
@@ -1961,7 +1959,7 @@ _make_pkglist() {
     _msg_info "Creating a list of installed packages on live-enviroment..."
     case "${buildmode}" in
         "bootstrap")
-            pacman -Q --sysroot "${pacstrap_dir}" >"${pacstrap_dir}/pkglist.${arch}.txt"
+            pacman -Q --sysroot "${pacstrap_dir}" >"${bootstrap_parent}/pkglist.${arch}.txt"
             ;;
         "iso"|"netboot")
             install -d -m 0755 -- "${isofs_dir}/${install_dir}"
@@ -2024,6 +2022,7 @@ _build_buildmode_bootstrap() {
 
     # Set up essential directory paths
     pacstrap_dir="${work_dir}/${arch}/bootstrap/root.${arch}"
+    bootstrap_parent="$(dirname -- "${pacstrap_dir}")"
     [[ -d "${work_dir}" ]] || install -d -- "${work_dir}"
     install -d -m 0755 -o 0 -g 0 -- "${pacstrap_dir}"
 

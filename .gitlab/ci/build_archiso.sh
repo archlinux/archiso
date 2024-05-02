@@ -152,7 +152,7 @@ create_metrics() {
                     "$(du -m -- "${output}/"*.tar*(.gz|.xz|.zst) | cut -f1)"
                 printf 'bootstrap_package_count{image="%s"} %s\n' \
                     "${profile}" \
-                    "$(sort -u -- "${tmpdir}/"*/bootstrap/root.*/pkglist.*.txt | wc -l)"
+                    "$(sort -u -- "${tmpdir}/"*/bootstrap/pkglist.*.txt | wc -l)"
                 ;;
         esac
     } >"${_metrics}"
