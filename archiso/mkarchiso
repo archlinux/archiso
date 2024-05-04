@@ -555,14 +555,14 @@ _make_efibootimg() {
     mmd -i "${efibootimg}" ::/EFI ::/EFI/BOOT
 }
 
-# Check if initramfs files contain early_cpio
-_check_if_initramfs_has_early_cpio() {
+# Check if initramfs files contain microcode update files
+_check_if_initramfs_has_ucode() {
     local initrd
 
     for initrd in $(compgen -G "${pacstrap_dir}"'/boot/initramfs-*.img'); do
-        if ! bsdtar -tf "$initrd" early_cpio &>/dev/null; then
+        if ! bsdtar -tf "$initrd" 'early_cpio' 'kernel/x86/microcode/*.bin' &>/dev/null; then
             need_external_ucodes=1
-            _msg_info "Initramfs file does not contain 'early_cpio'. External microcode initramfs images will be copied."
+            _msg_info "Initramfs file does not contain microcode update files. External microcode initramfs images will be copied."
             return
         fi
     done
@@ -2004,7 +2004,7 @@ _build_iso_base() {
     _run_once _make_version
     _run_once _make_customize_airootfs
     _run_once _make_pkglist
-    _run_once _check_if_initramfs_has_early_cpio
+    _run_once _check_if_initramfs_has_ucode
     if [[ "${buildmode}" == 'netboot' ]]; then
         _run_once _make_boot_on_iso9660
     else
