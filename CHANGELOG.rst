@@ -13,6 +13,7 @@ Changed
 
 - Moved the ``pkglist.x86_64.txt`` file outside the bootstrap tarball's ``root.x86_64`` directly to avoid polluting the
   root file system.
+- Use 4 MiB OVMF files in ``run_archiso`` instead of the old 2 MiB ones.
 
 Deprecated
 ----------
