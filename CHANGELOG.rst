@@ -18,6 +18,9 @@ Changed
   when using FAT32 (needs less than 1 MiB) and to give more space for adding custom files when repacking an ISO (e.g.
   when preparing it for Secure Boot).
 - Remove 300 KiB padding needed for CDs if the ISO exceeds the maximum size of a CD.
+- Use ``xz -9e`` as the releng profile's initramfs compression. Now that mkinitcpio does not decompress the loadable
+  kernel modules and firmware files anymore and moves them to the early uncompressed initramfs, we can compress the main
+  initramfs image with a higher compression without it having much impact on the ISO build time.
 
 Deprecated
 ----------
