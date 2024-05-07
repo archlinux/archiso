@@ -17,6 +17,7 @@ Changed
 - Increase the additional free space of the EFI partition size from 1 MiB to 8 MiB to account for file system overhead
   when using FAT32 (needs less than 1 MiB) and to give more space for adding custom files when repacking an ISO (e.g.
   when preparing it for Secure Boot).
+- Remove 300 KiB padding needed for CDs if the ISO exceeds the maximum size of a CD.
 
 Deprecated
 ----------
