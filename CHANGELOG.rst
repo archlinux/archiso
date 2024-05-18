@@ -21,6 +21,7 @@ Changed
 - Use ``xz -9e`` as the releng profile's initramfs compression. Now that mkinitcpio does not decompress the loadable
   kernel modules and firmware files anymore and moves them to the early uncompressed initramfs, we can compress the main
   initramfs image with a higher compression without it having much impact on the ISO build time.
+- Format the EFI system partition image as FAT32 if the size allows it (i.e. if it is at least 36 MiB).
 
 Deprecated
 ----------

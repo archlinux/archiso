@@ -527,6 +527,7 @@ _make_boot_on_fat() {
 _make_efibootimg() {
     local imgsize_kib="0"
     local imgsize_bytes=${1}
+    local mkfs_fat_opts=(-C -n ARCHISO_EFI)
 
     # Convert from bytes to KiB and round up to the next full MiB with an additional 8 MiB for reserved sectors, file
     # and directory entries and to allow adding custom files when repacking the ISO.
@@ -536,6 +537,13 @@ _make_efibootimg() {
             function mib_to_kib(x){return x*1024}
             END {print mib_to_kib(ceil((byte_to_kib($1)+8192)/1024))}' <<<"${imgsize_bytes}"
     )"
+
+    # Use FAT32 as early as possible. mkfs.fat selects FAT32 if the size ≥ 512 MiB, but a FAT32 file system can already
+    # be created at 36 MiB size (assuming 512 byte logical sector size).
+    if (( imgsize_kib >= 36864 )); then
+        mkfs_fat_opts+=(-F 32)
+    fi
+
     # The FAT image must be created with mkfs.fat not mformat, as some systems have issues with mformat made images:
     # https://lists.gnu.org/archive/html/grub-devel/2019-04/msg00099.html
     rm -f -- "${efibootimg}"
@@ -543,9 +551,9 @@ _make_efibootimg() {
     if [[ "${quiet}" == "y" ]]; then
         # mkfs.fat does not have a -q/--quiet option, so redirect stdout to /dev/null instead
         # https://github.com/dosfstools/dosfstools/issues/103
-        mkfs.fat -C -n ARCHISO_EFI "${efibootimg}" "${imgsize_kib}" >/dev/null
+        mkfs.fat "${mkfs_fat_opts[@]}" "${efibootimg}" "${imgsize_kib}" >/dev/null
     else
-        mkfs.fat -C -n ARCHISO_EFI "${efibootimg}" "${imgsize_kib}"
+        mkfs.fat "${mkfs_fat_opts[@]}" "${efibootimg}" "${imgsize_kib}"
     fi
 
     # Create the default/fallback boot path in which a boot loaders will be placed later.
