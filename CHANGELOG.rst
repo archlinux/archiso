@@ -11,6 +11,21 @@ Added
 Changed
 -------
 
+Deprecated
+----------
+
+Fixed
+-----
+
+Removed
+-------
+
+[78] - 2024-05-23
+=================
+
+Changed
+-------
+
 - Moved the ``pkglist.x86_64.txt`` file outside the bootstrap tarball's ``root.x86_64`` directly to avoid polluting the
   root file system.
 - Use 4 MiB OVMF files in ``run_archiso`` instead of the old 2 MiB ones.
@@ -22,9 +37,6 @@ Changed
   kernel modules and firmware files anymore and moves them to the early uncompressed initramfs, we can compress the main
   initramfs image with a higher compression without it having much impact on the ISO build time.
 - Format the EFI system partition image as FAT32 if the size allows it (i.e. if it is at least 36 MiB).
-
-Deprecated
-----------
 
 Fixed
 -----
