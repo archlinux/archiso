@@ -36,6 +36,9 @@ Fixed
 Removed
 -------
 
+- Remove the wezterm-terminfo package from the releng profile as the relevant file is now provided by the ncurses
+  package instead.
+
 [77] - 2024-04-21
 =================
 
