@@ -202,8 +202,7 @@ _mkairootfs_ext4+squashfs() {
     )
     [[ ! "${quiet}" == "y" ]] || mkfs_ext4_options+=('-q')
     rm -f -- "${pacstrap_dir}.img"
-    E2FSPROGS_FAKE_TIME="${SOURCE_DATE_EPOCH}" mkfs.ext4 "${mkfs_ext4_options[@]}" -- "${pacstrap_dir}.img" 32G
-    tune2fs -c 0 -i 0 -- "${pacstrap_dir}.img" >/dev/null
+    mkfs.ext4 "${mkfs_ext4_options[@]}" -- "${pacstrap_dir}.img" 32G
     _msg_info "Done!"
 
     install -d -m 0755 -- "${isofs_dir}/${install_dir}/${arch}"

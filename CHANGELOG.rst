@@ -22,6 +22,8 @@ Fixed
 Removed
 -------
 
+- Remove unneeded workaround for e2fsprogs < 1.47.1.
+
 [78] - 2024-05-23
 =================
 
