@@ -17,6 +17,8 @@ Deprecated
 Fixed
 -----
 
+- When downloading an automation script fail with non-zero status code instead of returning an HTML document when the remote HTTP server fails to deliver the document.
+
 Removed
 -------
 
