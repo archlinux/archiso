@@ -1687,34 +1687,20 @@ _add_xorrisofs_options_uefi-x64.grub.eltorito() {
 
 # Build bootstrap image
 _build_bootstrap_image() {
-    local tarball_ext
-
     # Set default tarball compression to uncompressed
     if (( ! "${#bootstrap_tarball_compression[@]}" )); then
         bootstrap_tarball_compression=('cat')
     fi
-
-    # Set tarball extension
-    case "${bootstrap_tarball_compression[0]}" in
-        'cat') tarball_ext='' ;;
-        'bzip') tarball_ext='.b2z' ;;
-        'gzip') tarball_ext='.gz' ;;
-        'lrzip') tarball_ext='.lrz' ;;
-        'lzip') tarball_ext='.lz' ;;
-        'lzop') tarball_ext='.lzo' ;;
-        'zstd'|'zstdmt') tarball_ext='.zst' ;;
-        *) _msg_error 'Unsupported compression!' 1 ;;
-    esac
 
     [[ -d "${out_dir}" ]] || install -d -- "${out_dir}"
 
     cd -- "${bootstrap_parent}"
 
     _msg_info "Creating bootstrap image..."
-    rm -f -- "${out_dir:?}/${image_name:?}${tarball_ext}"
-    bsdtar -cf - "root.${arch}" "pkglist.${arch}.txt" | "${bootstrap_tarball_compression[@]}" >"${out_dir}/${image_name}${tarball_ext}"
+    rm -f -- "${out_dir:?}/${image_name:?}"
+    bsdtar -cf - "root.${arch}" "pkglist.${arch}.txt" | "${bootstrap_tarball_compression[@]}" >"${out_dir}/${image_name}"
     _msg_info "Done!"
-    du -h -- "${out_dir}/${image_name}${tarball_ext}"
+    du -h -- "${out_dir}/${image_name}"
     cd -- "${OLDPWD}"
 }
 
@@ -2033,6 +2019,16 @@ _build_buildmode_bootstrap() {
     bootstrap_parent="$(dirname -- "${pacstrap_dir}")"
     [[ -d "${work_dir}" ]] || install -d -- "${work_dir}"
     install -d -m 0755 -o 0 -g 0 -- "${pacstrap_dir}"
+
+    # Set tarball extension
+    case "${bootstrap_tarball_compression[0]}" in
+        'bzip') image_name="${image_name}.b2z" ;;
+        'gzip') image_name="${image_name}.gz" ;;
+        'lrzip') image_name="${image_name}.lrz" ;;
+        'lzip') image_name="${image_name}.lz" ;;
+        'lzop') image_name="${image_name}.lzo" ;;
+        'zstd'|'zstdmt') image_name="${image_name}.zst" ;;
+    esac
 
     [[ "${quiet}" == "y" ]] || _show_config
     _run_once _make_pacman_conf

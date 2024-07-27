@@ -17,6 +17,8 @@ Deprecated
 Fixed
 -----
 
+- Show the correct image file name, including the extension, when building a bootstrap image.
+
 Removed
 -------
 
