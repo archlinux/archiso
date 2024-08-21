@@ -11,6 +11,8 @@ Added
 Changed
 -------
 
+- Use an empty UUID for the EROFS image file since the file system will never be referenced by it.
+
 Deprecated
 ----------
 
