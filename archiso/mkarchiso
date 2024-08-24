@@ -1387,7 +1387,7 @@ _validate_requirements_buildmode_bootstrap() {
     # Check if the compressor is installed
     if (( ${#bootstrap_tarball_compression[@]} )); then
         case "${bootstrap_tarball_compression[0]}" in
-            'bzip'|'gzip'|'lrzip'|'lzip'|'lzop'|'zstd'|'zstdmt')
+            'bzip'|'gzip'|'lrzip'|'lzip'|'lzop'|'xz'|'zstd'|'zstdmt')
                 if ! command -v "${bootstrap_tarball_compression[0]}" &>/dev/null; then
                     (( validation_error=validation_error+1 ))
                     _msg_error "Validating build mode '${_buildmode}': '${bootstrap_tarball_compression[0]}' is not available on this host. Install '${bootstrap_tarball_compression[0]/zstdmt/zstd}'!" 0
@@ -2025,6 +2025,7 @@ _build_buildmode_bootstrap() {
         'lrzip') image_name="${image_name}.lrz" ;;
         'lzip') image_name="${image_name}.lz" ;;
         'lzop') image_name="${image_name}.lzo" ;;
+        'xz') image_name="${image_name}.xz" ;;
         'zstd'|'zstdmt') image_name="${image_name}.zst" ;;
     esac
 
