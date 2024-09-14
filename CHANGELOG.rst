@@ -16,6 +16,7 @@ Changed
 - Use an empty UUID for the EROFS image file since the file system will never be referenced by it.
 - Do not use ``mkfs.erofs`` extended options ``fragments`` and ``dedupe`` in the baseline profile. This reduces the EROFS
   image size and compression time.
+- Update profile ``pacman.conf`` to include the new options added to ``/etc/pacman.conf`` in pacman 7.0.0.r3.g7736133-1.
 
 Deprecated
 ----------
