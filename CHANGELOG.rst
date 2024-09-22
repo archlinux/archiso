@@ -27,6 +27,7 @@ Fixed
 
 Removed
 -------
+- Removed reiserfsprogs from packages (EOL)
 
 [79] - 2024-07-25
 =================
