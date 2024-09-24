@@ -8,6 +8,24 @@ Changelog
 Added
 -----
 
+Changed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+
+Removed
+-------
+
+[80] - 2024-09-26
+=================
+
+Added
+-----
+
 - Support compressing the bootstrap tarball with ``xz``.
 
 Changed
@@ -18,9 +36,6 @@ Changed
   image size and compression time.
 - Update profile ``pacman.conf`` to include the new options added to ``/etc/pacman.conf`` in pacman 7.0.0.r3.g7736133-1.
 
-Deprecated
-----------
-
 Fixed
 -----
 
@@ -28,6 +43,7 @@ Fixed
 
 Removed
 -------
+
 - Removed reiserfsprogs from packages (EOL)
 
 [79] - 2024-07-25
