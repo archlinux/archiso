@@ -20,6 +20,9 @@ Fixed
 Removed
 -------
 
+- Removed gnu-netcat from releng profile, as cloud-init requires openbsd-netcat and the two netcat versions can not be
+  installed side-by-side.
+
 [80] - 2024-09-26
 =================
 
