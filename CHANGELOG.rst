@@ -17,6 +17,15 @@ Deprecated
 Fixed
 -----
 
+Removed
+-------
+
+[81] - 2024-10-28
+=================
+
+Fixed
+-----
+
 - Change enabled services in baseline and releng profile to adapt to changes in ``cloud-init`` ≥ 24.3 (renamed
   ``cloud-init.service`` to ``cloud-init-network.service``, introduced new ``cloud-init-main.service``).
 
