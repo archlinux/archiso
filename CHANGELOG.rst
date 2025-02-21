@@ -17,6 +17,8 @@ Deprecated
 Fixed
 -----
 
+- Do not hide ``pacstrap`` errors in non-verbose mode.
+
 Removed
 -------
 
