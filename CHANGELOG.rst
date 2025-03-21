@@ -11,6 +11,8 @@ Added
 Changed
 -------
 
+- Remove the pacstrap directory early to lower the maximum size of the working directory.
+
 Deprecated
 ----------
 
