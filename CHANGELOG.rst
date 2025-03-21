@@ -24,6 +24,8 @@ Fixed
 Removed
 -------
 
+- Removed deprecated dhclient from packages.
+
 
 [82] - 2024-11-27
 =================
