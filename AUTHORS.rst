@@ -14,6 +14,7 @@ Archiso Authors
 * Christian Hesse <mail@eworm.de>
 * Christopher Brannon <cmbrannon79@gmail.com>
 * Dan McGee <dan@archlinux.org>
+* Dariusz Pelowski <dariusz.pelowski@gmail.com>
 * Darren Ng <un1gfn@gmail.com>
 * David Runge <dvzrv@archlinux.org>
 * David Thurstenson <thurstylark@gmail.com>
@@ -30,6 +31,7 @@ Archiso Authors
 * John Lane <archlinux@jelmail.com>
 * Jonathan Liu <net147@gmail.com>
 * Jonathon Fernyhough <jonathon@m2x.dev>
+* Julian <deadbeef@outlook.de>
 * Justin Kromlinger <hashworks@archlinux.org>
 * Keshav Amburay <the.ridikulus.rat@gmail.com>
 * Kristian Klausen <kristian@klausen.dk>

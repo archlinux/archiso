@@ -11,10 +11,22 @@ Added
 Changed
 -------
 
-- Remove the pacstrap directory early to lower the maximum size of the working directory.
-
 Deprecated
 ----------
+
+Fixed
+-----
+
+Removed
+-------
+
+[83] - 2025-03-24
+=================
+
+Changed
+-------
+
+- Remove the pacstrap directory early to lower the maximum size of the working directory.
 
 Fixed
 -----
@@ -25,7 +37,6 @@ Removed
 -------
 
 - Removed deprecated dhclient from packages.
-
 
 [82] - 2024-11-27
 =================
