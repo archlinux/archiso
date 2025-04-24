@@ -20,6 +20,8 @@ Fixed
 Removed
 -------
 
+- Removed ``rp-pppoe`` from releng packages. ``ppp`` provides a PPPoE client that is sufficient for most use cases.
+
 [83] - 2025-03-24
 =================
 
