@@ -11,6 +11,9 @@ Added
 Changed
 -------
 
+- Undeprecate ``/${install_dir}/grubenv``. There are use cases that rely on extracting only the ``${install_dir}`` from
+  the ISO.
+
 Deprecated
 ----------
 
