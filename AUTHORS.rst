@@ -56,7 +56,7 @@ Archiso Authors
 * hayao <hayao@fascode.net>
 * kojq su <3145-kojqsu@users.noreply.gitlab.archlinux.org>
 * mono wock <aaronleemorrison@protonmail.com>
-* nl6720 <nl6720@gmail.com>
+* nl6720 <devnull@nl6720.me>
 * plain linen <bcdedit@hotmail.com>
 * shivanandvp <shivanandvp.oss@gmail.com>
 * weltio weltio <weltio@web.de>

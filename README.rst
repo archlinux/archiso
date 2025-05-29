@@ -175,7 +175,7 @@ or
 
 .. code:: sh
 
-  gpg --auto-key-locate keyserver --recv-keys BB8E6F1B81CF0BB301D74D1CBF425A01E68B38EF
+  gpg --auto-key-locate clear,dane --locate-external-keys devnull@nl6720.me
 
 Afterwards a tag can be verified from a clone of this repository:
 
