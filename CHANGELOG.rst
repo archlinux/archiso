@@ -15,6 +15,7 @@ Changed
 
 - Undeprecate ``/${install_dir}/grubenv``. There are use cases that rely on extracting only the ``${install_dir}`` from
   the ISO.
+- Use ``xdg-open`` instead of hardcoding the web browser in the ``Installation_guide`` script.
 
 Deprecated
 ----------
