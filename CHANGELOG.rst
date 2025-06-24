@@ -8,6 +8,8 @@ Changelog
 Added
 -----
 
+- Added ``mmc-utils`` to releng packages. It can be used to configure MMC and eMMC storage devices.
+
 Changed
 -------
 
