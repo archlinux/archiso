@@ -17,6 +17,8 @@ Deprecated
 Fixed
 -----
 
+-  Fix systemd-networkd drop-in configuration path.
+
 Removed
 -------
 
