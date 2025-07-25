@@ -53,6 +53,7 @@ Archiso Authors
 * Tom Yan <tom.ty89@gmail.com>
 * Yu Li-Yu <afg984@gmail.com>
 * Zig Globulin <zig@zigsystem.com>
+* cvlc12 <cvlc12@outlook.fr>
 * hayao <hayao@fascode.net>
 * kojq su <3145-kojqsu@users.noreply.gitlab.archlinux.org>
 * mono wock <aaronleemorrison@protonmail.com>
