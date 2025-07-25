@@ -17,10 +17,16 @@ Deprecated
 Fixed
 -----
 
--  Fix systemd-networkd drop-in configuration path.
-
 Removed
 -------
+
+[85] - 2025-07-28
+=================
+
+Fixed
+-----
+
+-  Fix systemd-networkd drop-in configuration path.
 
 [84] - 2025-06-26
 =================
