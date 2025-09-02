@@ -8,6 +8,9 @@ Changelog
 Added
 -----
 
+- Support other architectures. In theory it should now be possible to create UEFI bootable ISOs on AArch64, RISC-V 64
+  and LoongArch 64. Cross-architecture building is not supported.
+
 Changed
 -------
 
