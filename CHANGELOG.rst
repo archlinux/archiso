@@ -23,6 +23,10 @@ Changed
 Deprecated
 ----------
 
+- The ``bios.syslinux.eltorito`` and ``bios.syslinux.mbr`` boot modes are replaced by the ``bios.syslinux`` boot mode.
+  If you are using ``bios.syslinux.eltorito`` or ``bios.syslinux.mbr`` in your ``profiledef.sh``, replace them with a
+  single ``bios.syslinux``.
+
 Fixed
 -----
 

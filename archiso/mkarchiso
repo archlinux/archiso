@@ -445,9 +445,9 @@ _make_boot_on_iso9660() {
     _msg_info "Done!"
 }
 
-# Prepare syslinux for booting from MBR (isohybrid)
-_make_bootmode_bios.syslinux.mbr() {
-    _msg_info "Setting up SYSLINUX for BIOS booting from a disk..."
+# Prepare syslinux for booting from MBR (isohybrid) and El-Torito booting
+_make_bootmode_bios.syslinux() {
+    _msg_info "Setting up SYSLINUX for BIOS booting..."
     install -d -m 0755 -- "${isofs_dir}/boot/syslinux"
     for _cfg in "${profile}/syslinux/"*.cfg; do
         sed "s|%ARCHISO_LABEL%|${iso_label}|g;
@@ -482,20 +482,19 @@ _make_bootmode_bios.syslinux.mbr() {
         install -m 0644 -- "${pacstrap_dir}/boot/memtest86+/memtest.bin" "${isofs_dir}/boot/memtest86+/memtest"
         install -m 0644 -- "${pacstrap_dir}/usr/share/licenses/spdx/GPL-2.0-only.txt" "${isofs_dir}/boot/memtest86+/LICENSE"
     fi
-    _msg_info "Done! SYSLINUX set up for BIOS booting from a disk successfully."
-}
 
-# Prepare syslinux for El-Torito booting
-_make_bootmode_bios.syslinux.eltorito() {
-    _msg_info "Setting up SYSLINUX for BIOS booting from an optical disc..."
     install -d -m 0755 -- "${isofs_dir}/boot/syslinux"
     install -m 0644 -- "${pacstrap_dir}/usr/lib/syslinux/bios/isolinux.bin" "${isofs_dir}/boot/syslinux/"
     install -m 0644 -- "${pacstrap_dir}/usr/lib/syslinux/bios/isohdpfx.bin" "${isofs_dir}/boot/syslinux/"
 
-    # ISOLINUX and SYSLINUX installation is shared
-    _run_once _make_bootmode_bios.syslinux.mbr
-
-    _msg_info "Done! SYSLINUX set up for BIOS booting from an optical disc successfully."
+    _msg_info "Done! SYSLINUX set up for BIOS booting successfully."
+}
+# Deprecated boot modes
+_make_bootmode_bios.syslinux.eltorito() {
+    return 1
+}
+_make_bootmode_bios.syslinux.mbr() {
+    return 1
 }
 
 # Copy kernel and initramfs to FAT image
@@ -1030,14 +1029,7 @@ _make_bootmode_uefi-ia32.systemd-boot.eltorito() {
     _msg_info "Done!"
 }
 
-_validate_requirements_bootmode_bios.syslinux.mbr() {
-    # bios.syslinux.mbr requires bios.syslinux.eltorito
-    # shellcheck disable=SC2076
-    if [[ ! " ${bootmodes[*]} " =~ ' bios.syslinux.eltorito ' ]]; then
-        (( validation_error=validation_error+1 ))
-        _msg_error "Using 'bios.syslinux.mbr' boot mode without 'bios.syslinux.eltorito' is not supported." 0
-    fi
-
+_validate_requirements_bootmode_bios.syslinux() {
     # Check if the syslinux package is in the package list
     # shellcheck disable=SC2076
     if [[ ! " ${pkg_list[*]} " =~ ' syslinux ' ]]; then
@@ -1071,6 +1063,16 @@ _validate_requirements_bootmode_bios.syslinux.mbr() {
 _validate_requirements_bootmode_bios.syslinux.eltorito() {
     # bios.syslinux.eltorito has the exact same requirements as bios.syslinux.mbr
     _validate_requirements_bootmode_bios.syslinux.mbr
+}
+
+_validate_requirements_bootmode_bios.syslinux.mbr() {
+    _msg_warning "The '${bootmode}' boot mode is deprecated. Use 'bios.syslinux' instead."
+    bootmodes=("${bootmodes[@]/${bootmode}}")
+    # shellcheck disable=SC2076
+    if [[ ! " ${bootmodes[*]} " =~ ' bios.syslinux ' ]]; then
+        bootmodes+=('bios.syslinux')
+        _validate_requirements_bootmode_bios.syslinux
+    fi
 }
 
 _validate_requirements_common_systemd-boot() {
@@ -1493,8 +1495,8 @@ _validate_requirements_buildmode_netboot() {
     _validate_common_requirements_buildmode_all
 }
 
-# SYSLINUX El Torito
-_add_xorrisofs_options_bios.syslinux.eltorito() {
+# SYSLINUX MBR (isohybrid) and El Torito
+_add_xorrisofs_options_bios.syslinux() {
     xorrisofs_options+=(
         # El Torito boot image for x86 BIOS
         '-eltorito-boot' 'boot/syslinux/isolinux.bin'
@@ -1502,12 +1504,6 @@ _add_xorrisofs_options_bios.syslinux.eltorito() {
         '-eltorito-catalog' 'boot/syslinux/boot.cat'
         # Required options to boot with ISOLINUX
         '-no-emul-boot' '-boot-load-size' '4' '-boot-info-table'
-    )
-}
-
-# SYSLINUX MBR (isohybrid)
-_add_xorrisofs_options_bios.syslinux.mbr() {
-    xorrisofs_options+=(
         # SYSLINUX MBR bootstrap code; does not work without "-eltorito-boot syslinux/isolinux.bin"
         '-isohybrid-mbr' "${isofs_dir}/boot/syslinux/isohdpfx.bin"
         # When GPT is used, create an additional partition in the MBR (besides 0xEE) for sectors 0–1 (MBR
@@ -1551,7 +1547,7 @@ _add_xorrisofs_options_uefi-x64.systemd-boot.esp() {
     xorrisofs_options+=('-append_partition' '2' 'C12A7328-F81F-11D2-BA4B-00A0C93EC93B' "${efibootimg}")
     # Ensure GPT is used as some systems do not support UEFI booting without it
     # shellcheck disable=SC2076
-    if [[ " ${bootmodes[*]} " =~ ' bios.syslinux.mbr ' ]]; then
+    if [[ " ${bootmodes[*]} " =~ ' bios.syslinux ' ]]; then
         # A valid GPT prevents BIOS booting on some systems, instead use an invalid GPT (without a protective MBR).
         # The attached partition will have the EFI system partition type code in MBR, but in the invalid GPT it will
         # have a Microsoft basic partition type code.
@@ -1583,7 +1579,7 @@ _add_xorrisofs_options_uefi-x64.systemd-boot.eltorito() {
             '-no-emul-boot'
         )
         # A valid GPT prevents BIOS booting on some systems, use an invalid GPT instead.
-        if [[ " ${bootmodes[*]} " =~ ' bios.syslinux.mbr ' ]]; then
+        if [[ " ${bootmodes[*]} " =~ ' bios.syslinux ' ]]; then
             # If '-isohybrid-gpt-basdat' is specified before '-e', then the appended EFI system partition will have the
             # EFI system partition type ID/GUID in both MBR and GPT. If '-isohybrid-gpt-basdat' is specified after '-e',
             # the appended EFI system partition will have the Microsoft basic data type GUID in GPT.
@@ -1606,7 +1602,7 @@ _add_xorrisofs_options_uefi-x64.systemd-boot.eltorito() {
             '-no-emul-boot'
         )
     fi
-    # Specify where to save the El Torito boot catalog file in case it is not already set by bios.syslinux.eltorito
+    # Specify where to save the El Torito boot catalog file in case it is not already set by bios.syslinux
     # shellcheck disable=SC2076
     [[ " ${bootmodes[*]} " =~ ' bios.' ]] || xorrisofs_options+=('-eltorito-catalog' 'EFI/boot.cat')
 }
@@ -1622,7 +1618,7 @@ _add_xorrisofs_options_uefi-x64.grub.esp() {
     xorrisofs_options+=('-append_partition' '2' 'C12A7328-F81F-11D2-BA4B-00A0C93EC93B' "${efibootimg}")
     # Ensure GPT is used as some systems do not support UEFI booting without it
     # shellcheck disable=SC2076
-    if [[ " ${bootmodes[*]} " =~ ' bios.syslinux.mbr ' ]]; then
+    if [[ " ${bootmodes[*]} " =~ ' bios.syslinux ' ]]; then
         # A valid GPT prevents BIOS booting on some systems, instead use an invalid GPT (without a protective MBR).
         # The attached partition will have the EFI system partition type code in MBR, but in the invalid GPT it will
         # have a Microsoft basic partition type code.
@@ -1655,7 +1651,7 @@ _add_xorrisofs_options_uefi-x64.grub.eltorito() {
             '-no-emul-boot'
         )
         # A valid GPT prevents BIOS booting on some systems, use an invalid GPT instead.
-        if [[ " ${bootmodes[*]} " =~ ' bios.syslinux.mbr ' ]]; then
+        if [[ " ${bootmodes[*]} " =~ ' bios.syslinux ' ]]; then
             # If '-isohybrid-gpt-basdat' is specified before '-e', then the appended EFI system partition will have the
             # EFI system partition type ID/GUID in both MBR and GPT. If '-isohybrid-gpt-basdat' is specified after '-e',
             # the appended EFI system partition will have the Microsoft basic data type GUID in GPT.
@@ -1678,7 +1674,7 @@ _add_xorrisofs_options_uefi-x64.grub.eltorito() {
             '-no-emul-boot'
         )
     fi
-    # Specify where to save the El Torito boot catalog file in case it is not already set by bios.syslinux.eltorito
+    # Specify where to save the El Torito boot catalog file in case it is not already set by bios.syslinux
     # shellcheck disable=SC2076
     [[ " ${bootmodes[*]} " =~ ' bios.' ]] || xorrisofs_options+=('-eltorito-catalog' 'EFI/boot.cat')
 }

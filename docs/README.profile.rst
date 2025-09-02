@@ -44,8 +44,7 @@ The image file is constructed from some of the variables in ``profiledef.sh``: `
 * ``bootmodes``: A list of strings, that state the supported boot modes of the resulting image. Only the following are
   understood:
 
-  - ``bios.syslinux.mbr``: Syslinux for x86 BIOS booting from a disk
-  - ``bios.syslinux.eltorito``: Syslinux for x86 BIOS booting from an optical disc
+  - ``bios.syslinux``: Syslinux for x86 BIOS booting
   - ``uefi-ia32.grub.esp``: GRUB for IA32 UEFI booting from a disk
   - ``uefi-ia32.grub.eltorito``: GRUB for IA32 UEFI booting from an optical disc
   - ``uefi-x64.grub.esp``: GRUB for x64 UEFI booting from a disk
@@ -175,8 +174,7 @@ The *custom template identifiers* are **only** understood in the boot loader ent
 syslinux
 --------
 
-This directory is mandatory when the ``bios.syslinux.mbr`` or the ``bios.syslinux.eltorito`` bootmodes are selected in
-``profiledef.sh``.
+This directory is mandatory when the ``bios.syslinux`` bootmode is selected in ``profiledef.sh``.
 It contains configuration files for `syslinux <https://wiki.syslinux.org/wiki/index.php?title=SYSLINUX>`_ or `isolinux
 <https://wiki.syslinux.org/wiki/index.php?title=ISOLINUX>`_ , or `pxelinux
 <https://wiki.syslinux.org/wiki/index.php?title=PXELINUX>`_ used in the resulting image.
