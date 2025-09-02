@@ -32,6 +32,11 @@ Deprecated
   If you are using ``uefi-x64.systemd-boot.eltorito``, ``uefi-x64.systemd-boot.esp``,
   ``uefi-ia32.systemd-boot.eltorito`` or ``uefi-ia32.systemd-boot.eltorito`` in your ``profiledef.sh``, replace them
   with a single ``uefi.systemd-boot``.
+- The ``uefi-x64.grub.eltorito``, ``uefi-x64.grub.esp``, ``uefi-ia32.grub.eltorito`` and ``uefi-ia32.grub.eltorito``
+  boot modes are replaced by a single ``uefi.grub``.
+  Both x64 and IA32 architectures are covered by this new combined boot mode.
+  If you are using the ``uefi-x64.grub.eltorito``, ``uefi-x64.grub.esp``, ``uefi-ia32.grub.eltorito`` or
+  ``uefi-ia32.grub.eltorito`` boot modes in your ``profiledef.sh``, replace them with a single ``uefi.grub``.
 
 Fixed
 -----

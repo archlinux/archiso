@@ -45,12 +45,8 @@ The image file is constructed from some of the variables in ``profiledef.sh``: `
   understood:
 
   - ``bios.syslinux``: Syslinux for x86 BIOS booting
-  - ``uefi-ia32.grub.esp``: GRUB for IA32 UEFI booting from a disk
-  - ``uefi-ia32.grub.eltorito``: GRUB for IA32 UEFI booting from an optical disc
-  - ``uefi-x64.grub.esp``: GRUB for x64 UEFI booting from a disk
-  - ``uefi-x64.grub.eltorito``: GRUB for x64 UEFI booting from an optical disc
+  - ``uefi.grub``: GRUB for x64 and IA32 UEFI booting
   - ``uefi.systemd-boot``: systemd-boot for x64 and IA32 UEFI booting
-    Note that BIOS El Torito boot mode must always be listed before UEFI El Torito boot mode.
 * ``arch``: The architecture (e.g. ``x86_64``) to build the image for. This is also used to resolve the name of the packages
   file (e.g. ``packages.x86_64``)
 * ``packages``: File path to a text file containing a list of packages to install into the environment in ``iso`` and
@@ -181,12 +177,6 @@ The *custom template identifiers* are understood in all `.cfg` files in this dir
 grub
 ----
 
-This directory is mandatory when any of the following bootmodes is used in ``profiledef.sh``:
-
-- ``uefi-ia32.grub.esp`` or
-- ``uefi-ia32.grub.eltorito`` or
-- ``uefi-x64.grub.esp`` or
-- ``uefi-x64.grub.eltorito``
-
+This directory is mandatory when the ``uefi.grub`` bootmode is selected in ``profiledef.sh``.
 It contains configuration files for `GRUB <https://www.gnu.org/software/grub/>`_
 used in the resulting image.
