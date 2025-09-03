@@ -14,6 +14,8 @@ Changed
 -------
 
 - ``run_archiso`` defaults to booting the ISO with UEFI since that is the boot mode most people actually use.
+- Use the ``%ARCH%`` *custom template identifier* in the profile boot entry files for syslinux and systemd-boot instead
+  of hardcoding the architecture.
 
 Deprecated
 ----------
