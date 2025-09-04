@@ -57,6 +57,10 @@ The image file is constructed from some of the variables in ``profiledef.sh``: `
     Note that BIOS El Torito boot mode must always be listed before UEFI El Torito boot mode.
 * ``arch``: The architecture (e.g. ``x86_64``) to build the image for. This is also used to resolve the name of the packages
   file (e.g. ``packages.x86_64``)
+* ``packages``: File path to a text file containing a list of packages to install into the environment in ``iso`` and
+  ``netboot`` build modes (defaults to ``packages.${arch}``).
+* ``bootstrap_packages``: File path to a text file containing a list of packages to install into the environment in the
+  ``bootstrap`` build mode (defaults to ``bootstrap_packages.${arch}``).
 * ``pacman_conf``: The ``pacman.conf`` to use to install packages to the work directory when creating the image (defaults to
   the host's ``/etc/pacman.conf``)
 * ``airootfs_image_type``: The image type to create. The following options are understood (defaults to ``squashfs``):
@@ -75,8 +79,9 @@ The image file is constructed from some of the variables in ``profiledef.sh``: `
 bootstrap_packages.arch
 =======================
 
-All packages to be installed into the environment of a bootstrap image have to be listed in an architecture specific
-file (e.g. ``bootstrap_packages.x86_64``), which resides top-level in the profile.
+All packages to be installed into the environment of a bootstrap image have to be listed in a file specified by the
+``bootstrap_packages`` variable or the architecture specific ``bootstrap_packages.${arch}`` file
+(e.g. ``bootstrap_packages.x86_64``) which resides top-level in the profile, otherwise.
 
 Packages have to be listed one per line. Lines starting with a ``#`` and blank lines are ignored.
 
@@ -85,8 +90,9 @@ This file is required when generating bootstrap images using the ``bootstrap`` b
 packages.arch
 =============
 
-All packages to be installed into the environment of an ISO image have to be listed in an architecture specific file
-(e.g. ``packages.x86_64``), which resides top-level in the profile.
+All packages to be installed into the environment of an ISO image have to be listed in a file specified by the
+``packages`` variable or the architecture specific ``packages.${arch}`` file (e.g. ``packages.x86_64``) which resides
+top-level in the profile, otherwise.
 
 Packages have to be listed one per line. Lines starting with a ``#`` and blank lines are ignored.
 

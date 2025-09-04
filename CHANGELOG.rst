@@ -8,6 +8,8 @@ Changelog
 Added
 -----
 
+- Document the ``profiledef.sh`` file's ``packages`` and ``bootstrap_packages`` variables.
+
 Changed
 -------
 
