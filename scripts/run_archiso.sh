@@ -21,18 +21,18 @@ Usage:
 
 Options:
     -a              set accessibility support using brltty
-    -b              set boot type to 'BIOS' (default)
+    -b              set boot type to 'BIOS'
     -d              set image type to hard disk instead of optical disc
     -h              print help
     -i [image]      image to boot into
     -s              use Secure Boot (only relevant when using UEFI)
-    -u              set boot type to 'UEFI'
+    -u              set boot type to 'UEFI' (default)
     -v              use VNC display (instead of default SDL)
     -c [image]      attach an additional optical disc image (e.g. for cloud-init)
 
 Example:
     Run an image using UEFI:
-    $ run_archiso -u -i archiso-2020.05.23-x86_64.iso
+    $ run_archiso -i archiso-2020.05.23-x86_64.iso
 EOF
     printf '%s' "${usagetext}"
 }
@@ -117,7 +117,7 @@ run_image() {
 image=''
 oddimage=''
 accessibility=''
-boot_type='bios'
+boot_type='uefi'
 mediatype='cdrom'
 secure_boot='off'
 display='sdl'

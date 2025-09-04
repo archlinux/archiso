@@ -13,6 +13,8 @@ Added
 Changed
 -------
 
+- ``run_archiso`` defaults to booting the ISO with UEFI since that is the boot mode most people actually use.
+
 Deprecated
 ----------
 
