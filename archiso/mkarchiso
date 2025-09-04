@@ -1775,16 +1775,9 @@ _read_profile() {
 
         # Resolve paths of files that are expected to reside in the profile's directory
         [[ -n "$arch" ]] || arch="$(uname -m)"
-        [[ -n "$packages" ]] || packages="${profile}/packages.${arch}"
-        packages="$(realpath -- "${packages}")"
+        packages="$(realpath -- "${packages:-${profile}/packages.${arch}}")"
+        bootstrap_packages="$(realpath -- "${bootstrap_packages:-${profile}/bootstrap_packages.${arch}}")"
         pacman_conf="$(realpath -- "${pacman_conf}")"
-
-        # Resolve paths of files that may reside in the profile's directory
-        if [[ -z "$bootstrap_packages" ]] && [[ -e "${profile}/bootstrap_packages.${arch}" ]]; then
-            bootstrap_packages="${profile}/bootstrap_packages.${arch}"
-            bootstrap_packages="$(realpath -- "${bootstrap_packages}")"
-            pacman_conf="$(realpath -- "${pacman_conf}")"
-        fi
 
         cd -- "${OLDPWD}"
     fi

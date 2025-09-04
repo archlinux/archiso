@@ -17,6 +17,8 @@ Deprecated
 Fixed
 -----
 
+- Correctly resolve relative paths in the ``profiledef.sh`` file's ``bootstrap_packages`` variable.
+
 Removed
 -------
 
