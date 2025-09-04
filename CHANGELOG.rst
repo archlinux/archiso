@@ -9,6 +9,8 @@ Added
 -----
 
 - Document the ``profiledef.sh`` file's ``packages`` and ``bootstrap_packages`` variables.
+- When using GRUB (only used by the baseline profile) or ``loopback.cfg``, support detecting the UEFI shell on other
+  architectures. This allows to reuse these files in case someone wants to port the profiles to non-x86_64.
 
 Changed
 -------
