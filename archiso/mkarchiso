@@ -1696,7 +1696,8 @@ _build_bootstrap_image() {
 
     _msg_info "Creating bootstrap image..."
     rm -f -- "${out_dir:?}/${image_name:?}"
-    bsdtar -cf - "root.${arch}" "pkglist.${arch}.txt" | "${bootstrap_tarball_compression[@]}" >"${out_dir}/${image_name}"
+    bsdtar -cf - "root.${arch}" "pkglist.${arch}.txt" 'version' \
+        | "${bootstrap_tarball_compression[@]}" >"${out_dir}/${image_name}"
     _msg_info "Done!"
     du -h -- "${out_dir}/${image_name}"
     cd -- "${OLDPWD}"
@@ -1900,15 +1901,19 @@ _make_version() {
     local _os_release
 
     _msg_info "Creating version files..."
-    # Write version file to system installation dir
-    rm -f -- "${pacstrap_dir}/version"
-    printf '%s\n' "${iso_version}" >"${pacstrap_dir}/version"
 
     if [[ "${buildmode}" == @("iso"|"netboot") ]]; then
+        # Write version file to system installation dir
+        rm -f -- "${pacstrap_dir}/version"
+        printf '%s\n' "${iso_version}" >"${pacstrap_dir}/version"
+
         install -d -m 0755 -- "${isofs_dir}/${install_dir}"
         # Write version file to ISO 9660
         printf '%s\n' "${iso_version}" >"${isofs_dir}/${install_dir}/version"
-
+    elif [[ "${buildmode}" == 'bootstrap' ]]; then
+        # Write version file to the root of the tarball
+        rm -f -- "${bootstrap_parent}/version"
+        printf '%s\n' "${iso_version}" >"${bootstrap_parent}/version"
     fi
     if [[ "${buildmode}" == "iso" ]]; then
         # Write a limited grubenv with version information to install_dir on ISO 9660 for use cases where only the

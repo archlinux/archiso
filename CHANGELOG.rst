@@ -22,6 +22,8 @@ Fixed
 -----
 
 - Correctly resolve relative paths in the ``profiledef.sh`` file's ``bootstrap_packages`` variable.
+- Do not modify the ``os-release`` file or add a ``version`` file to the bootstrap tarball's ``root.${arch}`` directory.
+  Place the ``version`` file in the tarball's top level directory instead.
 
 Removed
 -------
