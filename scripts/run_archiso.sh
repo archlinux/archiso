@@ -17,7 +17,7 @@ print_help() {
     local usagetext
     IFS='' read -r -d '' usagetext <<EOF || true
 Usage:
-    run_archiso [options]
+    ${app_name} [options]
 
 Options:
     -a              set accessibility support using brltty
@@ -45,7 +45,7 @@ cleanup_working_dir() {
 
 copy_ovmf_vars() {
     if [[ ! -f '/usr/share/edk2/x64/OVMF_VARS.4m.fd' ]]; then
-        printf 'ERROR: %s\n' "OVMF_VARS.4m.fd not found. Install edk2-ovmf."
+        printf '[%s] ERROR: %s\n' "$app_name" "OVMF_VARS.4m.fd not found. Install edk2-ovmf." >&2
         exit 1
     fi
     cp -av -- '/usr/share/edk2/x64/OVMF_VARS.4m.fd' "${working_dir}/"
@@ -53,11 +53,11 @@ copy_ovmf_vars() {
 
 check_image() {
     if [[ -z "$image" ]]; then
-        printf 'ERROR: %s\n' "Image name can not be empty."
+        printf '[%s] ERROR: Image name can not be empty.\n' "$app_name" >&2
         exit 1
     fi
     if [[ ! -f "$image" ]]; then
-        printf 'ERROR: %s\n' "Image file (${image}) does not exist."
+        printf '[%s] ERROR: Image file (%s) does not exist.\n' "$app_name" "$image" >&2
         exit 1
     fi
 }
@@ -66,7 +66,7 @@ run_image() {
     if [[ "$boot_type" == 'uefi' ]]; then
         copy_ovmf_vars
         if [[ "${secure_boot}" == 'on' ]]; then
-            printf '%s\n' 'Using Secure Boot'
+            printf '[%s] Using Secure Boot\n' "$app_name"
             local ovmf_code='/usr/share/edk2/x64/OVMF_CODE.secboot.4m.fd'
         else
             local ovmf_code='/usr/share/edk2/x64/OVMF_CODE.4m.fd'
@@ -114,6 +114,7 @@ run_image() {
         -no-reboot
 }
 
+readonly app_name="${0##*/}"
 image=''
 oddimage=''
 accessibility=''
@@ -158,7 +159,7 @@ if (( ${#@} > 0 )); then
                 qemu_options+=(-vnc 'vnc=0.0.0.0:0,vnc=[::]:0')
                 ;;
             *)
-                printf '%s\n' "Error: Wrong option. Try 'run_archiso -h'."
+                printf '[%s] Error: Wrong option. Try "%s -h".\n' "$app_name" "$app_name" >&2
                 exit 1
                 ;;
         esac

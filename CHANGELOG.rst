@@ -27,6 +27,7 @@ Changed
   entries for x86_64 are an exception to support x86_64 systems with IA32 UEFI.
 - Rename ``bootstrap_packages.x86_64`` to ``bootstrap_packages`` to simplify reusing them when porting to non-x86_64
   architectures.
+- Print ``run_archiso`` errors to stderr and show the application name in them.
 
 Deprecated
 ----------
