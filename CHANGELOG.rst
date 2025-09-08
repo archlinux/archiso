@@ -12,6 +12,7 @@ Added
   and LoongArch 64. Cross-architecture building is not supported.
 - Read package lists from ``bootstrap_packages`` and ``packages`` if they exist, but ``bootstrap_packages.${arch}`` and
   ``packages.${arch}`` do not.
+- Support i686, aarch64 and riscv64 in the ``run_archiso`` script.
 
 Changed
 -------
