@@ -10,6 +10,8 @@ Added
 
 - Support other architectures. In theory it should now be possible to create UEFI bootable ISOs on AArch64, RISC-V 64
   and LoongArch 64. Cross-architecture building is not supported.
+- Read package lists from ``bootstrap_packages`` and ``packages`` if they exist, but ``bootstrap_packages.${arch}`` and
+  ``packages.${arch}`` do not.
 
 Changed
 -------

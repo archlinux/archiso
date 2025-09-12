@@ -1521,7 +1521,15 @@ _read_profile() {
 
         # Resolve paths of files that are expected to reside in the profile's directory
         [[ -n "$arch" ]] || arch="$(uname -m)"
+        # Use "packages" if it exists but "packages.${arch}" does not
+        if [[ -z "$packages" && ! -e "${profile}/packages.${arch}" && -e "${profile}/packages" ]]; then
+            packages="${profile}/packages"
+        fi
         packages="$(realpath -- "${packages:-${profile}/packages.${arch}}")"
+        # Use "bootstrap_packages" if it exists but "bootstrap_packages.${arch}" does not
+        if [[ -z "$bootstrap_packages" && ! -e "${profile}/bootstrap_packages.${arch}" && -e "${profile}/bootstrap_packages" ]]; then
+            bootstrap_packages="${profile}/bootstrap_packages"
+        fi
         bootstrap_packages="$(realpath -- "${bootstrap_packages:-${profile}/bootstrap_packages.${arch}}")"
         pacman_conf="$(realpath -- "${pacman_conf}")"
 

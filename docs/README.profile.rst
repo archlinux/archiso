@@ -74,8 +74,9 @@ bootstrap_packages.arch
 =======================
 
 All packages to be installed into the environment of a bootstrap image have to be listed in a file specified by the
-``bootstrap_packages`` variable or the architecture specific ``bootstrap_packages.${arch}`` file
-(e.g. ``bootstrap_packages.x86_64``) which resides top-level in the profile, otherwise.
+``bootstrap_packages`` variable. If the variable is not specified, the architecture specific
+``bootstrap_packages.${arch}`` file (e.g. ``bootstrap_packages.x86_64``) or the ``bootstrap_packages`` file which reside
+top-level in the profile will be used instead.
 
 Packages have to be listed one per line. Lines starting with a ``#`` and blank lines are ignored.
 
@@ -85,8 +86,8 @@ packages.arch
 =============
 
 All packages to be installed into the environment of an ISO image have to be listed in a file specified by the
-``packages`` variable or the architecture specific ``packages.${arch}`` file (e.g. ``packages.x86_64``) which resides
-top-level in the profile, otherwise.
+``packages`` variable. If the variable is not specified, the architecture specific ``packages.${arch}`` file (e.g.
+``packages.x86_64``) or the ``packages`` file which reside top-level in the profile will be used instead.
 
 Packages have to be listed one per line. Lines starting with a ``#`` and blank lines are ignored.
 
