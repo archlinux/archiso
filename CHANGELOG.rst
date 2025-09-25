@@ -23,6 +23,21 @@ Changed
 Deprecated
 ----------
 
+- The ``bios.syslinux.eltorito`` and ``bios.syslinux.mbr`` boot modes are replaced by the ``bios.syslinux`` boot mode.
+  If you are using ``bios.syslinux.eltorito`` or ``bios.syslinux.mbr`` in your ``profiledef.sh``, replace them with a
+  single ``bios.syslinux``.
+- The ``uefi-x64.systemd-boot.eltorito``, ``uefi-x64.systemd-boot.esp``, ``uefi-ia32.systemd-boot.eltorito`` and
+  ``uefi-ia32.systemd-boot.eltorito`` boot modes are replaced by the single ``uefi.systemd-boot`` boot mode.
+  Both x64 and IA32 architectures are covered by this new combined boot mode.
+  If you are using ``uefi-x64.systemd-boot.eltorito``, ``uefi-x64.systemd-boot.esp``,
+  ``uefi-ia32.systemd-boot.eltorito`` or ``uefi-ia32.systemd-boot.eltorito`` in your ``profiledef.sh``, replace them
+  with a single ``uefi.systemd-boot``.
+- The ``uefi-x64.grub.eltorito``, ``uefi-x64.grub.esp``, ``uefi-ia32.grub.eltorito`` and ``uefi-ia32.grub.eltorito``
+  boot modes are replaced by a single ``uefi.grub``.
+  Both x64 and IA32 architectures are covered by this new combined boot mode.
+  If you are using the ``uefi-x64.grub.eltorito``, ``uefi-x64.grub.esp``, ``uefi-ia32.grub.eltorito`` or
+  ``uefi-ia32.grub.eltorito`` boot modes in your ``profiledef.sh``, replace them with a single ``uefi.grub``.
+
 Fixed
 -----
 
