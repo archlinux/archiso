@@ -8,6 +8,25 @@ Changelog
 Added
 -----
 
+Changed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+
+Removed
+-------
+
+
+[86] - 2025-09-25
+=================
+
+Added
+-----
+
 - Document the ``profiledef.sh`` file's ``packages`` and ``bootstrap_packages`` variables.
 - When using GRUB (only used by the baseline profile) or ``loopback.cfg``, support detecting the UEFI shell on other
   architectures. This allows to reuse these files in case someone wants to port the profiles to non-x86_64.
@@ -45,9 +64,6 @@ Fixed
 - Do not modify the ``os-release`` file or add a ``version`` file to the bootstrap tarball's ``root.${arch}`` directory.
   Place the ``version`` file in the tarball's top level directory instead.
 - Do not show the systemd-boot boot entry for x64 Memtest86+ in IA32 UEFI.
-
-Removed
--------
 
 [85] - 2025-07-28
 =================
