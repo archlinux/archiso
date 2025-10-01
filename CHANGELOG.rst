@@ -19,6 +19,8 @@ Changed
   mirrors. The default mirrorlist's top mirror is fast enough for most people.
 - Only uncomment HTTPS mirrors in ``/etc/pacman.d/mirrorlist``. Those who want to use HTTP mirrors can uncomment them
   manually.
+- The profiles do not hardcode the ``arch`` variable  in ``profiledef.sh`` anymore and instead rely on ``mkarchiso``
+  filling it in from ``uname -m``.
 
 Deprecated
 ----------

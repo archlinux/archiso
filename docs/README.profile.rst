@@ -49,8 +49,8 @@ The image file is constructed from some of the variables in ``profiledef.sh``: `
     booting (IA32 UEFI) will also be added.
   - ``uefi.systemd-boot``: systemd-boot for UEFI booting. For the x86_64 architecture, in addition to x64 UEFI, support
     for mixed-mode booting (IA32 UEFI) will also be added.
-* ``arch``: The architecture (e.g. ``x86_64``) to build the image for. This is also used to resolve the name of the packages
-  file (e.g. ``packages.x86_64``)
+* ``arch``: The architecture (e.g. ``x86_64``) to build the image for (defaults to the value returned by ``uname -m``).
+  This is also used to resolve the name of the packages file (e.g. ``packages.x86_64``)
 * ``packages``: File path to a text file containing a list of packages to install into the environment in ``iso`` and
   ``netboot`` build modes (defaults to ``packages.${arch}``).
 * ``bootstrap_packages``: File path to a text file containing a list of packages to install into the environment in the
