@@ -21,6 +21,8 @@ Changed
   manually.
 - The profiles do not hardcode the ``arch`` variable  in ``profiledef.sh`` anymore and instead rely on ``mkarchiso``
   filling it in from ``uname -m``.
+- UEFI-architecture-specific systemd-boot boot entry files for foreign UEFI architectures are not added to the ISO. IA32
+  entries for x86_64 are an exception to support x86_64 systems with IA32 UEFI.
 
 Deprecated
 ----------

@@ -164,7 +164,8 @@ It contains configuration for `systemd-boot
     root of an EFI system partition.
 
 The *custom template identifiers* are **only** understood in the boot loader entry `.conf` files (i.e. **not** in
-``loader.conf``).
+``loader.conf``). Boot entries for foreign UEFI architectures will be skipped with the exception of IA32 boot entries
+when building for the x86_64 architecture.
 
 syslinux
 --------

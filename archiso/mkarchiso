@@ -818,7 +818,7 @@ _make_common_bootmode_uefi.systemd-boot_copy_files() {
 
 # Prepare systemd-boot
 _make_bootmode_uefi.systemd-boot() {
-    local _conf _file _available_ucodes=()
+    local _conf _file _available_ucodes=() boot_entry_arch
 
     _msg_info "Setting up systemd-boot for UEFI booting..."
 
@@ -826,6 +826,14 @@ _make_bootmode_uefi.systemd-boot() {
     install -d -m 0755 -- "${work_dir}/loader" "${work_dir}/loader/entries"
     install -m 0644 -- "${profile}/efiboot/loader/loader.conf" "${work_dir}/loader"
     for _conf in "${profile}/efiboot/loader/entries/"*".conf"; do
+        # Extract the UEFI architecture from the boot entry file
+        if boot_entry_arch="$(grep -Pao -- '^architecture\s+\K\w+' "${_conf}" 2>/dev/null)"; then
+            # Skip adding boot entry files for foreign UEFI architectures (unless when on x86_64 and adding IA32 boot entries)
+            if ! [[ "${boot_entry_arch^^}" == "${uefi_arch[$arch]^^}" || ( "$arch" == 'x86_64' && "${boot_entry_arch^^}" == 'IA32' ) ]]; then
+                continue
+            fi
+        fi
+
         sed "s|%ARCHISO_LABEL%|${iso_label}|g;
              s|%ARCHISO_UUID%|${iso_uuid}|g;
              s|%INSTALL_DIR%|${install_dir}|g;
