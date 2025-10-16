@@ -77,6 +77,26 @@ _msg_error() {
     fi
 }
 
+# Check if mkarchiso is running in a simulated environment
+_check_host_environment() {
+    if [[ "$(id -u)" -eq 0 ]]; then
+        virt_type="$(systemd-detect-virt 2>/dev/null || echo unknown)"
+
+        if [[ "$virt_type" == "none" ]]; then
+            _msg_warning "mkarchiso appears to be running directly on your host system."
+            _msg_warning "Running mkarchiso outside a chroot, VM, or container may damage your system."
+            _msg_warning "Detected environment: $virt_type"
+            read -rp "Continue anyway? [y/N]: " ans
+            [[ "$ans" =~ ^[Yy]$ ]] || {
+                echo "Aborted."
+                exit 1
+            }
+        else
+            _msg_info "Detected virtualized environment: $virt_type."
+        fi
+    fi
+}
+
 # Show help usage, with an exit status.
 # $1: exit status number.
 _usage() {
@@ -1813,6 +1833,8 @@ fi
 if (( EUID != 0 )); then
     _msg_error "${app_name} must be run as root." 1
 fi
+
+_check_host_environment()
 
 # get the absolute path representation of the first non-option argument
 profile="$(realpath -- "${1}")"
