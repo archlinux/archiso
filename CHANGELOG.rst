@@ -15,6 +15,8 @@ Changed
 -------
 
 - Show the FAT image size in MiB instead of KiB to make it easier to comprehend.
+- ``reflector.service`` is no longer enabled by default in the releng profile since it takes too long to rate the
+  mirrors. The default mirrorlist's top mirror is fast enough for most people.
 
 Deprecated
 ----------
