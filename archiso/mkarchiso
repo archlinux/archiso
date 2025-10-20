@@ -547,7 +547,7 @@ _make_efibootimg() {
     # The FAT image must be created with mkfs.fat not mformat, as some systems have issues with mformat made images:
     # https://lists.gnu.org/archive/html/grub-devel/2019-04/msg00099.html
     rm -f -- "${efibootimg}"
-    _msg_info "Creating FAT image of size: ${imgsize_kib} KiB..."
+    _msg_info "Creating FAT image of size: $(( imgsize_kib / 1024 )) MiB..."
     if [[ "${quiet}" == "y" ]]; then
         # mkfs.fat does not have a -q/--quiet option, so redirect stdout to /dev/null instead
         # https://github.com/dosfstools/dosfstools/issues/103

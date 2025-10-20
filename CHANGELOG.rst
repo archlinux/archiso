@@ -14,6 +14,8 @@ Added
 Changed
 -------
 
+- Show the FAT image size in MiB instead of KiB to make it easier to comprehend.
+
 Deprecated
 ----------
 
