@@ -31,6 +31,8 @@ Fixed
 -----
 
 - Fixed deprecated boot mode upgrading.
+- Ensure the ISO always contains the kernel and initramfs regardless of the used boot modes, so that an installation
+  medium created via file system transposition is bootable.
 
 Removed
 -------
