@@ -525,19 +525,17 @@ _make_boot_on_fat() {
 }
 
 # Create a FAT image (efiboot.img) which will serve as the EFI system partition
-# $1: image size in bytes
 _make_efibootimg() {
-    local imgsize_kib="0"
-    local imgsize_bytes=${1}
+    local -i imgsize_kib=0
     local mkfs_fat_opts=(-C -n ARCHISO_EFI)
 
-    # Convert from bytes to KiB and round up to the next full MiB with an additional 8 MiB for reserved sectors, file
-    # and directory entries and to allow adding custom files when repacking the ISO.
-    imgsize_kib="$(
-        awk 'function ceil(x){return int(x)+(x>int(x))}
-            function byte_to_kib(x){return x/1024}
-            function mib_to_kib(x){return x*1024}
-            END {print mib_to_kib(ceil((byte_to_kib($1)+8192)/1024))}' <<<"${imgsize_bytes}"
+    # Calculate the file size in bytes, convert to KiB and round up to the next full MiB with an additional 8 MiB for
+    # reserved sectors, file and directory entries and to allow adding custom files when repacking the ISO.
+    imgsize_kib="$(du -bcs -- "${efiboot_files[@]}" 2>/dev/null \
+        | awk 'function ceil(x){return int(x)+(x>int(x))}
+              function byte_to_kib(x){return x/1024}
+              function mib_to_kib(x){return x*1024}
+              END {print mib_to_kib(ceil((byte_to_kib($1)+8192)/1024))}'
     )"
 
     # Use FAT32 as early as possible. mkfs.fat selects FAT32 if the size ≥ 512 MiB, but a FAT32 file system can already
@@ -676,7 +674,6 @@ _make_common_grubenv_and_loopbackcfg() {
 # Prepare GRUB
 _make_bootmode_uefi.grub() {
     local grub_target grubmodules=() files_to_copy=()
-    local -i efiboot_imgsize
 
     _msg_info "Setting up GRUB for UEFI booting..."
 
@@ -721,8 +718,7 @@ _make_bootmode_uefi.grub() {
     fi
 
     # Create a FAT image for the EFI system partition
-    efiboot_imgsize="$(du -bcs -- "${efiboot_files[@]}" 2>/dev/null | awk 'END { print $1 }')"
-    _make_efibootimg "$efiboot_imgsize"
+    _make_efibootimg
 
     # Additionally set up GRUB in ISO 9660. This allows creating a medium for the live environment by using
     # manual partitioning and simply copying the ISO 9660 file system contents.
@@ -823,7 +819,6 @@ _make_common_bootmode_uefi.systemd-boot_copy_files() {
 # Prepare systemd-boot
 _make_bootmode_uefi.systemd-boot() {
     local _conf _file _available_ucodes=()
-    local -i efiboot_imgsize
 
     _msg_info "Setting up systemd-boot for UEFI booting..."
 
@@ -860,9 +855,8 @@ _make_bootmode_uefi.systemd-boot() {
                         "${pacstrap_dir}/boot/memtest86+/memtest.efi"
                         "${pacstrap_dir}/usr/share/licenses/spdx/GPL-2.0-only.txt")
     fi
-    efiboot_imgsize="$(du -bcs -- "${efiboot_files[@]}" 2>/dev/null | awk 'END { print $1 }')"
     # Create a FAT image for the EFI system partition
-    _make_efibootimg "$efiboot_imgsize"
+    _make_efibootimg
 
     # Additionally set up systemd-boot in ISO 9660. This allows creating a medium for the live environment by using
     # manual partitioning and simply copying the ISO 9660 file system contents.
