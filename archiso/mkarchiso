@@ -791,18 +791,32 @@ _make_bootmode_uefi.grub() {
         install -m 0644 -- "${pacstrap_dir}/usr/share/edk2-shell/${uefi_arch[$arch],,}/Shell_Full.efi" \
             "${isofs_dir}/shell${uefi_arch[$arch],,}.efi"
     fi
+
+    # Memtest86+
+    if [[ -e "${boot_dir}/memtest86+/memtest86${uefi_arch[$arch],,}.efi" ]]; then
+        install -d -m 0755 -- "${isofs_dir}/boot/memtest86+/"
+        install -m 0644 -- "${boot_dir}/memtest86+/memtest86${uefi_arch[$arch],,}.efi" \
+            "${isofs_dir}/boot/memtest86+/"
+        install -m 0644 -- "${pacstrap_dir}/usr/share/licenses/spdx/GPL-2.0-only.txt" \
+            "${isofs_dir}/boot/memtest86+/LICENSE"
+    fi
+
+    # Files for mixed mode booting
     if [[ "$arch" == 'x86_64' ]]; then
         # UEFI shell for x86_64 systems with IA32 UEFI
         if [[ -e "${pacstrap_dir}/usr/share/edk2-shell/ia32/Shell_Full.efi" ]]; then
             install -m 0644 -- "${pacstrap_dir}/usr/share/edk2-shell/ia32/Shell_Full.efi" "${isofs_dir}/shellia32.efi"
         fi
 
-        # Copy Memtest86+
-        # Only the x64 binary is built. See https://gitlab.archlinux.org/archlinux/packaging/packages/memtest86plus/-/merge_requests/2
-        if [[ -e "${boot_dir}/memtest86+/memtest.efi" ]]; then
-            install -d -m 0755 -- "${isofs_dir}/boot/memtest86+/"
-            install -m 0644 -- "${boot_dir}/memtest86+/memtest.efi" "${isofs_dir}/boot/memtest86+/memtest.efi"
-            install -m 0644 -- "${pacstrap_dir}/usr/share/licenses/spdx/GPL-2.0-only.txt" "${isofs_dir}/boot/memtest86+/LICENSE"
+        # Memtest86+ for IA32 UEFI
+        if [[ -e "${boot_dir}/memtest86+/memtest86ia32.efi" ]]; then
+            if [[ ! -e "${isofs_dir}/boot/memtest86+/LICENSE" ]]; then
+                install -d -m 0755 -- "${isofs_dir}/boot/memtest86+/"
+                install -m 0644 -- "${pacstrap_dir}/usr/share/licenses/spdx/GPL-2.0-only.txt" \
+                    "${isofs_dir}/boot/memtest86+/LICENSE"
+            fi
+            install -m 0644 -- "${boot_dir}/memtest86+/memtest86ia32.efi" \
+                "${isofs_dir}/boot/memtest86+/"
         fi
     fi
 
@@ -850,13 +864,14 @@ _make_common_bootmode_uefi.systemd-boot_copy_files() {
     fi
 
     # Copy Memtest86+
-    # Only the x64 binary is built. See https://gitlab.archlinux.org/archlinux/packaging/packages/memtest86plus/-/merge_requests/2
-    if [[ "$target_arch" == 'x64' ]]; then
-        if [[ -e "${boot_dir}/memtest86+/memtest.efi" ]]; then
+    if [[ -e "${boot_dir}/memtest86+/memtest86${target_arch,,}.efi" ]]; then
+        if [[ ! -e "${isofs_dir}/boot/memtest86+/LICENSE" ]]; then
             install -d -m 0755 -- "${isofs_dir}/boot/memtest86+/"
-            install -m 0644 -- "${boot_dir}/memtest86+/memtest.efi" "${isofs_dir}/boot/memtest86+/memtest.efi"
-            install -m 0644 -- "${pacstrap_dir}/usr/share/licenses/spdx/GPL-2.0-only.txt" "${isofs_dir}/boot/memtest86+/LICENSE"
+            install -m 0644 -- "${pacstrap_dir}/usr/share/licenses/spdx/GPL-2.0-only.txt" \
+                "${isofs_dir}/boot/memtest86+/LICENSE"
         fi
+        install -m 0644 -- "${pacstrap_dir}/boot/memtest86+/memtest86${target_arch,,}.efi" \
+            "${isofs_dir}/boot/memtest86+/"
     fi
 }
 
@@ -914,7 +929,7 @@ _make_bootmode_uefi.systemd-boot() {
     efiboot_files=("${isofs_dir}/EFI/"
                    "${isofs_dir}/loader/"
                    "${isofs_dir}/shell"*'.efi'
-                   "${isofs_dir}/boot/memtest86+/memtest.efi"
+                   "${isofs_dir}/boot/memtest86+/memtest"*'.efi'
                    "${isofs_dir}/boot/memtest86+/LICENSE"
                    "${boot_dir}/vmlinuz-"*
                    "${boot_dir}/initramfs-"*".img"
@@ -930,10 +945,10 @@ _make_bootmode_uefi.systemd-boot() {
         efiboot_rootdir_files+=("${isofs_dir}/shell"*'.efi')
     fi
     mcopy -s -i "${efibootimg}" "${efiboot_rootdir_files[@]}" '::/'
-    if [[ -e "${isofs_dir}/boot/memtest86+/memtest.efi" ]]; then
+    if compgen -G "${isofs_dir}/boot/memtest86+/memtest"*'.efi' >/dev/null; then
         mmd -i "${efibootimg}" '::/boot' '::/boot/memtest86+'
         mcopy -i "${efibootimg}" \
-            "${isofs_dir}/boot/memtest86+/memtest.efi" "${isofs_dir}/boot/memtest86+/LICENSE" '::/boot/memtest86+/'
+            "${isofs_dir}/boot/memtest86+/memtest"*'.efi' "${isofs_dir}/boot/memtest86+/LICENSE" '::/boot/memtest86+/'
     fi
 
     # Copy kernel and initramfs to FAT image.
@@ -1038,7 +1053,7 @@ _validate_common_requirements_bootmode_uefi() {
         _msg_info "'edk2-shell' is not in the package list. The ISO will not contain a bootable UEFI shell."
     fi
     # shellcheck disable=SC2076
-    if [[ "$arch" == 'x86_64'  && ! " ${pkg_list[*]} " =~ ' memtest86+-efi ' ]]; then
+    if [[ "$arch" == @('x86_64'|'aarch64'|'loongarch64')  && ! " ${pkg_list[*]} " =~ ' memtest86+-efi ' ]]; then
         _msg_info "Validating '${bootmode}': 'memtest86+-efi' is not in the package list. Memory testing will not be available from the UEFI boot loader."
     fi
 }
