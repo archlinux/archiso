@@ -944,7 +944,7 @@ _validate_requirements_bootmode_bios.syslinux.eltorito() {
 
 _validate_requirements_bootmode_bios.syslinux.mbr() {
     _msg_warning "The '${bootmode}' boot mode is deprecated. Use 'bios.syslinux' instead."
-    bootmodes=("${bootmodes[@]/${bootmode}}")
+    _remove_deprecated_boot_mode
     # shellcheck disable=SC2076
     if [[ ! " ${bootmodes[*]} " =~ ' bios.syslinux ' ]]; then
         bootmodes+=('bios.syslinux')
@@ -1013,7 +1013,7 @@ _validate_requirements_bootmode_uefi.systemd-boot() {
 
 _validate_requirements_bootmode_uefi-x64.systemd-boot.esp() {
     _msg_warning "The '${bootmode}' boot mode is deprecated. Use 'uefi.systemd-boot' instead."
-    bootmodes=("${bootmodes[@]/${bootmode}}")
+    _remove_deprecated_boot_mode
     # shellcheck disable=SC2076
     if [[ ! " ${bootmodes[*]} " =~ ' uefi.systemd-boot ' ]]; then
         bootmodes+=('uefi.systemd-boot')
@@ -1079,7 +1079,7 @@ _validate_requirements_bootmode_uefi-ia32.grub.eltorito() {
 }
 _validate_requirements_bootmode_uefi-x64.grub.esp() {
     _msg_warning "The '${bootmode}' boot mode is deprecated. Use 'uefi.grub' instead."
-    bootmodes=("${bootmodes[@]/${bootmode}}")
+    _remove_deprecated_boot_mode
     # shellcheck disable=SC2076
     if [[ ! " ${bootmodes[*]} " =~ ' uefi.grub ' ]]; then
         bootmodes+=('uefi.grub')
@@ -1089,6 +1089,22 @@ _validate_requirements_bootmode_uefi-x64.grub.esp() {
 _validate_requirements_bootmode_uefi-x64.grub.eltorito() {
     # uefi-x64.grub.eltorito has the exact same requirements as uefi-x64.grub.esp
     _validate_requirements_bootmode_uefi-x64.grub.esp
+}
+
+# Remove deprecated boot mode from the bootmodes array
+_remove_deprecated_boot_mode() {
+    local -i bootmodes_index
+
+    # Find the array index of the deprecated boot mode
+    for bootmodes_index in "${!bootmodes[@]}"; do
+        if [[ "$bootmode" == "${bootmodes[${bootmodes_index}]}" ]]; then
+            # Remove the deprecated boot mode
+            unset "bootmodes[${bootmodes_index}]"
+            # Reindex the array
+            bootmodes=("${bootmodes[@]}")
+            break
+        fi
+    done
 }
 
 # Build airootfs filesystem image

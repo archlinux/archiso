@@ -20,6 +20,8 @@ Deprecated
 Fixed
 -----
 
+- Fixed deprecated boot mode upgrading.
+
 Removed
 -------
 
