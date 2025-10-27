@@ -84,6 +84,33 @@ check_image() {
 }
 
 run_image() {
+    local -a qemu_options
+
+    # Set default qemu options
+    qemu_options=(
+        -boot 'order=d,menu=on,reboot-timeout=5000'
+        -m "size=3072,slots=0,maxmem=$((3072*1024*1024))"
+        -cpu max
+        -smp 4
+        -k en-us
+        -name 'archiso,process=archiso_0'
+        -device 'virtio-scsi-pci,id=scsi0'
+        -display "${display}"
+        -audiodev 'pa,id=snd0'
+        -device ich9-intel-hda
+        -device 'hda-output,audiodev=snd0'
+        -device 'virtio-net-pci,romfile=,netdev=net0'
+        -netdev 'user,id=net0,hostfwd=tcp::60022-:22'
+        -device qemu-xhci
+        -device usb-kbd
+        -device usb-mouse
+        -device usb-tablet
+        -device "scsi-${mediatype%rom},bus=scsi0.0,drive=${mediatype}0"
+        -drive "id=${mediatype}0,if=none,format=raw,media=${mediatype/hd/disk},read-only=on,file=${image}"
+        -serial stdio
+        -no-reboot
+    )
+
     # Use KVM acceleration if possible
     if [[ "$arch" == "$(uname -m)" || ( "$arch" == 'i686' && "$(uname -m)" == 'x86_64' ) ]]; then
         qemu_options+=(-enable-kvm)
@@ -110,18 +137,21 @@ run_image() {
 
     if [[ "$boot_type" == 'uefi' ]]; then
         cp -av -- "${ovmf_vars[$arch]}" "${working_dir}/"
-        if [[ "${secure_boot}" == 'on' ]]; then
-            printf '[%s] Using Secure Boot\n' "$app_name"
-        fi
 
         qemu_options+=(
             '-drive' "if=pflash,format=raw,unit=0,file=${ovmf_code[$arch]},read-only=on"
             '-drive' "if=pflash,format=raw,unit=1,file=${working_dir}/${ovmf_vars[$arch]##*/}"
-            '-global' "driver=cfi.pflash01,property=secure,value=${secure_boot}"
         )
+
+        if (( secure_boot )); then
+            printf '[%s] Using Secure Boot\n' "$app_name"
+            qemu_options+=('-global' 'driver=cfi.pflash01,property=secure,value=on')
+        else
+            qemu_options+=('-global' 'driver=cfi.pflash01,property=secure,value=off')
+        fi
     fi
 
-    if [[ "${accessibility}" == 'on' ]]; then
+    if (( accessibility )); then
         qemu_options+=(
             '-chardev' 'braille,id=brltty'
             '-device' 'usb-braille,id=usbbrl,chardev=brltty'
@@ -135,41 +165,24 @@ run_image() {
         )
     fi
 
-    "$qemu_command" \
-        -boot order=d,menu=on,reboot-timeout=5000 \
-        -m "size=3072,slots=0,maxmem=$((3072*1024*1024))" \
-        -cpu max \
-        -smp 4 \
-        -k en-us \
-        -name archiso,process=archiso_0 \
-        -device virtio-scsi-pci,id=scsi0 \
-        -display "${display}" \
-        -audiodev pa,id=snd0 \
-        -device ich9-intel-hda \
-        -device hda-output,audiodev=snd0 \
-        -device virtio-net-pci,romfile=,netdev=net0 -netdev user,id=net0,hostfwd=tcp::60022-:22 \
-        -device qemu-xhci \
-        -device usb-kbd \
-        -device usb-mouse \
-        -device usb-tablet \
-        -device "scsi-${mediatype%rom},bus=scsi0.0,drive=${mediatype}0" \
-        -drive "id=${mediatype}0,if=none,format=raw,media=${mediatype/hd/disk},read-only=on,file=${image}" \
-        "${qemu_options[@]}" \
-        -serial stdio \
-        -no-reboot
+    if (( use_vnc )); then
+        qemu_options+=(-vnc 'vnc=0.0.0.0:0,vnc=[::]:0')
+    fi
+
+    "$qemu_command" "${qemu_options[@]}"
 }
 
 readonly app_name="${0##*/}"
 arch="$(uname -m)"
 image=''
 oddimage=''
-accessibility=''
+declare -i accessibility=0
 boot_type='uefi'
 mediatype='cdrom'
-secure_boot='off'
+declare -i secure_boot=0
+declare -i use_vnc=0
 display='sdl'
 qemu_command=''
-qemu_options=()
 working_dir="$(mktemp -dt run_archiso.XXXXXXXXXX)"
 readonly -A ovmf_code=(['x86_64']='/usr/share/edk2/x64/OVMF_CODE.secboot.4m.fd'
                        ['aarch64']='/usr/share/edk2/aarch64/QEMU_CODE.fd'
@@ -186,7 +199,7 @@ if (( ${#@} > 0 )); then
                 arch="${OPTARG,,}"
                 ;;
             a)
-                accessibility='on'
+                accessibility=1
                 ;;
             b)
                 boot_type='bios'
@@ -208,11 +221,11 @@ if (( ${#@} > 0 )); then
                 boot_type='uefi'
                 ;;
             s)
-                secure_boot='on'
+                secure_boot=1
                 ;;
             v)
                 display='none'
-                qemu_options+=(-vnc 'vnc=0.0.0.0:0,vnc=[::]:0')
+                use_vnc=1
                 ;;
             *)
                 printf '[%s] Error: Wrong option. Try "%s -h".\n' "$app_name" "$app_name" >&2
