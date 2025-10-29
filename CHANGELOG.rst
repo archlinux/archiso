@@ -8,6 +8,24 @@ Changelog
 Added
 -----
 
+Changed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+
+Removed
+-------
+
+[87] - 2025-10-29
+=================
+
+Added
+-----
+
 - Support other architectures. In theory it should now be possible to create UEFI bootable ISOs on AArch64, RISC-V 64
   and LoongArch 64. Cross-architecture building is not supported.
 - Read package lists from ``bootstrap_packages`` and ``packages`` if they exist, but ``bootstrap_packages.${arch}`` and
@@ -30,19 +48,12 @@ Changed
   architectures.
 - Print ``run_archiso`` errors to stderr and show the application name in them.
 
-Deprecated
-----------
-
 Fixed
 -----
 
 - Fixed deprecated boot mode upgrading.
 - Ensure the ISO always contains the kernel and initramfs regardless of the used boot modes, so that an installation
   medium created via file system transposition is bootable.
-
-Removed
--------
-
 
 [86] - 2025-09-25
 =================
