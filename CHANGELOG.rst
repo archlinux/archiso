@@ -11,6 +11,9 @@ Added
 Changed
 -------
 
+- Use xz compression for the baseline profile's bootstrap tarball so that it has more differences when compared to the
+  releng profile.
+
 Deprecated
 ----------
 
