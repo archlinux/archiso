@@ -21,6 +21,9 @@ Deprecated
 Fixed
 -----
 
+- Use ``systemd-run`` to invoke ``curl`` with a transient service that depends on ``network-online.target`` since no
+  services are currently pulling in ``network_online.target``.
+
 Removed
 -------
 
