@@ -14,6 +14,7 @@ Changed
 - Use xz compression for the baseline profile's bootstrap tarball so that it has more differences when compared to the
   releng profile.
 - Match network interfaces by their type, instead of name, in systemd-networkd configuration.
+- Update ``getty@tty1.service`` drop-in file to match upstream changes.
 
 Deprecated
 ----------
