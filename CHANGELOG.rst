@@ -23,6 +23,8 @@ Fixed
 
 - Use ``systemd-run`` to invoke ``curl`` with a transient service that depends on ``network-online.target`` since no
   services are currently pulling in ``network_online.target``.
+- Fix the ``usable_cards`` variable definition in the ``livecd-sound`` accessibility script which was wrongly assigned
+  to a string rather than an array, causing the ``-p / --pick`` option to fail silently.
 
 Removed
 -------
