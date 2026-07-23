@@ -1466,7 +1466,7 @@ _build_bootstrap_image() {
     _msg_info "Creating bootstrap image..."
     rm -f -- "${out_dir:?}/${image_name:?}"
     _unshare bsdtar -cf - "root.${arch}" "pkglist.${arch}.txt" 'version' \
-        | "${bootstrap_tarball_compression[@]}" >"${out_dir}/${image_name}"
+        | _unshare "${bootstrap_tarball_compression[@]}" >"${out_dir}/${image_name}"
     _msg_info "Done!"
     du -h -- "${out_dir}/${image_name}"
     cd -- "${OLDPWD}"
