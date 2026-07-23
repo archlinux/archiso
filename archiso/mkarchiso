@@ -915,7 +915,7 @@ _make_bootmode_uefi-ia32.systemd-boot.esp() {
 
 _validate_requirements_bootmode_bios.syslinux() {
     # Check if the architecture supports BIOS booting
-    if [[ "$arch" != @('x86_64'|'i686') ]]; then
+    if [[ "$arch" != @('x86_64'|'i686'|'i486'|'pentium4') ]]; then
         (( validation_error=validation_error+1 ))
         _msg_error "Validating '${bootmode}': BIOS boot modes are not supported on the '${arch}' architecture!" 0
     fi
@@ -1775,7 +1775,7 @@ _build_iso_base() {
     _run_once _make_version
     _run_once _make_customize_airootfs
     _run_once _make_pkglist
-    if [[ "$arch" == @('x86_64'|'i686') ]]; then
+    if [[ "$arch" == @('x86_64'|'i686'|'i486'|'pentium4') ]]; then
         _run_once _check_if_initramfs_has_ucode
     fi
     # Copy the kernel and initramfs to ISO 9660 for boot loaders that can read the ISO 9660 file system and also for
