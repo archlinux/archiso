@@ -27,6 +27,7 @@ Fixed
 
 - Stop requiring ``tune2fs`` for ``ext4+squashfs`` images.
 - Validate ``install_dir`` characters for ISO and netboot builds and its length for ISO builds.
+- Create the ``grubenv`` and UUID search files regardless of the order of the ``iso`` and ``netboot`` build modes.
 - Reject profiles that use the ``uefi.systemd-boot`` and ``uefi.grub`` boot modes together.
 - Fixed a typo that prevented including the UEFI shell for UEFI architectures other than x64.
 - Correctly support compressing the bootstrap tarball with bzip2.

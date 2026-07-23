@@ -1692,21 +1692,6 @@ _make_version() {
         rm -f -- "${bootstrap_parent}/version"
         printf '%s\n' "${iso_version}" >"${bootstrap_parent}/version"
     fi
-    if [[ "${buildmode}" == "iso" ]]; then
-        # Write a limited grubenv with version information to install_dir on ISO 9660 for use cases where only the
-        # install_dir is used.
-        rm -f -- "${isofs_dir}/${install_dir}/grubenv"
-        printf '%.1024s' "$(printf '# GRUB Environment Block\nNAME=%s\nVERSION=%s\n%s' \
-            "${iso_name}" "${iso_version}" "$(printf '%0.1s' "#"{1..1024})")" \
-            >"${isofs_dir}/${install_dir}/grubenv"
-
-        # Create a /boot/YYYY-mm-dd-HH-MM-SS-00.uuid file on ISO 9660. GRUB will search for it to find the ISO
-        # volume. This is similar to what grub-mkrescue does, except it places the file in /.disk/, but we opt to use a
-        # directory that does not start with a dot to avoid it being accidentally missed when copying the ISO's contents.
-        search_filename="/boot/${iso_uuid}.uuid"
-        install -d -m 755 -- "${isofs_dir}/boot"
-        : >"${isofs_dir}${search_filename}"
-    fi
 
     # Append IMAGE_ID & IMAGE_VERSION to os-release
     _os_release="$(realpath -- "${pacstrap_dir}/etc/os-release")"
@@ -1725,6 +1710,22 @@ _make_version() {
     _unshare touch -m -d"@${SOURCE_DATE_EPOCH}" -- "${pacstrap_dir}/usr/lib/clock-epoch"
 
     _msg_info "Done!"
+}
+
+_make_iso_limited_grubenv_and_search_uuid_file() {
+    # Write a limited grubenv with version information to install_dir on ISO 9660 for use cases where only the
+    # install_dir is used.
+    rm -f -- "${isofs_dir}/${install_dir}/grubenv"
+    printf '%.1024s' "$(printf '# GRUB Environment Block\nNAME=%s\nVERSION=%s\n%s' \
+        "${iso_name}" "${iso_version}" "$(printf '%0.1s' "#"{1..1024})")" \
+        >"${isofs_dir}/${install_dir}/grubenv"
+
+    # Create a /boot/YYYY-mm-dd-HH-MM-SS-00.uuid file on ISO 9660. GRUB will search for it to find the ISO
+    # volume. This is similar to what grub-mkrescue does, except it places the file in /.disk/, but we opt to use a
+    # directory that does not start with a dot to avoid it being accidentally missed when copying the ISO's contents.
+    search_filename="/boot/${iso_uuid}.uuid"
+    install -d -m 755 -- "${isofs_dir}/boot"
+    : >"${isofs_dir}${search_filename}"
 }
 
 _make_pkglist() {
@@ -1773,6 +1774,9 @@ _build_iso_base() {
     _run_once _make_custom_airootfs
     _run_once _make_packages
     _run_once _make_version
+    if [[ "${buildmode}" == "iso" ]]; then
+        _make_iso_limited_grubenv_and_search_uuid_file
+    fi
     _run_once _make_customize_airootfs
     _run_once _make_pkglist
     if [[ "$arch" == @('x86_64'|'i686') ]]; then
