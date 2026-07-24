@@ -12,6 +12,7 @@ Added
   installing via SSH.
 - Support running ``mkarchiso`` as a regular (non-root) user by using ``unshare``. This requires user namespace support
   in the kernel.
+- Allow BIOS boot modes and check the initramfs for microcode on the ``i486`` and ``pentium4`` architectures.
 
 Changed
 -------
