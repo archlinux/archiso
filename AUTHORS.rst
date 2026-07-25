@@ -41,6 +41,7 @@ Archiso Authors
 * Martin Damian Fernandez <martin.damian.fernandez@gmail.com>
 * Michael Gilchrist <michaelgilch@gmail.com>
 * Michael Vorburger <mike@vorburger.ch>
+* Omar Roth <roth@omar.yt>
 * Pellegrino Prevete <pellegrinoprevete@gmail.com>
 * Pierre Schmitz <pierre@archlinux.de>
 * Robin Candau <antiz@archlinux.org>
