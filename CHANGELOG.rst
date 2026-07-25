@@ -31,6 +31,8 @@ Fixed
 - Reject profiles that use the ``uefi.systemd-boot`` and ``uefi.grub`` boot modes together.
 - Fixed a typo that prevented including the UEFI shell for UEFI architectures other than x64.
 - Correctly support compressing the bootstrap tarball with bzip2.
+- Copy the airootfs ``/boot`` directory to the working directory and use it for boot loader setup, so that its files
+  are still available when the ``netboot`` build mode runs before ``iso``.
 
 Removed
 -------
