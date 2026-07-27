@@ -9,6 +9,7 @@ Added
 -----
 
 - Add support for architecture-specific kernel parameters in all boot loaders.
+- Add an AArch64-specific package list to the releng profile.
 - Support compressing the bootstrap tarball with ``lz4``.
 - Support using ``pzstd`` to create ``.zst`` bootstrap tarballs.
 
