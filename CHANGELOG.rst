@@ -10,6 +10,7 @@ Added
 
 - Add support for architecture-specific kernel parameters in all boot loaders.
 - Add an AArch64-specific package list to the releng profile.
+- Add support for generating AArch64 EFI executables with stubble and platform device trees.
 - Support compressing the bootstrap tarball with ``lz4``.
 - Support using ``pzstd`` to create ``.zst`` bootstrap tarballs.
 

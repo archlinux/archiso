@@ -51,6 +51,7 @@ efiboot_files=()
 # adapted from GRUB_EARLY_INITRD_LINUX_STOCK in https://git.savannah.gnu.org/cgit/grub.git/tree/util/grub-mkconfig.in
 readonly ucodes=('intel-uc.img' 'intel-ucode.img' 'amd-uc.img' 'amd-ucode.img' 'early_ucode.cpio' 'microcode.cpio')
 declare -i need_external_ucodes=0
+declare -i use_stubble=0
 readonly -A uefi_arch=(
     ['x86_64']='x64'
     ['aarch64']='AA64'
@@ -430,6 +431,42 @@ _make_customize_airootfs() {
         _unshare rm -- "${pacstrap_dir}/root/customize_airootfs.sh"
         _msg_info "Done! customize_airootfs.sh run successfully."
     fi
+}
+
+# Build an EFI executable containing the kernel and platform device tree
+_make_stubble_efi() {
+    local dtb_path hwids_path kernel kernel_path kernelver module_dir
+    local -a devicetree_args=() dtbs=()
+
+    _msg_info "Generating a stubble EFI executable..."
+    hwids_path="${pacstrap_dir}/usr/lib/systemd/boot/hwids/${uefi_arch[$arch],,}/"
+    [[ -d "${hwids_path}" ]] || _msg_error "The directory '${hwids_path}' does not exist" 1
+
+    for module_dir in "${pacstrap_dir}/usr/lib/modules/"*; do
+        # Skip directories without a pkgbase
+        [[ -f "${module_dir}/pkgbase" ]] || continue
+        pkgbase="$(<"${module_dir}/pkgbase")"
+        kernelver="${module_dir##*/}"
+        [[ -n "${kernelver}" ]] || _msg_error "Could not determine the version of kernel '${kernel}'"
+        kernel_path="${boot_dir}/vmlinuz-${pkgbase}"
+        # Stubble only supports qualcomm devices
+        dtb_path="${pacstrap_dir}/usr/lib/modules/${kernelver}/dtb/qcom/"
+        [[ -d "${dtb_path}" ]] || _msg_error "The directory '${dtb_path}' does not exist" 1
+        _msg_info "Fusing DTBs with the kernel..."
+        # Don't include the EL2 DTBs
+        mapfile -d '' -t dtbs < <(find "${dtb_path}" -maxdepth 1 -type f -name '*.dtb' ! -name '*-el2.dtb' -print0)
+        devicetree_args=("${dtbs[@]/#/--devicetree-auto=}")
+
+        ukify build \
+            --stub="${pacstrap_dir}/usr/lib/stubble/stubble.efi" \
+            --uname="${kernelver}" \
+            --linux="${kernel_path}" \
+            --hwids="${hwids_path}" \
+             "${devicetree_args[@]}" \
+            --output="${kernel_path}"
+    done
+
+    _msg_info "Done! Stubble EFI executable generated successfully."
 }
 
 # Set up boot loaders
@@ -1357,6 +1394,20 @@ _validate_common_requirements_buildmode_iso_netboot() {
         (( validation_error=validation_error+1 ))
         _msg_error "Unsupported image type: '${airootfs_image_type}'" 0
     fi
+
+    if [[ "$arch" == 'aarch64' ]]; then
+        use_stubble=1
+
+        # shellcheck disable=SC2076
+        if [[ ! " ${pkg_list[*]} " =~ ' stubble ' ]]; then
+            _msg_warning "'stubble' is not in the package list. Device tree files (.dtb) will not be merged in kernel images."
+            use_stubble=0
+        fi
+        if ! command -v ukify &>/dev/null; then
+            _msg_warning "'ukify' is not available on this host. Install 'systemd-ukify' to merge device tree files in kernel images."
+            use_stubble=0
+        fi
+    fi
 }
 
 _validate_requirements_buildmode_iso() {
@@ -1800,6 +1851,11 @@ _build_iso_base() {
     fi
     _run_once _make_customize_airootfs
     _run_once _copy_boot_out_of_pacstrap_dir
+
+    if (( use_stubble )); then
+        _run_once _make_stubble_efi
+    fi
+
     _run_once _make_pkglist
     if [[ "$arch" == @('x86_64'|'i686'|'i486'|'pentium4') ]]; then
         _run_once _check_if_initramfs_has_ucode
