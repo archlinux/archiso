@@ -911,12 +911,17 @@ _make_bootmode_uefi-ia32.systemd-boot.esp() {
     return 1
 }
 
-_validate_requirements_bootmode_bios.syslinux() {
+_validate_common_requirements_bootmode_bios() {
     # Check if the architecture supports BIOS booting
     if [[ "$arch" != @('x86_64'|'i686'|'i486'|'pentium4') ]]; then
-        (( validation_error=validation_error+1 ))
-        _msg_error "Validating '${bootmode}': BIOS boot modes are not supported on the '${arch}' architecture!" 0
+        _msg_warning "Validating '${bootmode}': BIOS boot modes are not supported on the '${arch}' architecture! Skipping."
+        _remove_boot_mode
+        return 1
     fi
+}
+
+_validate_requirements_bootmode_bios.syslinux() {
+    _validate_common_requirements_bootmode_bios || return 0
 
     # Check if the syslinux package is in the package list
     # shellcheck disable=SC2076
@@ -955,7 +960,7 @@ _validate_requirements_bootmode_bios.syslinux.eltorito() {
 
 _validate_requirements_bootmode_bios.syslinux.mbr() {
     _msg_warning "The '${bootmode}' boot mode is deprecated. Use 'bios.syslinux' instead."
-    _remove_deprecated_boot_mode
+    _remove_boot_mode
     # shellcheck disable=SC2076
     if [[ ! " ${bootmodes[*]} " =~ ' bios.syslinux ' ]]; then
         bootmodes+=('bios.syslinux')
@@ -1025,7 +1030,7 @@ _validate_requirements_bootmode_uefi.systemd-boot() {
 
 _validate_requirements_bootmode_uefi-x64.systemd-boot.esp() {
     _msg_warning "The '${bootmode}' boot mode is deprecated. Use 'uefi.systemd-boot' instead."
-    _remove_deprecated_boot_mode
+    _remove_boot_mode
     # shellcheck disable=SC2076
     if [[ ! " ${bootmodes[*]} " =~ ' uefi.systemd-boot ' ]]; then
         bootmodes+=('uefi.systemd-boot')
@@ -1092,7 +1097,7 @@ _validate_requirements_bootmode_uefi-ia32.grub.eltorito() {
 }
 _validate_requirements_bootmode_uefi-x64.grub.esp() {
     _msg_warning "The '${bootmode}' boot mode is deprecated. Use 'uefi.grub' instead."
-    _remove_deprecated_boot_mode
+    _remove_boot_mode
     # shellcheck disable=SC2076
     if [[ ! " ${bootmodes[*]} " =~ ' uefi.grub ' ]]; then
         bootmodes+=('uefi.grub')
@@ -1104,8 +1109,8 @@ _validate_requirements_bootmode_uefi-x64.grub.eltorito() {
     _validate_requirements_bootmode_uefi-x64.grub.esp
 }
 
-# Remove deprecated boot mode from the bootmodes array
-_remove_deprecated_boot_mode() {
+# Remove current boot mode from the bootmodes array
+_remove_boot_mode() {
     local -i bootmodes_index
 
     # Find the array index of the deprecated boot mode
@@ -1370,6 +1375,11 @@ _validate_requirements_buildmode_iso() {
             _msg_error "${bootmode} is not a valid boot mode!" 0
         fi
     done
+    # Check if any bootmodes remain after validation
+    if (( ${#bootmodes[@]} < 1 )); then
+        (( validation_error=validation_error+1 ))
+        _msg_error "No supported boot modes specified in '${profile}/profiledef.sh'." 0
+    fi
 
     if ! command -v awk &>/dev/null; then
         (( validation_error=validation_error+1 ))

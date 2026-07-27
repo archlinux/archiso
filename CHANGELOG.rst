@@ -11,6 +11,8 @@ Added
 Changed
 -------
 
+- Skip BIOS boot modes for non-x86 architectures, instead of failing, to allow using the same profile for all
+  architectures.
 
 Deprecated
 ----------
