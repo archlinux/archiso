@@ -18,6 +18,10 @@ Deprecated
 Fixed
 -----
 
+- Create the ``grubenv`` and UUID search files regardless of the order of the ``iso`` and ``netboot`` build modes.
+- Copy the airootfs ``/boot`` directory to the working directory and use it for boot loader setup, so that its files
+  are still available when the ``netboot`` build mode runs before ``iso``.
+
 Removed
 -------
 
