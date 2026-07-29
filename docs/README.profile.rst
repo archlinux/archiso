@@ -146,6 +146,8 @@ respective variables in ``profiledef.sh``:
 * ``%ARCHISO_LABEL%``: Set this using the ``iso_label`` variable in ``profiledef.sh``.
 * ``%INSTALL_DIR%``: Set this using the ``install_dir`` variable in ``profiledef.sh``.
 * ``%ARCH%``: Set this using the ``arch`` variable in ``profiledef.sh``.
+* ``%KERNEL_PARAMS%``: Set this using an architecture-specific variable in ``profiledef.sh``, such as ``kernel_params_aarch64`` or
+  ``kernel_params_x86_64``.
 
 Additionally there are also *custom template identifiers* have harcoded values set by ``mkarchiso`` that cannot be
 overridden:
