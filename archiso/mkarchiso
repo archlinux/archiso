@@ -42,7 +42,7 @@ buildmodes=()
 bootmodes=()
 airootfs_image_type=""
 airootfs_image_tool_options=()
-bootstrap_tarball_compression=""
+bootstrap_tarball_compression=()
 cert_list=()
 declare -A file_permissions=()
 efibootimg=""
@@ -1818,15 +1818,17 @@ _build_buildmode_bootstrap() {
     _unshare install -d -m 0755 -o 0 -g 0 -- "${pacstrap_dir}"
 
     # Set tarball extension
-    case "${bootstrap_tarball_compression[0]}" in
-        'bzip2') image_name="${image_name}.bz2" ;;
-        'gzip') image_name="${image_name}.gz" ;;
-        'lrzip') image_name="${image_name}.lrz" ;;
-        'lzip') image_name="${image_name}.lz" ;;
-        'lzop') image_name="${image_name}.lzo" ;;
-        'xz') image_name="${image_name}.xz" ;;
-        'zstd'|'zstdmt') image_name="${image_name}.zst" ;;
-    esac
+    if (( "${#bootstrap_tarball_compression[@]}" > 0 )); then
+        case "${bootstrap_tarball_compression[0]}" in
+            'bzip2') image_name="${image_name}.bz2" ;;
+            'gzip') image_name="${image_name}.gz" ;;
+            'lrzip') image_name="${image_name}.lrz" ;;
+            'lzip') image_name="${image_name}.lz" ;;
+            'lzop') image_name="${image_name}.lzo" ;;
+            'xz') image_name="${image_name}.xz" ;;
+            'zstd'|'zstdmt') image_name="${image_name}.zst" ;;
+        esac
+    fi
 
     [[ "${quiet}" == "y" ]] || _show_config
     _run_once _make_pacman_conf

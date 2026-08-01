@@ -20,6 +20,7 @@ Fixed
 -----
 
 - Do not use reStructuredText line blocks in the man page to avoid them being shown as monospace code blocks in HTML.
+- Prevent failure if ``bootstrap_tarball_compression`` is not set in ``profiledef.sh``.
 
 Removed
 -------
