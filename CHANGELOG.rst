@@ -13,6 +13,8 @@ Changed
 
 - Skip BIOS boot modes for non-x86 architectures, instead of failing, to allow using the same profile for all
   architectures.
+- Use xz's ``arm64`` BCJ filter, in addition to ``x86``, to better compress the releng profile's squashfs image on
+  AArch64.
 
 Deprecated
 ----------
