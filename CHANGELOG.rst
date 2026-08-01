@@ -8,6 +8,8 @@ Changelog
 Added
 -----
 
+- Support the ``i486`` and ``pentium4`` architectures in the ``run_archiso`` script.
+
 Changed
 -------
 

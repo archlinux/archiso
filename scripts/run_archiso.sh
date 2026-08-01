@@ -20,7 +20,8 @@ Usage:
     ${app_name} [options]
 
 Options:
-    -A [arch]       change architecture (defaults to the host architecture; supports: x86_64, i686, aarch64 and riscv64)
+    -A [arch]       change architecture (defaults to the host architecture;
+                    supports: x86_64, i486, i686, pentium4, aarch64 and riscv64)
     -a              set accessibility support using brltty
     -b              set boot type to 'BIOS'
     -d              set image type to hard disk instead of optical disc
@@ -46,9 +47,9 @@ cleanup_working_dir() {
 
 check_architecture() {
     if [[ "$boot_type" == 'bios' ]]; then
-        if [[ "$arch" != @('i686'|'x86_64') ]]; then
+        if [[ "$arch" != @('i486'|'i686'|'pentium4'|'x86_64') ]]; then
             printf '[%s] Error: Unsupported architecture for the BIOS boot method: %s\n' "$app_name" "$arch" >&2
-            printf '[%s] Error: The BIOS boot method is supported on: %s\n' "$app_name" 'x86_64 i686' >&2
+            printf '[%s] Error: The BIOS boot method is supported on: %s\n' "$app_name" 'x86_64 i486 i686 pentium4' >&2
             exit 1
         fi
     else
@@ -63,7 +64,7 @@ check_architecture() {
     fi
 
     case "$arch" in
-        i686) qemu_command='qemu-system-i386' ;;
+        'i486'|'i686'|'pentium4') qemu_command='qemu-system-i386' ;;
         *) qemu_command="qemu-system-${arch}" ;;
     esac
     if ! command -v "$qemu_command" %>/dev/null; then
@@ -90,8 +91,6 @@ run_image() {
     qemu_options=(
         -boot 'order=d,menu=on,reboot-timeout=5000'
         -m "size=3072,slots=0,maxmem=$((3072*1024*1024))"
-        -cpu max
-        -smp 4
         -k en-us
         -name 'archiso,process=archiso_0'
         -device 'virtio-scsi-pci,id=scsi0'
@@ -112,23 +111,43 @@ run_image() {
     )
 
     # Use KVM acceleration if possible
-    if [[ "$arch" == "$(uname -m)" || ( "$arch" == 'i686' && "$(uname -m)" == 'x86_64' ) ]]; then
+    if [[ "$arch" == "$(uname -m)" || ( "$arch" == @('i486'|'i686'|'pentium4') && "$(uname -m)" == 'x86_64' ) ]]; then
         qemu_options+=(-enable-kvm)
     fi
 
     # Set architecture-specific options
     case "$arch" in
-        x86_64|i686)
+        'x86_64')
             qemu_options=(
                 -machine "type=q35,smm=on,usb=on,pcspk-audiodev=snd0"
+                -cpu max
+                -smp 4
                 -global ICH9-LPC.disable_s3=1
                 -vga virtio
                 "${qemu_options[@]}"
             )
             ;;
-        aarch64|riscv64)
+        'i486')
+            qemu_options=(
+                -machine "type=pc,usb=on,pcspk-audiodev=snd0"
+                -cpu 486-v1
+                -vga virtio
+                "${qemu_options[@]}"
+            )
+            ;;
+        'i686'|'pentium4')
+            qemu_options=(
+                -machine "type=pc,usb=on,pcspk-audiodev=snd0"
+                -cpu kvm32-v1
+                -vga virtio
+                "${qemu_options[@]}"
+            )
+            ;;
+        'aarch64'|'riscv64')
             qemu_options=(
                 -machine "type=virt,usb=on,acpi=on"
+                -cpu max
+                -smp 4
                 -device 'virtio-gpu-pci,id=video0'
                 "${qemu_options[@]}"
             )
