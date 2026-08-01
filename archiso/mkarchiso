@@ -1463,19 +1463,18 @@ _add_xorrisofs_options_uefi.grub() {
 
 # Build bootstrap image
 _build_bootstrap_image() {
-    # Set default tarball compression to uncompressed
-    if (( ! "${#bootstrap_tarball_compression[@]}" )); then
-        bootstrap_tarball_compression=('cat')
-    fi
-
     [[ -d "${out_dir}" ]] || install -d -- "${out_dir}"
 
     cd -- "${bootstrap_parent}"
 
     _msg_info "Creating bootstrap image..."
     rm -f -- "${out_dir:?}/${image_name:?}"
-    _unshare bsdtar -cf - "root.${arch}" "pkglist.${arch}.txt" 'version' \
-        | _unshare "${bootstrap_tarball_compression[@]}" >"${out_dir}/${image_name}"
+    if (( "${#bootstrap_tarball_compression[@]}" == 0 )); then
+        _unshare bsdtar -cf "${out_dir}/${image_name}" "root.${arch}" "pkglist.${arch}.txt" 'version'
+    else
+        _unshare bsdtar -cf - "root.${arch}" "pkglist.${arch}.txt" 'version' \
+            | _unshare "${bootstrap_tarball_compression[@]}" >"${out_dir}/${image_name}"
+    fi
     _msg_info "Done!"
     du -h -- "${out_dir}/${image_name}"
     cd -- "${OLDPWD}"
