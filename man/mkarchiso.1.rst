@@ -19,6 +19,8 @@ Description
 
 **mkarchiso** creates an ISO, netboot artifacts and a bootstrap tarball and optionally signs them.
 
+.. Note:: Running as a regular (non-root) user requires **unshare(1)** and user namespace support in the kernel.
+
 Options
 =======
 

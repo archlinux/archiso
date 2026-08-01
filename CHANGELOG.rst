@@ -11,6 +11,8 @@ Added
 Changed
 -------
 
+- Document the use of ``unshare`` in the man page.
+
 Deprecated
 ----------
 
