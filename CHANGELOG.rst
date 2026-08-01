@@ -17,6 +17,8 @@ Deprecated
 Fixed
 -----
 
+- Do not use reStructuredText line blocks in the man page to avoid them being shown as monospace code blocks in HTML.
+
 Removed
 -------
 
