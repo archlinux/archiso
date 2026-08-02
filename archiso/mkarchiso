@@ -726,7 +726,8 @@ _make_bootmode_uefi.grub() {
         -o "${isofs_dir}/EFI/BOOT/BOOT${uefi_arch[$arch]}.EFI" "boot/grub/grub.cfg=${work_dir}/grub-embed.cfg"
 
     # Create IA32 EFI binary for mixed-mode booting on x86_64 systems with IA32 UEFI
-    if [[ "$arch" == 'x86_64' ]]; then
+    if [[ "$arch" == 'x86_64' && -d '/usr/lib/grub/i386-efi' ]]; then
+        _msg_info "Setting up GRUB for mixed mode booting..."
         grub-mkstandalone -O i386-efi \
             --modules="${grubmodules[*]}" \
             --locales="en@quot" \
@@ -862,7 +863,8 @@ _make_bootmode_uefi.systemd-boot() {
     # Copy EFI binaries and related files
     _make_common_bootmode_uefi.systemd-boot_copy_files "${uefi_arch[$arch]}"
     # Set up mixed mode booting for x86_64 systems with IA32 UEFI
-    if [[ "$arch" == 'x86_64' ]]; then
+    if [[ "$arch" == 'x86_64' && -e "${pacstrap_dir}/usr/lib/systemd/boot/efi/systemd-bootia32.efi" ]]; then
+        _msg_info "Setting up systemd-boot for mixed mode booting..."
         _make_common_bootmode_uefi.systemd-boot_copy_files 'IA32'
     fi
 

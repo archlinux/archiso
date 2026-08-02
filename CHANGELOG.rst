@@ -15,6 +15,8 @@ Changed
 - Warn when running ``mkarchiso`` as root via sudo, run0 or a similar tool since it is fully supported to run it as a
   regular user instead.
 - Simplify UEFI shell menu entries in GRUB configuration.
+- Do not fail if a boot loader for mixed mode booting (for x86_64 systems with IA32 UEFI) cannot be found. Instead,
+  simply skip support for mixed mode booting.
 
 Deprecated
 ----------
