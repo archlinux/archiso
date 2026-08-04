@@ -7,7 +7,6 @@ iso_publisher="Arch Linux <https://archlinux.org>"
 iso_application="Arch Linux baseline"
 iso_version="$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y.%m.%d)"
 install_dir="arch"
-buildmodes=('iso')
 bootmodes=('bios.syslinux'
            'uefi.grub')
 pacman_conf="pacman.conf"

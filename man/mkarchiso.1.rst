@@ -44,6 +44,7 @@ Options
 -G mbox          Set the PGP signer (must include an email address). Passed to gpg as the value for **--sender**.
 -h               Help message.
 -m mode          Build mode(s) to use (valid modes are: *bootstrap*, *iso* and *netboot*). Multiple build modes are provided as quoted, space delimited list.
+                 Default: *iso*
 -o out_dir       Set the output directory.
                  Default: |out_dir|.
 -p packages      Package(s) to install.

@@ -24,6 +24,8 @@ Fixed
 Removed
 -------
 
+- Remove ``buildmodes`` from both profile's ``profiledef.sh`` since it does not differ from the default (i.e. ``iso``).
+
 [90] - 2026-09-01
 =================
 

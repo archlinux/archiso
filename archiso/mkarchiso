@@ -114,6 +114,7 @@ usage: ${app_name} [options] <profile_dir>
      -h               This message
      -m [mode ..]     Build mode(s) to use (valid modes are: 'bootstrap', 'iso' and 'netboot').
                       Multiple build modes are provided as quoted, space delimited list.
+                      Default: 'iso'
      -o <out_dir>     Set the output directory
                       Default: '${out_dir}'
      -p [package ..]  Package(s) to install.
