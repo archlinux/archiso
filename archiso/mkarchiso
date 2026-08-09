@@ -1880,13 +1880,15 @@ _build() {
     fi
 }
 
-_unshare() {
-    if (( EUID != 0 )); then
-        unshare --map-auto --map-root-user -- "$@"
-    else
+if (( EUID == 0 )); then
+    _unshare() {
         "$@"
-    fi
-}
+    }
+else
+    _unshare() {
+        unshare --map-auto --map-root-user -- "$@"
+    }
+fi
 
 while getopts 'c:p:C:L:P:A:D:w:m:o:g:G:vrh?' arg; do
     case "${arg}" in
