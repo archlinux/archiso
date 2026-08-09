@@ -12,6 +12,8 @@ Changed
 -------
 
 - Document the use of ``unshare`` in the man page.
+- Warn when running ``mkarchiso`` as root via sudo, run0 or a similar tool since it is fully supported to run it as a
+  regular user instead.
 
 Deprecated
 ----------

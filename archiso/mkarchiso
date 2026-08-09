@@ -1884,6 +1884,9 @@ if (( EUID == 0 )); then
     _unshare() {
         "$@"
     }
+    if [[ -v SUDO_USER ]]; then
+        _msg_warning "Running as root is not advised."
+    fi
 else
     _unshare() {
         unshare --map-auto --map-root-user -- "$@"
