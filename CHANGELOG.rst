@@ -31,6 +31,8 @@ Fixed
 Removed
 -------
 
+- Removed ``broadcom-wl`` from releng packages since the package has been removed from the official repositories.
+
 [89] - 2026-07-25
 =================
 
