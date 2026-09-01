@@ -8,6 +8,24 @@ Changelog
 Added
 -----
 
+Changed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+
+Removed
+-------
+
+[90] - 2026-09-01
+=================
+
+Added
+-----
+
 - Support the ``i486`` and ``pentium4`` architectures in the ``run_archiso`` script.
 
 Changed
@@ -17,9 +35,6 @@ Changed
   architectures.
 - Use xz's ``arm64`` BCJ filter, in addition to ``x86``, to better compress the releng profile's squashfs image on
   AArch64.
-
-Deprecated
-----------
 
 Fixed
 -----
