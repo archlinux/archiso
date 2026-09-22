@@ -33,6 +33,8 @@ Removed
 - Remove ``buildmodes`` from both profile's ``profiledef.sh`` since it does not differ from the default (i.e. ``iso``).
 - Remove leftover ``/etc/modprobe.d/broadcom-wl.conf`` from the releng profile. Its only purpose was to override
   ``/usr/lib/modprobe.d/broadcom-wl.conf`` that was shipped with the (removed) ``broadcom-wl`` package.
+- Remove custom ``/etc/mkinitcpio.d/linux.preset`` from both profiles. The default preset is good enough and this
+  reduces the number of files to change when customizing archiso profiles.
 
 [90] - 2026-09-01
 =================
