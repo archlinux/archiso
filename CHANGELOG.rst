@@ -8,6 +8,8 @@ Changelog
 Added
 -----
 
+- Support compressing the bootstrap tarball with ``lz4``.
+
 Changed
 -------
 
