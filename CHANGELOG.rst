@@ -31,6 +31,8 @@ Removed
 -------
 
 - Remove ``buildmodes`` from both profile's ``profiledef.sh`` since it does not differ from the default (i.e. ``iso``).
+- Remove leftover ``/etc/modprobe.d/broadcom-wl.conf`` from the releng profile. Its only purpose was to override
+  ``/usr/lib/modprobe.d/broadcom-wl.conf`` that was shipped with the (removed) ``broadcom-wl`` package.
 
 [90] - 2026-09-01
 =================
