@@ -9,6 +9,7 @@ Added
 -----
 
 - Support compressing the bootstrap tarball with ``lz4``.
+- Support using ``pzstd`` to create ``.zst`` bootstrap tarballs.
 
 Changed
 -------
