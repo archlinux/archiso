@@ -30,6 +30,7 @@ iso_application=""
 iso_version=""
 install_dir=""
 arch=""
+kernel_params=""
 pacman_conf=""
 packages=""
 bootstrap_packages=""
@@ -481,6 +482,7 @@ _make_bootmode_bios.syslinux() {
         sed "s|%ARCHISO_LABEL%|${iso_label}|g;
              s|%ARCHISO_UUID%|${iso_uuid}|g;
              s|%INSTALL_DIR%|${install_dir}|g;
+             s|%KERNEL_PARAMS%|${kernel_params}|g;
              s|%ARCH%|${arch}|g" \
             "${_cfg}" >"${isofs_dir}/boot/syslinux/${_cfg##*/}"
     done
@@ -601,6 +603,7 @@ _make_common_bootmode_grub_cfg() {
         sed "s|%ARCHISO_LABEL%|${iso_label}|g;
              s|%ARCHISO_UUID%|${iso_uuid}|g;
              s|%INSTALL_DIR%|${install_dir}|g;
+             s|%KERNEL_PARAMS%|${kernel_params}|g;
              s|%ARCH%|${arch}|g;
              s|%ARCHISO_SEARCH_FILENAME%|${search_filename}|g" \
             "${_cfg}" >"${work_dir}/grub/${_cfg##*/}"
@@ -682,6 +685,7 @@ _make_common_grubenv_and_loopbackcfg() {
         sed "s|%ARCHISO_LABEL%|${iso_label}|g;
              s|%ARCHISO_UUID%|${iso_uuid}|g;
              s|%INSTALL_DIR%|${install_dir}|g;
+             s|%KERNEL_PARAMS%|${kernel_params}|g;
              s|%ARCH%|${arch}|g;
              s|%ARCHISO_SEARCH_FILENAME%|${search_filename}|g" \
             "${profile}/grub/loopback.cfg" >"${isofs_dir}/boot/grub/loopback.cfg"
@@ -840,6 +844,7 @@ _make_bootmode_uefi.systemd-boot() {
         sed "s|%ARCHISO_LABEL%|${iso_label}|g;
              s|%ARCHISO_UUID%|${iso_uuid}|g;
              s|%INSTALL_DIR%|${install_dir}|g;
+             s|%KERNEL_PARAMS%|${kernel_params}|g;
              s|%ARCH%|${arch}|g" \
             "${_conf}" >"${work_dir}/loader/entries/${_conf##*/}"
     done
@@ -1539,6 +1544,9 @@ _build_iso_image() {
 
 # Read profile's values from profiledef.sh
 _read_profile() {
+    # shellcheck disable=SC2034
+    local kernel_params_i486 kernel_params_i686 kernel_params_pentium4 kernel_params_x86_64 kernel_params_aarch64 kernel_params_riscv64 kernel_params_loongarch64
+
     if [[ -z "${profile}" ]]; then
         _msg_error "No profile specified!" 1
     fi
@@ -1555,6 +1563,8 @@ _read_profile() {
 
         # Resolve paths of files that are expected to reside in the profile's directory
         [[ -n "$arch" ]] || arch="$(uname -m)"
+        local kernel_params_var="kernel_params_${arch}"
+        kernel_params="${!kernel_params_var-}"
         # Use "packages" if it exists but "packages.${arch}" does not
         if [[ -z "$packages" && ! -e "${profile}/packages.${arch}" && -e "${profile}/packages" ]]; then
             packages="${profile}/packages"
