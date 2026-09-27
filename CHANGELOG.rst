@@ -8,6 +8,24 @@ Changelog
 Added
 -----
 
+Changed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+
+Removed
+-------
+
+[91] - 2026-09-27
+=================
+
+Added
+-----
+
 - Add support for architecture-specific kernel parameters in all boot loaders.
 - Add an AArch64-specific package list to the releng profile.
 - Add support for generating AArch64 EFI executables with stubble and platform device trees.
@@ -23,9 +41,6 @@ Changed
 - Simplify UEFI shell menu entries in GRUB configuration.
 - Do not fail if a boot loader for mixed mode booting (for x86_64 systems with IA32 UEFI) cannot be found. Instead,
   simply skip support for mixed mode booting.
-
-Deprecated
-----------
 
 Fixed
 -----

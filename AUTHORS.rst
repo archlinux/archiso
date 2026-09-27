@@ -13,6 +13,7 @@ Archiso Authors
 * Charles Vejnar <ce@vejnar.org>
 * Christian Hesse <mail@eworm.de>
 * Christopher Brannon <cmbrannon79@gmail.com>
+* Clover <alex@ironrobin.net>
 * Dan McGee <dan@archlinux.org>
 * Dariusz Pelowski <dariusz.pelowski@gmail.com>
 * Darren Ng <un1gfn@gmail.com>
