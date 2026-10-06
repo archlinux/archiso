@@ -3,7 +3,7 @@ archiso
 =======
 
 The archiso project features scripts and configuration templates to build installation media (*.iso* images and
-*.tar bootstrap images) as well as netboot artifacts for BIOS and UEFI based systems.
+*.tar* bootstrap images) as well as netboot artifacts for BIOS and UEFI based systems.
 Currently creating the images is only supported on Arch Linux but may work on other operating systems as well.
 
 Requirements
@@ -17,7 +17,7 @@ The following packages need to be installed to be able to create an image with t
 * e2fsprogs
 * erofs-utils (optional)
 * findutils
-* grub
+* grub (optional; for the ``uefi.grub`` bootmode)
 * gzip
 * libarchive
 * libisoburn
@@ -26,6 +26,8 @@ The following packages need to be installed to be able to create an image with t
 * pacman
 * sed
 * squashfs-tools
+* systemd-ukify (optional; for embedding AArch64 device tree files)
+* util-linux
 
 For running the images in a virtualized test environment the following packages are required:
 
@@ -62,11 +64,7 @@ be lost on update).
 
 The examples below will assume an unmodified profile in a system location (unless noted otherwise).
 
-It is advised to consult the help output of **mkarchiso**:
-
-.. code:: sh
-
-   mkarchiso -h
+It is advised to consult the `mkarchiso(1) <https://man.archlinux.org/man/mkarchiso.1>`_ man page.
 
 Create images with packaged archiso
 -----------------------------------
@@ -87,24 +85,24 @@ Clone this repository and run:
 Testing
 =======
 
-The convenience script **run_archiso** is provided to boot into the medium using qemu.
+The convenience script **run_archiso** is provided to boot into the medium using QEMU.
 It is advised to consult its help output:
 
 .. code:: sh
 
    run_archiso -h
 
-Run the following to boot the iso using BIOS:
+Run the following to boot the ISO using UEFI:
 
 .. code:: sh
 
    run_archiso -i path/to/an/arch.iso
 
-Run the following to boot the iso using UEFI:
+Run the following to boot the ISO using BIOS:
 
 .. code:: sh
 
-   run_archiso -u -i path/to/an/arch.iso
+   run_archiso -b -i path/to/an/arch.iso
 
 The script can of course also be executed from this repository:
 
@@ -124,8 +122,8 @@ To install archiso system-wide use the included ``Makefile``:
 
 Optional features
 
-The iso image contains a GRUB environment block holding the iso name and version. This allows to
-boot the iso image from GRUB with a version specific cow directory to mitigate overlay clashes.
+The ISO image contains a GRUB environment block holding the *.iso* file name and version. This allows to
+boot the ISO image from GRUB with a version specific cow directory to mitigate overlay clashes.
 
 .. code:: sh
 
@@ -138,7 +136,7 @@ boot the iso image from GRUB with a version specific cow directory to mitigate o
 Contribute
 ==========
 
-Development of archiso takes place on Arch Linux' Gitlab: https://gitlab.archlinux.org/archlinux/archiso.
+Development of archiso takes place on Arch Linux' GitLab: https://gitlab.archlinux.org/archlinux/archiso.
 
 Please read our distribution-wide `Code of Conduct <https://terms.archlinux.org/docs/code-of-conduct/>`_ before
 contributing, to understand what actions will and will not be tolerated.
@@ -166,7 +164,7 @@ To verify a tag, first import the relevant PGP key(s):
 
 .. code:: sh
 
-  gpg --auto-key-locate wkd --search-keys dvzrv@archlinux.org
+  gpg --auto-key-locate wkd --locate-external-keys dvzrv@archlinux.org
 
 or
 
