@@ -20,6 +20,8 @@ Fixed
 Removed
 -------
 
+- Remove ``linux-atm`` from releng profiles. ATM support was dropped with linux 7.2.
+
 [91] - 2026-09-27
 =================
 
