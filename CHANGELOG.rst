@@ -20,6 +20,8 @@ Fixed
 Removed
 -------
 
+- Remove ``kms`` mkinitcpio hook.
+
 [91] - 2026-09-27
 =================
 
