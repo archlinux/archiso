@@ -8,18 +8,30 @@ Changelog
 Added
 -----
 
-- Add boot entries for the Memtest86+ IA32, AA64 and LOONGARCH64 EFI binaries.
-
 Changed
 -------
-
-- Adapt to the EFI binary name change of the memtest86+-efi package.
 
 Deprecated
 ----------
 
 Fixed
 -----
+
+Removed
+-------
+
+[92] - 2026-10-31
+=================
+
+Added
+-----
+
+- Add boot entries for the Memtest86+ IA32, AA64 and LOONGARCH64 EFI binaries.
+
+Changed
+-------
+
+- Adapt to the EFI binary name change of the memtest86+-efi package.
 
 Removed
 -------

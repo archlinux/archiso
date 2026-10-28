@@ -9,6 +9,7 @@ Archiso Authors
 * Alexander Speshilov <speshuric@gmail.com>
 * Anton Hvornum <anton@hvornum.se>
 * Antonio V <crazysnob@live.it>
+* Benjamin Schneider <ben@bens.haus>
 * Chandan Singh <cks071g2@gmail.com>
 * Charles Vejnar <ce@vejnar.org>
 * Christian Hesse <mail@eworm.de>
@@ -40,6 +41,7 @@ Archiso Authors
 * Loui Chang <louipc.ist@gmail.com>
 * Lukas Fleischer <archlinux@cryptocrack.de>
 * Martin Damian Fernandez <martin.damian.fernandez@gmail.com>
+* Matej Dian <snoop05b@gmail.com>
 * Michael Gilchrist <michaelgilch@gmail.com>
 * Michael Vorburger <mike@vorburger.ch>
 * Omar Roth <roth@omar.yt>
